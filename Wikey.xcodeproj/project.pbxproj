@@ -1,0 +1,814 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		02FE059849B0EA93DA944EC6 /* WorkflowEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AA2E33F5834328B1676075C /* WorkflowEditorView.swift */; };
+		033DF5DBF070491C9B43C44B /* WikeySettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4F766E91A1B80A9C12FBAEC /* WikeySettingsView.swift */; };
+		09E7C3E09C1886278FE0D381 /* WikeyDesignComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78E342F0F6965420E4F40F7C /* WikeyDesignComponents.swift */; };
+		0C7CCEF891E33A41F59495E8 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29F348C057BC64F22F800363 /* ContentView.swift */; };
+		20CF0164562147E06DC478F2 /* HotkeyRegistrar.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7262FE82D70589434BC129D /* HotkeyRegistrar.swift */; };
+		27A9C27A392B8F1F5A58FB7F /* LoginItemService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8560B8F9FAA2423F83B5AFD2 /* LoginItemService.swift */; };
+		445E014CC3B3C6F67694C884 /* LayoutZoneTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DED5C2DC0216363FC43B3BF0 /* LayoutZoneTests.swift */; };
+		55BF68D94F5D08BAC89802E5 /* WikeyApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1EF5D86CA973B6444063C36 /* WikeyApp.swift */; };
+		57FCA4BFF1808A3845F2E6B2 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E4044A7589BCC13D42395C5 /* OnboardingView.swift */; };
+		590245A0CFE67869BF4CF7D9 /* MenuBarContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 785E1FA6D60362D2E231CFB0 /* MenuBarContentView.swift */; };
+		63147077D02F807AD118A26A /* PermissionCenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3E3BAD7A516C118AD61DE4C /* PermissionCenter.swift */; };
+		712F8C7FD60150B0B66AF542 /* WorkflowRunner.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB5E59681CF2AF25BFC5FF4B /* WorkflowRunner.swift */; };
+		764F388AE8FB73D0D099FA32 /* LayoutEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B48F73680E3E23180A8E8089 /* LayoutEditorView.swift */; };
+		7CC0613A4BFE3B169DBFB94A /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = A699EC2BB7C9CCC56AF58A54 /* main.swift */; };
+		7E6F3623DC1A138E9727F277 /* WikeyCore.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 40179216A1772150F1719EAC /* WikeyCore.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		8362354BC1EB4FBE72EA9192 /* WikeyCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 40179216A1772150F1719EAC /* WikeyCore.framework */; };
+		854F4322866212E982763957 /* RichTextEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CD5FD16E604EF4F1646268C /* RichTextEditor.swift */; };
+		8C4980DCEAB4DBFB4490CF2A /* TemplateEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5D474D7A2FE6E9C6853A5B0 /* TemplateEditorView.swift */; };
+		927F0D80C51F1791461D8FEA /* WikeyRuntime.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F8F86E61039D8E0A96453B2 /* WikeyRuntime.swift */; };
+		A82F0ABC9CA30EED0A8635F2 /* ShortcutRecorderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 928C51A8110C6A07CC483231 /* ShortcutRecorderView.swift */; };
+		AC96BF2982CDB8BFD3C83617 /* ShortcutModelsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 663A3FFA0154A8359CDC55F4 /* ShortcutModelsTests.swift */; };
+		B2DAC1456C2D128715B1C578 /* AutomationModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7EDE41677010F0CFC513F4F7 /* AutomationModels.swift */; };
+		B5799D8F35C35736980A3568 /* ClipboardService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 744108B9609996B38F488896 /* ClipboardService.swift */; };
+		BC6A1834D3C90304AFE9B0A3 /* SequenceMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8A71BEF5729FB22DA320117 /* SequenceMonitor.swift */; };
+		C550C2993B9C28E16D2DD1B2 /* WikeyStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A29E038D71C3173FDA10BF35 /* WikeyStoreTests.swift */; };
+		CF2B941163616EA8EBA6622D /* WindowLayoutController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5C17D07296F5224CC879898 /* WindowLayoutController.swift */; };
+		DB1F394805DE2D7195B28F28 /* WikeyCore.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 40179216A1772150F1719EAC /* WikeyCore.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		E24573A2C1C0FF57A601F03A /* ShortcutModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A806BBE6571A9A314CA4626 /* ShortcutModels.swift */; };
+		E77D93BDE77F2DACE4F10BFC /* ApplicationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D115422AEFE98EEB2398A213 /* ApplicationController.swift */; };
+		FAB9A8082885070D03068832 /* WikeyCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 40179216A1772150F1719EAC /* WikeyCore.framework */; };
+		FCA8C63E9E1624F4EB94572B /* WikeyStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A24D53D060BE24564F62CF55 /* WikeyStore.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		3FDE6CBDFE70D7CCADF5D2D4 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 343313D19D21AE1D9A9D9A6E /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 81D8B5F1A0B1D857FB005C05;
+			remoteInfo = WikeyLoginHelper;
+		};
+		52ECFDAB1E08AD87C766E7E8 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 343313D19D21AE1D9A9D9A6E /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 7C4EF252B951D3E200174012;
+			remoteInfo = WikeyCore;
+		};
+		776C27E4E7A7647464304601 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 343313D19D21AE1D9A9D9A6E /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 7C4EF252B951D3E200174012;
+			remoteInfo = WikeyCore;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		115E9728B54B9D844691ED9D /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				DB1F394805DE2D7195B28F28 /* WikeyCore.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8E18929B8B8AC19ABD61BBA1 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				7E6F3623DC1A138E9727F277 /* WikeyCore.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		0846B804A546C6724A579006 /* WikeyCoreTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = WikeyCoreTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		1F8F86E61039D8E0A96453B2 /* WikeyRuntime.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WikeyRuntime.swift; sourceTree = "<group>"; };
+		29F348C057BC64F22F800363 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		3AA2E33F5834328B1676075C /* WorkflowEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkflowEditorView.swift; sourceTree = "<group>"; };
+		40179216A1772150F1719EAC /* WikeyCore.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = WikeyCore.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		4E4044A7589BCC13D42395C5 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
+		663A3FFA0154A8359CDC55F4 /* ShortcutModelsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShortcutModelsTests.swift; sourceTree = "<group>"; };
+		6A34AA7CAB109B5FC6B0402E /* Wikey.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Wikey.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		6A806BBE6571A9A314CA4626 /* ShortcutModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShortcutModels.swift; sourceTree = "<group>"; };
+		744108B9609996B38F488896 /* ClipboardService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipboardService.swift; sourceTree = "<group>"; };
+		785E1FA6D60362D2E231CFB0 /* MenuBarContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarContentView.swift; sourceTree = "<group>"; };
+		78E342F0F6965420E4F40F7C /* WikeyDesignComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WikeyDesignComponents.swift; sourceTree = "<group>"; };
+		7EDE41677010F0CFC513F4F7 /* AutomationModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutomationModels.swift; sourceTree = "<group>"; };
+		8560B8F9FAA2423F83B5AFD2 /* LoginItemService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginItemService.swift; sourceTree = "<group>"; };
+		928C51A8110C6A07CC483231 /* ShortcutRecorderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShortcutRecorderView.swift; sourceTree = "<group>"; };
+		9CD5FD16E604EF4F1646268C /* RichTextEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RichTextEditor.swift; sourceTree = "<group>"; };
+		A24D53D060BE24564F62CF55 /* WikeyStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WikeyStore.swift; sourceTree = "<group>"; };
+		A29E038D71C3173FDA10BF35 /* WikeyStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WikeyStoreTests.swift; sourceTree = "<group>"; };
+		A699EC2BB7C9CCC56AF58A54 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
+		A6A488800A1BC3C394D2F46B /* WikeyLoginHelper.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WikeyLoginHelper.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		B1EF5D86CA973B6444063C36 /* WikeyApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WikeyApp.swift; sourceTree = "<group>"; };
+		B48F73680E3E23180A8E8089 /* LayoutEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LayoutEditorView.swift; sourceTree = "<group>"; };
+		B7262FE82D70589434BC129D /* HotkeyRegistrar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotkeyRegistrar.swift; sourceTree = "<group>"; };
+		B8A71BEF5729FB22DA320117 /* SequenceMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SequenceMonitor.swift; sourceTree = "<group>"; };
+		C4F766E91A1B80A9C12FBAEC /* WikeySettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WikeySettingsView.swift; sourceTree = "<group>"; };
+		C5C17D07296F5224CC879898 /* WindowLayoutController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindowLayoutController.swift; sourceTree = "<group>"; };
+		C5D474D7A2FE6E9C6853A5B0 /* TemplateEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TemplateEditorView.swift; sourceTree = "<group>"; };
+		D115422AEFE98EEB2398A213 /* ApplicationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApplicationController.swift; sourceTree = "<group>"; };
+		D3E3BAD7A516C118AD61DE4C /* PermissionCenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PermissionCenter.swift; sourceTree = "<group>"; };
+		DED5C2DC0216363FC43B3BF0 /* LayoutZoneTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LayoutZoneTests.swift; sourceTree = "<group>"; };
+		EB5E59681CF2AF25BFC5FF4B /* WorkflowRunner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkflowRunner.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		3E3433E35ED7F5DA3D4CF3BD /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FAB9A8082885070D03068832 /* WikeyCore.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DAF93330FB2B6C00E9DA7436 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8362354BC1EB4FBE72EA9192 /* WikeyCore.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		133048EE824E84524EFA3A0E /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				6A34AA7CAB109B5FC6B0402E /* Wikey.app */,
+				40179216A1772150F1719EAC /* WikeyCore.framework */,
+				0846B804A546C6724A579006 /* WikeyCoreTests.xctest */,
+				A6A488800A1BC3C394D2F46B /* WikeyLoginHelper.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		33094601B28C24084903EAF3 /* WikeyCoreTests */ = {
+			isa = PBXGroup;
+			children = (
+				DED5C2DC0216363FC43B3BF0 /* LayoutZoneTests.swift */,
+				663A3FFA0154A8359CDC55F4 /* ShortcutModelsTests.swift */,
+				A29E038D71C3173FDA10BF35 /* WikeyStoreTests.swift */,
+			);
+			name = WikeyCoreTests;
+			path = Tests/WikeyCoreTests;
+			sourceTree = "<group>";
+		};
+		39F44E29A870DC1047815552 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				29F348C057BC64F22F800363 /* ContentView.swift */,
+				B48F73680E3E23180A8E8089 /* LayoutEditorView.swift */,
+				785E1FA6D60362D2E231CFB0 /* MenuBarContentView.swift */,
+				4E4044A7589BCC13D42395C5 /* OnboardingView.swift */,
+				9CD5FD16E604EF4F1646268C /* RichTextEditor.swift */,
+				928C51A8110C6A07CC483231 /* ShortcutRecorderView.swift */,
+				C5D474D7A2FE6E9C6853A5B0 /* TemplateEditorView.swift */,
+				78E342F0F6965420E4F40F7C /* WikeyDesignComponents.swift */,
+				C4F766E91A1B80A9C12FBAEC /* WikeySettingsView.swift */,
+				3AA2E33F5834328B1676075C /* WorkflowEditorView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		3E11CACBB92DA55D548CF68F /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				D115422AEFE98EEB2398A213 /* ApplicationController.swift */,
+				744108B9609996B38F488896 /* ClipboardService.swift */,
+				B7262FE82D70589434BC129D /* HotkeyRegistrar.swift */,
+				8560B8F9FAA2423F83B5AFD2 /* LoginItemService.swift */,
+				D3E3BAD7A516C118AD61DE4C /* PermissionCenter.swift */,
+				B8A71BEF5729FB22DA320117 /* SequenceMonitor.swift */,
+				1F8F86E61039D8E0A96453B2 /* WikeyRuntime.swift */,
+				C5C17D07296F5224CC879898 /* WindowLayoutController.swift */,
+				EB5E59681CF2AF25BFC5FF4B /* WorkflowRunner.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		668E6742F1B7A29375743574 /* Wikey */ = {
+			isa = PBXGroup;
+			children = (
+				B92CAD5775CD37E519C65D37 /* App */,
+				39F44E29A870DC1047815552 /* Views */,
+			);
+			name = Wikey;
+			path = Sources/Wikey;
+			sourceTree = "<group>";
+		};
+		9E61690B628D2C186BE024C3 /* WikeyCore */ = {
+			isa = PBXGroup;
+			children = (
+				D140A4A76E5362B6504F2702 /* Models */,
+				3E11CACBB92DA55D548CF68F /* Services */,
+				ADA97ECF2BB6CF8E997A0C1E /* Stores */,
+			);
+			name = WikeyCore;
+			path = Sources/WikeyCore;
+			sourceTree = "<group>";
+		};
+		ADA97ECF2BB6CF8E997A0C1E /* Stores */ = {
+			isa = PBXGroup;
+			children = (
+				A24D53D060BE24564F62CF55 /* WikeyStore.swift */,
+			);
+			path = Stores;
+			sourceTree = "<group>";
+		};
+		B92CAD5775CD37E519C65D37 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				B1EF5D86CA973B6444063C36 /* WikeyApp.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		D140A4A76E5362B6504F2702 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				7EDE41677010F0CFC513F4F7 /* AutomationModels.swift */,
+				6A806BBE6571A9A314CA4626 /* ShortcutModels.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		DF414C4D550351D288CD1EBC /* WikeyLoginHelper */ = {
+			isa = PBXGroup;
+			children = (
+				A699EC2BB7C9CCC56AF58A54 /* main.swift */,
+			);
+			name = WikeyLoginHelper;
+			path = Sources/WikeyLoginHelper;
+			sourceTree = "<group>";
+		};
+		F89E5A444538CC56D59EEA3D = {
+			isa = PBXGroup;
+			children = (
+				668E6742F1B7A29375743574 /* Wikey */,
+				9E61690B628D2C186BE024C3 /* WikeyCore */,
+				33094601B28C24084903EAF3 /* WikeyCoreTests */,
+				DF414C4D550351D288CD1EBC /* WikeyLoginHelper */,
+				133048EE824E84524EFA3A0E /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		37AA096AF63214FD7F47C128 /* Wikey */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = FCBD6216B99C66C922E978E4 /* Build configuration list for PBXNativeTarget "Wikey" */;
+			buildPhases = (
+				503A197EA3FD6B7D44CE4B69 /* Sources */,
+				DAF93330FB2B6C00E9DA7436 /* Frameworks */,
+				115E9728B54B9D844691ED9D /* Embed Frameworks */,
+				EFCA788DBAB050983A2AC058 /* Embed Login Helper */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				FDDCEA8D8A3C392CBDEA36F2 /* PBXTargetDependency */,
+				356D83D29F6E3F8F06E6EEE7 /* PBXTargetDependency */,
+			);
+			name = Wikey;
+			packageProductDependencies = (
+			);
+			productName = Wikey;
+			productReference = 6A34AA7CAB109B5FC6B0402E /* Wikey.app */;
+			productType = "com.apple.product-type.application";
+		};
+		5A883BF9070AF701472AB683 /* WikeyCoreTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 5B87325357EAEFE12C591705 /* Build configuration list for PBXNativeTarget "WikeyCoreTests" */;
+			buildPhases = (
+				C4E412FB0F5C07A6BD5C7A78 /* Sources */,
+				3E3433E35ED7F5DA3D4CF3BD /* Frameworks */,
+				8E18929B8B8AC19ABD61BBA1 /* Embed Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				1B4269428B7774B408B9E0D3 /* PBXTargetDependency */,
+			);
+			name = WikeyCoreTests;
+			packageProductDependencies = (
+			);
+			productName = WikeyCoreTests;
+			productReference = 0846B804A546C6724A579006 /* WikeyCoreTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		7C4EF252B951D3E200174012 /* WikeyCore */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 59A681FBD32C232358C4AD67 /* Build configuration list for PBXNativeTarget "WikeyCore" */;
+			buildPhases = (
+				0EE9BCD42012953DE25D0FA0 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = WikeyCore;
+			packageProductDependencies = (
+			);
+			productName = WikeyCore;
+			productReference = 40179216A1772150F1719EAC /* WikeyCore.framework */;
+			productType = "com.apple.product-type.framework";
+		};
+		81D8B5F1A0B1D857FB005C05 /* WikeyLoginHelper */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 2F814DACCB42BC8FEFD75745 /* Build configuration list for PBXNativeTarget "WikeyLoginHelper" */;
+			buildPhases = (
+				960EA09B99FDEF749643A736 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = WikeyLoginHelper;
+			packageProductDependencies = (
+			);
+			productName = WikeyLoginHelper;
+			productReference = A6A488800A1BC3C394D2F46B /* WikeyLoginHelper.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		343313D19D21AE1D9A9D9A6E /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1600;
+				TargetAttributes = {
+					37AA096AF63214FD7F47C128 = {
+						DevelopmentTeam = "";
+						ProvisioningStyle = Automatic;
+					};
+					5A883BF9070AF701472AB683 = {
+						DevelopmentTeam = "";
+						ProvisioningStyle = Automatic;
+					};
+					7C4EF252B951D3E200174012 = {
+						DevelopmentTeam = "";
+						ProvisioningStyle = Automatic;
+					};
+					81D8B5F1A0B1D857FB005C05 = {
+						DevelopmentTeam = "";
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = 39E32D1E66E14ED4244D0AE9 /* Build configuration list for PBXProject "Wikey" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = F89E5A444538CC56D59EEA3D;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 133048EE824E84524EFA3A0E /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				7C4EF252B951D3E200174012 /* WikeyCore */,
+				81D8B5F1A0B1D857FB005C05 /* WikeyLoginHelper */,
+				37AA096AF63214FD7F47C128 /* Wikey */,
+				5A883BF9070AF701472AB683 /* WikeyCoreTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		EFCA788DBAB050983A2AC058 /* Embed Login Helper */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Embed Login Helper";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "set -e\ndestination=\"${TARGET_BUILD_DIR}/${WRAPPER_NAME}/Contents/Library/LoginItems\"\nmkdir -p \"${destination}\"\nrm -rf \"${destination}/WikeyLoginHelper.app\"\ncp -R \"${BUILT_PRODUCTS_DIR}/WikeyLoginHelper.app\" \"${destination}/\"\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		0EE9BCD42012953DE25D0FA0 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E77D93BDE77F2DACE4F10BFC /* ApplicationController.swift in Sources */,
+				B2DAC1456C2D128715B1C578 /* AutomationModels.swift in Sources */,
+				B5799D8F35C35736980A3568 /* ClipboardService.swift in Sources */,
+				20CF0164562147E06DC478F2 /* HotkeyRegistrar.swift in Sources */,
+				27A9C27A392B8F1F5A58FB7F /* LoginItemService.swift in Sources */,
+				63147077D02F807AD118A26A /* PermissionCenter.swift in Sources */,
+				BC6A1834D3C90304AFE9B0A3 /* SequenceMonitor.swift in Sources */,
+				E24573A2C1C0FF57A601F03A /* ShortcutModels.swift in Sources */,
+				927F0D80C51F1791461D8FEA /* WikeyRuntime.swift in Sources */,
+				FCA8C63E9E1624F4EB94572B /* WikeyStore.swift in Sources */,
+				CF2B941163616EA8EBA6622D /* WindowLayoutController.swift in Sources */,
+				712F8C7FD60150B0B66AF542 /* WorkflowRunner.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		503A197EA3FD6B7D44CE4B69 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0C7CCEF891E33A41F59495E8 /* ContentView.swift in Sources */,
+				764F388AE8FB73D0D099FA32 /* LayoutEditorView.swift in Sources */,
+				590245A0CFE67869BF4CF7D9 /* MenuBarContentView.swift in Sources */,
+				57FCA4BFF1808A3845F2E6B2 /* OnboardingView.swift in Sources */,
+				854F4322866212E982763957 /* RichTextEditor.swift in Sources */,
+				A82F0ABC9CA30EED0A8635F2 /* ShortcutRecorderView.swift in Sources */,
+				8C4980DCEAB4DBFB4490CF2A /* TemplateEditorView.swift in Sources */,
+				55BF68D94F5D08BAC89802E5 /* WikeyApp.swift in Sources */,
+				09E7C3E09C1886278FE0D381 /* WikeyDesignComponents.swift in Sources */,
+				033DF5DBF070491C9B43C44B /* WikeySettingsView.swift in Sources */,
+				02FE059849B0EA93DA944EC6 /* WorkflowEditorView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		960EA09B99FDEF749643A736 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7CC0613A4BFE3B169DBFB94A /* main.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C4E412FB0F5C07A6BD5C7A78 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				445E014CC3B3C6F67694C884 /* LayoutZoneTests.swift in Sources */,
+				AC96BF2982CDB8BFD3C83617 /* ShortcutModelsTests.swift in Sources */,
+				C550C2993B9C28E16D2DD1B2 /* WikeyStoreTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		1B4269428B7774B408B9E0D3 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 7C4EF252B951D3E200174012 /* WikeyCore */;
+			targetProxy = 776C27E4E7A7647464304601 /* PBXContainerItemProxy */;
+		};
+		356D83D29F6E3F8F06E6EEE7 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 81D8B5F1A0B1D857FB005C05 /* WikeyLoginHelper */;
+			targetProxy = 3FDE6CBDFE70D7CCADF5D2D4 /* PBXContainerItemProxy */;
+		};
+		FDDCEA8D8A3C392CBDEA36F2 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 7C4EF252B951D3E200174012 /* WikeyCore */;
+			targetProxy = 52ECFDAB1E08AD87C766E7E8 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		07412B11298EC73F29CA3D56 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				COMBINE_HIDPI_IMAGES = YES;
+				ENABLE_APP_SANDBOX = NO;
+				ENABLE_HARDENED_RUNTIME = YES;
+				INFOPLIST_FILE = "Resources/Wikey-Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.wikey.app;
+				PRODUCT_NAME = Wikey;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		0922516B9FA504C5227E399A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				COMBINE_HIDPI_IMAGES = YES;
+				ENABLE_APP_SANDBOX = NO;
+				ENABLE_HARDENED_RUNTIME = YES;
+				INFOPLIST_FILE = "Resources/Wikey-Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.wikey.app;
+				PRODUCT_NAME = Wikey;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		2ABD35791497A19DE151CDE0 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		69B7FAEE3C5CC5D38F487797 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = "";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		743D9278D46B8B58D93C97AB /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "";
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				GENERATE_INFOPLIST_FILE = YES;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.wikey.core;
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				VERSIONING_SYSTEM = "apple-generic";
+			};
+			name = Release;
+		};
+		95287A0B5AE182FA9A400215 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				COMBINE_HIDPI_IMAGES = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.wikey.WikeyCoreTests;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		B00B303EC3007B9973C345C4 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = "Resources/WikeyLoginHelper-Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.wikey.login-helper";
+				PRODUCT_NAME = WikeyLoginHelper;
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+			};
+			name = Debug;
+		};
+		B9EB3ECA7912134ECA30A81E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = "Resources/WikeyLoginHelper-Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.wikey.login-helper";
+				PRODUCT_NAME = WikeyLoginHelper;
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+			};
+			name = Release;
+		};
+		E91ED75AD46754754B096E18 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				COMBINE_HIDPI_IMAGES = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.wikey.WikeyCoreTests;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		F96D3404ADB8D5C362AE5FBC /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "";
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				GENERATE_INFOPLIST_FILE = YES;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.wikey.core;
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				VERSIONING_SYSTEM = "apple-generic";
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		2F814DACCB42BC8FEFD75745 /* Build configuration list for PBXNativeTarget "WikeyLoginHelper" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B00B303EC3007B9973C345C4 /* Debug */,
+				B9EB3ECA7912134ECA30A81E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		39E32D1E66E14ED4244D0AE9 /* Build configuration list for PBXProject "Wikey" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				2ABD35791497A19DE151CDE0 /* Debug */,
+				69B7FAEE3C5CC5D38F487797 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		59A681FBD32C232358C4AD67 /* Build configuration list for PBXNativeTarget "WikeyCore" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F96D3404ADB8D5C362AE5FBC /* Debug */,
+				743D9278D46B8B58D93C97AB /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		5B87325357EAEFE12C591705 /* Build configuration list for PBXNativeTarget "WikeyCoreTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E91ED75AD46754754B096E18 /* Debug */,
+				95287A0B5AE182FA9A400215 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		FCBD6216B99C66C922E978E4 /* Build configuration list for PBXNativeTarget "Wikey" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				0922516B9FA504C5227E399A /* Debug */,
+				07412B11298EC73F29CA3D56 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 343313D19D21AE1D9A9D9A6E /* Project object */;
+}

@@ -1,0 +1,75 @@
+name: Wikey
+options:
+  bundleIdPrefix: com.wikey
+  deploymentTarget:
+    macOS: "15.0"
+  xcodeVersion: "16.0"
+
+settings:
+  base:
+    SWIFT_VERSION: "5.0"
+    MACOSX_DEPLOYMENT_TARGET: "15.0"
+    CODE_SIGN_STYLE: Automatic
+    DEVELOPMENT_TEAM: ""
+
+targets:
+  WikeyCore:
+    type: framework
+    platform: macOS
+    sources:
+      - Sources/WikeyCore
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.wikey.core
+        GENERATE_INFOPLIST_FILE: YES
+
+  WikeyLoginHelper:
+    type: application
+    platform: macOS
+    sources:
+      - Sources/WikeyLoginHelper
+    info:
+      path: Resources/WikeyLoginHelper-Info.plist
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.wikey.login-helper
+        PRODUCT_NAME: WikeyLoginHelper
+        SKIP_INSTALL: YES
+
+  Wikey:
+    type: application
+    platform: macOS
+    sources:
+      - Sources/Wikey
+    info:
+      path: Resources/Wikey-Info.plist
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.wikey.app
+        PRODUCT_NAME: Wikey
+        ENABLE_APP_SANDBOX: NO
+        ENABLE_HARDENED_RUNTIME: YES
+    dependencies:
+      - target: WikeyCore
+      - target: WikeyLoginHelper
+        embed: false
+    postBuildScripts:
+      - name: Embed Login Helper
+        basedOnDependencyAnalysis: false
+        script: |
+          set -e
+          destination="${TARGET_BUILD_DIR}/${WRAPPER_NAME}/Contents/Library/LoginItems"
+          mkdir -p "${destination}"
+          rm -rf "${destination}/WikeyLoginHelper.app"
+          cp -R "${BUILT_PRODUCTS_DIR}/WikeyLoginHelper.app" "${destination}/"
+    scheme:
+      testTargets:
+        - WikeyCoreTests
+
+  WikeyCoreTests:
+    type: bundle.unit-test
+    platform: macOS
+    sources:
+      - Tests/WikeyCoreTests
+    dependencies:
+      - target: WikeyCore
