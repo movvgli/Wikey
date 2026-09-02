@@ -20,6 +20,7 @@
 		63147077D02F807AD118A26A /* PermissionCenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3E3BAD7A516C118AD61DE4C /* PermissionCenter.swift */; };
 		712F8C7FD60150B0B66AF542 /* WorkflowRunner.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB5E59681CF2AF25BFC5FF4B /* WorkflowRunner.swift */; };
 		764F388AE8FB73D0D099FA32 /* LayoutEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B48F73680E3E23180A8E8089 /* LayoutEditorView.swift */; };
+		7BDCBC53E0192FBFFAFEE6F9 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2AAC3E4BFBB08DCCCA85D5BC /* Assets.xcassets */; };
 		7CC0613A4BFE3B169DBFB94A /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = A699EC2BB7C9CCC56AF58A54 /* main.swift */; };
 		7E6F3623DC1A138E9727F277 /* WikeyCore.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 40179216A1772150F1719EAC /* WikeyCore.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		8362354BC1EB4FBE72EA9192 /* WikeyCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 40179216A1772150F1719EAC /* WikeyCore.framework */; };
@@ -95,6 +96,7 @@
 		0846B804A546C6724A579006 /* WikeyCoreTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = WikeyCoreTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		1F8F86E61039D8E0A96453B2 /* WikeyRuntime.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WikeyRuntime.swift; sourceTree = "<group>"; };
 		29F348C057BC64F22F800363 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		2AAC3E4BFBB08DCCCA85D5BC /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		3AA2E33F5834328B1676075C /* WorkflowEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkflowEditorView.swift; sourceTree = "<group>"; };
 		40179216A1772150F1719EAC /* WikeyCore.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = WikeyCore.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		4E4044A7589BCC13D42395C5 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
@@ -206,6 +208,7 @@
 			isa = PBXGroup;
 			children = (
 				B92CAD5775CD37E519C65D37 /* App */,
+				C782BDC5F620EEE383BFC9A4 /* Resources */,
 				39F44E29A870DC1047815552 /* Views */,
 			);
 			name = Wikey;
@@ -238,6 +241,14 @@
 				B1EF5D86CA973B6444063C36 /* WikeyApp.swift */,
 			);
 			path = App;
+			sourceTree = "<group>";
+		};
+		C782BDC5F620EEE383BFC9A4 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				2AAC3E4BFBB08DCCCA85D5BC /* Assets.xcassets */,
+			);
+			path = Resources;
 			sourceTree = "<group>";
 		};
 		D140A4A76E5362B6504F2702 /* Models */ = {
@@ -277,6 +288,7 @@
 			buildConfigurationList = FCBD6216B99C66C922E978E4 /* Build configuration list for PBXNativeTarget "Wikey" */;
 			buildPhases = (
 				503A197EA3FD6B7D44CE4B69 /* Sources */,
+				F1365A21FF9369DE369CF909 /* Resources */,
 				DAF93330FB2B6C00E9DA7436 /* Frameworks */,
 				115E9728B54B9D844691ED9D /* Embed Frameworks */,
 				EFCA788DBAB050983A2AC058 /* Embed Login Helper */,
@@ -400,6 +412,17 @@
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		F1365A21FF9369DE369CF909 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7BDCBC53E0192FBFFAFEE6F9 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
 		EFCA788DBAB050983A2AC058 /* Embed Login Helper */ = {

@@ -26,7 +26,8 @@ let package = Package(
             dependencies: [
                 "WikeyCore",
                 .product(name: "Sparkle", package: "Sparkle"),
-            ]
+            ],
+            exclude: ["Resources"]
         ),
         .executableTarget(
             name: "WikeyLoginHelper"

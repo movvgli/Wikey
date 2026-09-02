@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="Sources/Wikey/Resources/Assets.xcassets/AppIcon.appiconset/icon_128x128@2x.png" width="128" alt="Wikey app icon">
+</p>
+
 # Wikey
 
 Wikey is a macOS app that bundles everyday tasks behind a shortcut.

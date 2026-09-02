@@ -12,11 +12,10 @@ struct OnboardingView: View {
         VStack(spacing: 0) {
             VStack(alignment: .leading, spacing: 26) {
                 HStack(spacing: 14) {
-                    Image(systemName: "bolt.fill")
-                        .font(.system(size: 24, weight: .semibold))
-                        .foregroundStyle(.white)
+                    Image(nsImage: NSApplication.shared.applicationIconImage)
+                        .resizable()
+                        .scaledToFit()
                         .frame(width: 48, height: 48)
-                        .background(Color.accentColor, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
                     VStack(alignment: .leading, spacing: 4) {
                         Text("Wikey 시작하기")
                             .font(.system(size: 28, weight: .semibold))

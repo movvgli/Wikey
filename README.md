@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="Sources/Wikey/Resources/Assets.xcassets/AppIcon.appiconset/icon_128x128@2x.png" width="128" alt="Wikey 앱 아이콘">
+</p>
+
 # Wikey
 
 단축키 하나로 자주 하는 일을 묶어 실행하는 macOS 앱입니다.

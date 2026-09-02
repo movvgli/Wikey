@@ -20,6 +20,7 @@ XCODEBUILD_ARGS=(
   -project "$ROOT_DIR/Wikey.xcodeproj"
   -scheme "$APP_NAME"
   -configuration Release
+  -quiet
   -derivedDataPath "$DERIVED_DATA"
   -destination "generic/platform=macOS"
   MARKETING_VERSION="$VERSION"
