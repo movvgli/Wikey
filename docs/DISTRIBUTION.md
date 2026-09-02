@@ -2,7 +2,9 @@
 
 ## 현재 상태
 
-태그를 푸시하면 GitHub Actions가 테스트를 실행하고 ad-hoc 서명된 DMG와 SHA-256 체크섬을 시험 릴리스로 게시합니다. 이 빌드는 Apple 공증본이 아니므로 macOS에서 개발자 확인 경고가 표시될 수 있습니다.
+태그를 푸시하면 GitHub Actions가 테스트를 실행하고 ad-hoc 서명된 DMG, SHA-256 체크섬과 Sparkle 업데이트 피드를 시험 릴리스로 게시합니다. 이 빌드는 Apple 공증본이 아니므로 macOS에서 개발자 확인 경고가 표시될 수 있습니다.
+
+업데이트 피드는 `update-feed` 브랜치의 `appcast.xml`에 게시됩니다. 앱은 EdDSA 서명을 검증한 뒤에만 DMG를 업데이트로 받아들입니다.
 
 ## 로컬 시험 배포
 
@@ -31,12 +33,22 @@ WIKEY_NOTARY_PROFILE="wikey-notary" \
 
 인증서, `.p12` 파일, 앱 전용 암호와 공증 자격 증명은 저장소에 커밋하지 않습니다.
 
+## Sparkle 업데이트 서명
+
+Sparkle의 `generate_keys`로 만든 개인 키는 로컬 키체인에 보관합니다. 공개 키만 `SUPublicEDKey`로 앱에 포함하며, 개인 키는 코드나 릴리스 파일에 넣지 않습니다.
+
+GitHub Actions 릴리스를 사용하려면 내보낸 개인 키를 저장소의 Actions secret `SPARKLE_ED_PRIVATE_KEY`로 등록해야 합니다. 워크플로는 이 비밀값으로 appcast 서명을 만들며 로그나 공개 브랜치에는 개인 키를 기록하지 않습니다.
+
+키를 잃으면 기존 설치본이 새 키로 서명한 업데이트를 신뢰할 수 없습니다. 키체인 외에 암호화된 별도 백업을 보관하세요.
+
 ## 릴리스 체크리스트
 
 - `swift test` 통과
 - 버전과 빌드 번호 확인
 - 앱, 헬퍼와 내장 라이브러리 서명 확인
 - DMG `hdiutil verify` 통과
+- appcast 버전, 다운로드 URL과 EdDSA 서명 확인
+- GitHub Actions secret `SPARKLE_ED_PRIVATE_KEY` 설정 확인
 - 공증을 사용하는 경우 `stapler validate` 통과
 - 새 사용자 계정에서 설치와 권한 흐름 확인
 - 릴리스 노트에 공증 여부 명시

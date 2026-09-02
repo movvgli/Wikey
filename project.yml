@@ -9,8 +9,15 @@ settings:
   base:
     SWIFT_VERSION: "5.0"
     MACOSX_DEPLOYMENT_TARGET: "15.0"
+    MARKETING_VERSION: "1.0.0"
+    CURRENT_PROJECT_VERSION: "1"
     CODE_SIGN_STYLE: Automatic
     DEVELOPMENT_TEAM: ""
+
+packages:
+  Sparkle:
+    url: https://github.com/sparkle-project/Sparkle
+    exactVersion: 2.9.6
 
 targets:
   WikeyCore:
@@ -30,6 +37,11 @@ targets:
       - Sources/WikeyLoginHelper
     info:
       path: Resources/WikeyLoginHelper-Info.plist
+      properties:
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        LSMinimumSystemVersion: "15.0"
+        LSUIElement: true
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.wikey.login-helper
@@ -43,6 +55,16 @@ targets:
       - Sources/Wikey
     info:
       path: Resources/Wikey-Info.plist
+      properties:
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        LSApplicationCategoryType: public.app-category.productivity
+        LSMinimumSystemVersion: "15.0"
+        SUEnableAutomaticChecks: true
+        SUAutomaticallyUpdate: false
+        SUFeedURL: https://raw.githubusercontent.com/movvgli/Wikey/update-feed/appcast.xml
+        SUPublicEDKey: KYMCwU1bB70rz+f0DguhjotRDSs/5nrJqSRul09YeZE=
+        SUScheduledCheckInterval: 86400
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.wikey.app
@@ -53,6 +75,8 @@ targets:
       - target: WikeyCore
       - target: WikeyLoginHelper
         embed: false
+      - package: Sparkle
+        product: Sparkle
     postBuildScripts:
       - name: Embed Login Helper
         basedOnDependencyAnalysis: false

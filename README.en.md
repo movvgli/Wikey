@@ -17,6 +17,7 @@ Launch apps, open websites, paste rich templates, and arrange multiple windows a
 - Copy-only and automatic paste modes
 - Multi-display layouts with full, half, third, two-thirds, and quadrant zones
 - Launch at login and quick access from the menu bar
+- In-app update checks, downloads, and installation
 
 Workflow actions run from top to bottom. If one action fails, Wikey records the failure and continues with the remaining actions when possible.
 
@@ -28,6 +29,8 @@ Workflow actions run from top to bottom. If one action fails, Wikey records the 
 ## Install
 
 DMGs in GitHub Releases are currently unnotarized preview builds. macOS may show a warning that it cannot verify the developer. See [Installation](docs/INSTALL.md) for the current installation and permission steps.
+
+Starting with Wikey 1.1.0, the app checks for updates once per day. You can also use **Wikey → Check for Updates…** or **Settings → Updates**. Version 1.0.0 has no updater, so it requires one final manual installation of 1.1.0.
 
 Build and run from source:
 

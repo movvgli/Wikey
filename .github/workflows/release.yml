@@ -35,6 +35,31 @@ jobs:
       - name: Verify checksum
         run: shasum -a 256 -c "dist/Wikey-$WIKEY_VERSION.dmg.sha256"
 
+      - name: Generate signed update feed
+        env:
+          SPARKLE_ED_PRIVATE_KEY: ${{ secrets.SPARKLE_ED_PRIVATE_KEY }}
+        run: |
+          if [[ -z "$SPARKLE_ED_PRIVATE_KEY" ]]; then
+            echo "SPARKLE_ED_PRIVATE_KEY is not configured." >&2
+            exit 1
+          fi
+
+          appcast_tool="$(find .build-bundle/DerivedData/SourcePackages/artifacts -type f -name generate_appcast -print -quit)"
+          if [[ -z "$appcast_tool" ]]; then
+            echo "Sparkle generate_appcast tool was not found." >&2
+            exit 1
+          fi
+
+          feed_dir="$(mktemp -d)"
+          cp "dist/Wikey-$WIKEY_VERSION.dmg" "$feed_dir/"
+          printf '%s\n' "Wikey $WIKEY_VERSION" > "$feed_dir/release-notes.txt"
+          printf '%s' "$SPARKLE_ED_PRIVATE_KEY" | "$appcast_tool" \
+            --ed-key-file - \
+            --download-url-prefix "https://github.com/movvgli/Wikey/releases/download/$GITHUB_REF_NAME/" \
+            --link "https://github.com/movvgli/Wikey" \
+            -o "$GITHUB_WORKSPACE/dist/appcast.xml" \
+            "$feed_dir"
+
       - name: Publish preview release
         env:
           GH_TOKEN: ${{ github.token }}
@@ -48,14 +73,41 @@ jobs:
             gh release upload "$GITHUB_REF_NAME" \
               "dist/Wikey-$WIKEY_VERSION.dmg" \
               "dist/Wikey-$WIKEY_VERSION.dmg.sha256" \
+              "dist/appcast.xml" \
               --clobber
           else
             gh release create "$GITHUB_REF_NAME" \
               "dist/Wikey-$WIKEY_VERSION.dmg" \
               "dist/Wikey-$WIKEY_VERSION.dmg.sha256" \
+              "dist/appcast.xml" \
               --title "Wikey $WIKEY_VERSION" \
               --notes-file "$notes" \
               --generate-notes \
               --prerelease \
               --verify-tag
           fi
+
+      - name: Publish update feed
+        run: |
+          git fetch origin update-feed:refs/remotes/origin/update-feed || true
+          feed_parent="$(mktemp -d)"
+          feed_worktree="$feed_parent/feed"
+          if git show-ref --verify --quiet refs/remotes/origin/update-feed; then
+            git worktree add --detach "$feed_worktree" origin/update-feed
+            git -C "$feed_worktree" switch -C update-feed
+          else
+            git worktree add --detach "$feed_worktree"
+            git -C "$feed_worktree" switch --orphan update-feed
+            git -C "$feed_worktree" rm -rf .
+          fi
+          cp dist/appcast.xml "$feed_worktree/appcast.xml"
+          git -C "$feed_worktree" add appcast.xml
+          if git -C "$feed_worktree" diff --cached --quiet; then
+            echo "Update feed is already current."
+            exit 0
+          fi
+          git -C "$feed_worktree" \
+            -c user.name='github-actions[bot]' \
+            -c user.email='41898282+github-actions[bot]@users.noreply.github.com' \
+            commit -m "Update appcast for $GITHUB_REF_NAME"
+          git -C "$feed_worktree" push origin update-feed

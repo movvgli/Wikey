@@ -8,6 +8,9 @@ let package = Package(
         .executable(name: "Wikey", targets: ["Wikey"]),
         .executable(name: "WikeyLoginHelper", targets: ["WikeyLoginHelper"]),
     ],
+    dependencies: [
+        .package(url: "https://github.com/sparkle-project/Sparkle", exact: "2.9.6"),
+    ],
     targets: [
         .target(
             name: "WikeyCore",
@@ -20,7 +23,10 @@ let package = Package(
         ),
         .executableTarget(
             name: "Wikey",
-            dependencies: ["WikeyCore"]
+            dependencies: [
+                "WikeyCore",
+                .product(name: "Sparkle", package: "Sparkle"),
+            ]
         ),
         .executableTarget(
             name: "WikeyLoginHelper"

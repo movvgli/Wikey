@@ -4,6 +4,7 @@ import WikeyCore
 
 struct MenuBarContentView: View {
     @Environment(WikeyRuntime.self) private var runtime
+    @Environment(UpdateController.self) private var updates
     @Environment(\.openWindow) private var openWindow
 
     var body: some View {
@@ -48,6 +49,10 @@ struct MenuBarContentView: View {
             openWindow(id: "main")
             NSApp.activate(ignoringOtherApps: true)
         }
+        Button("업데이트 확인…") {
+            updates.checkForUpdates()
+        }
+        .disabled(!updates.canCheckForUpdates)
         SettingsLink { Text("설정…") }
         Divider()
         Button("Wikey 종료") { NSApp.terminate(nil) }

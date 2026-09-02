@@ -3,6 +3,7 @@ import WikeyCore
 
 struct WikeySettingsView: View {
     @Environment(WikeyRuntime.self) private var runtime
+    @Environment(UpdateController.self) private var updates
 
     var body: some View {
         ScrollView {
@@ -104,6 +105,60 @@ struct WikeySettingsView: View {
                     }
                 }
 
+                Divider()
+
+                WikeySection(
+                    title: "업데이트",
+                    detail: "새 버전을 자동으로 확인하고 Wikey 안에서 설치할 수 있습니다."
+                ) {
+                    PlainPanel {
+                        VStack(spacing: 0) {
+                            UpdateSettingRow(
+                                title: "자동으로 업데이트 확인",
+                                detail: "하루에 한 번 새 버전을 확인합니다.",
+                                isOn: Binding(
+                                    get: { updates.automaticallyChecksForUpdates },
+                                    set: { updates.setAutomaticallyChecksForUpdates($0) }
+                                )
+                            )
+
+                            Divider().padding(.leading, 42)
+
+                            UpdateSettingRow(
+                                title: "업데이트 자동 다운로드",
+                                detail: "새 버전을 미리 받아 설치할 준비를 합니다.",
+                                isOn: Binding(
+                                    get: { updates.automaticallyDownloadsUpdates },
+                                    set: { updates.setAutomaticallyDownloadsUpdates($0) }
+                                ),
+                                isEnabled: updates.allowsAutomaticUpdates
+                            )
+
+                            Divider().padding(.leading, 42)
+
+                            HStack(spacing: 12) {
+                                Image(systemName: "info.circle")
+                                    .foregroundStyle(.secondary)
+                                    .font(.title3)
+                                    .frame(width: 30)
+                                VStack(alignment: .leading, spacing: 3) {
+                                    Text("현재 버전 \(currentVersion)")
+                                        .font(.headline)
+                                    Text(lastCheckedText)
+                                        .font(.subheadline)
+                                        .foregroundStyle(.secondary)
+                                }
+                                Spacer()
+                                Button("지금 확인") {
+                                    updates.checkForUpdates()
+                                }
+                                .disabled(!updates.canCheckForUpdates)
+                            }
+                            .padding(.vertical, 12)
+                        }
+                    }
+                }
+
                 if !runtime.hotkeys.registrationErrors.isEmpty || runtime.store.lastPersistenceError != nil {
                     Divider()
                     WikeySection(title: "확인 필요") {
@@ -133,10 +188,60 @@ struct WikeySettingsView: View {
         }
         .frame(minWidth: 560, minHeight: 460)
         .navigationTitle("설정")
+        .task { updates.refresh() }
     }
 
     private var isRunningFromApplications: Bool {
         Bundle.main.bundleURL.path.hasPrefix("/Applications/")
+    }
+
+    private var currentVersion: String {
+        let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String
+        let build = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String
+
+        switch (version, build) {
+        case let (.some(version), .some(build)):
+            return "\(version) (\(build))"
+        case let (.some(version), .none):
+            return version
+        default:
+            return "알 수 없음"
+        }
+    }
+
+    private var lastCheckedText: String {
+        guard let date = updates.lastUpdateCheckDate else {
+            return "아직 업데이트를 확인하지 않았습니다."
+        }
+        return "마지막 확인: \(date.formatted(date: .abbreviated, time: .shortened))"
+    }
+}
+
+private struct UpdateSettingRow: View {
+    var title: String
+    var detail: String
+    @Binding var isOn: Bool
+    var isEnabled = true
+
+    var body: some View {
+        HStack(spacing: 12) {
+            Image(systemName: "arrow.triangle.2.circlepath")
+                .foregroundStyle(.secondary)
+                .font(.title3)
+                .frame(width: 30)
+            VStack(alignment: .leading, spacing: 3) {
+                Text(title).font(.headline)
+                Text(detail)
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+            }
+            Spacer()
+            Toggle(title, isOn: $isOn)
+                .labelsHidden()
+                .toggleStyle(.switch)
+                .disabled(!isEnabled)
+        }
+        .padding(.vertical, 12)
     }
 }
 

@@ -6,16 +6,25 @@ import WikeyCore
 struct WikeyApp: App {
     @NSApplicationDelegateAdaptor(WikeyAppDelegate.self) private var appDelegate
     @State private var runtime = WikeyRuntime()
+    @State private var updates = UpdateController()
 
     var body: some Scene {
         WindowGroup("Wikey", id: "main") {
             ContentView()
                 .environment(runtime)
+                .environment(updates)
                 .task { runtime.start() }
                 .frame(minWidth: 920, minHeight: 620)
         }
         .defaultSize(width: 1120, height: 760)
         .commands {
+            CommandGroup(after: .appInfo) {
+                Button("업데이트 확인…") {
+                    updates.checkForUpdates()
+                }
+                .disabled(!updates.canCheckForUpdates)
+            }
+
             CommandMenu("워크플로") {
                 ForEach(runtime.store.workflows.filter(\.isEnabled)) { workflow in
                     Button(shortMenuTitle(workflow.name)) {
@@ -28,12 +37,14 @@ struct WikeyApp: App {
         MenuBarExtra("Wikey", systemImage: menuBarSymbol) {
             MenuBarContentView()
                 .environment(runtime)
+                .environment(updates)
                 .task { runtime.start() }
         }
 
         Settings {
             WikeySettingsView()
                 .environment(runtime)
+                .environment(updates)
         }
     }
 

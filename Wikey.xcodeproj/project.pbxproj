@@ -32,8 +32,10 @@
 		B5799D8F35C35736980A3568 /* ClipboardService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 744108B9609996B38F488896 /* ClipboardService.swift */; };
 		BC6A1834D3C90304AFE9B0A3 /* SequenceMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8A71BEF5729FB22DA320117 /* SequenceMonitor.swift */; };
 		C550C2993B9C28E16D2DD1B2 /* WikeyStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A29E038D71C3173FDA10BF35 /* WikeyStoreTests.swift */; };
+		C6AD3D7ACA38FD462B1A8B80 /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = B66D693FB7A487E2063ACB81 /* Sparkle */; };
 		CF2B941163616EA8EBA6622D /* WindowLayoutController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5C17D07296F5224CC879898 /* WindowLayoutController.swift */; };
 		DB1F394805DE2D7195B28F28 /* WikeyCore.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 40179216A1772150F1719EAC /* WikeyCore.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		DD5B1C0F78ADC5846938C905 /* UpdateController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CFCF42AC1BEA3A2CEFF6D14 /* UpdateController.swift */; };
 		E24573A2C1C0FF57A601F03A /* ShortcutModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A806BBE6571A9A314CA4626 /* ShortcutModels.swift */; };
 		E77D93BDE77F2DACE4F10BFC /* ApplicationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D115422AEFE98EEB2398A213 /* ApplicationController.swift */; };
 		FAB9A8082885070D03068832 /* WikeyCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 40179216A1772150F1719EAC /* WikeyCore.framework */; };
@@ -104,6 +106,7 @@
 		78E342F0F6965420E4F40F7C /* WikeyDesignComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WikeyDesignComponents.swift; sourceTree = "<group>"; };
 		7EDE41677010F0CFC513F4F7 /* AutomationModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutomationModels.swift; sourceTree = "<group>"; };
 		8560B8F9FAA2423F83B5AFD2 /* LoginItemService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginItemService.swift; sourceTree = "<group>"; };
+		8CFCF42AC1BEA3A2CEFF6D14 /* UpdateController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateController.swift; sourceTree = "<group>"; };
 		928C51A8110C6A07CC483231 /* ShortcutRecorderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShortcutRecorderView.swift; sourceTree = "<group>"; };
 		9CD5FD16E604EF4F1646268C /* RichTextEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RichTextEditor.swift; sourceTree = "<group>"; };
 		A24D53D060BE24564F62CF55 /* WikeyStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WikeyStore.swift; sourceTree = "<group>"; };
@@ -137,6 +140,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				8362354BC1EB4FBE72EA9192 /* WikeyCore.framework in Frameworks */,
+				C6AD3D7ACA38FD462B1A8B80 /* Sparkle in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -230,6 +234,7 @@
 		B92CAD5775CD37E519C65D37 /* App */ = {
 			isa = PBXGroup;
 			children = (
+				8CFCF42AC1BEA3A2CEFF6D14 /* UpdateController.swift */,
 				B1EF5D86CA973B6444063C36 /* WikeyApp.swift */,
 			);
 			path = App;
@@ -284,6 +289,7 @@
 			);
 			name = Wikey;
 			packageProductDependencies = (
+				B66D693FB7A487E2063ACB81 /* Sparkle */,
 			);
 			productName = Wikey;
 			productReference = 6A34AA7CAB109B5FC6B0402E /* Wikey.app */;
@@ -379,6 +385,9 @@
 			);
 			mainGroup = F89E5A444538CC56D59EEA3D;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				9F4B577090731F07F78B960D /* XCRemoteSwiftPackageReference "Sparkle" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 133048EE824E84524EFA3A0E /* Products */;
 			projectDirPath = "";
@@ -445,6 +454,7 @@
 				854F4322866212E982763957 /* RichTextEditor.swift in Sources */,
 				A82F0ABC9CA30EED0A8635F2 /* ShortcutRecorderView.swift in Sources */,
 				8C4980DCEAB4DBFB4490CF2A /* TemplateEditorView.swift in Sources */,
+				DD5B1C0F78ADC5846938C905 /* UpdateController.swift in Sources */,
 				55BF68D94F5D08BAC89802E5 /* WikeyApp.swift in Sources */,
 				09E7C3E09C1886278FE0D381 /* WikeyDesignComponents.swift in Sources */,
 				033DF5DBF070491C9B43C44B /* WikeySettingsView.swift in Sources */,
@@ -562,6 +572,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -581,6 +592,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				MARKETING_VERSION = 1.0.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -627,6 +639,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = "";
 				ENABLE_NS_ASSERTIONS = NO;
@@ -640,6 +653,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				MARKETING_VERSION = 1.0.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -809,6 +823,25 @@
 			defaultConfigurationName = Debug;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		9F4B577090731F07F78B960D /* XCRemoteSwiftPackageReference "Sparkle" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sparkle-project/Sparkle";
+			requirement = {
+				kind = exactVersion;
+				version = 2.9.6;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		B66D693FB7A487E2063ACB81 /* Sparkle */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9F4B577090731F07F78B960D /* XCRemoteSwiftPackageReference "Sparkle" */;
+			productName = Sparkle;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 343313D19D21AE1D9A9D9A6E /* Project object */;
 }

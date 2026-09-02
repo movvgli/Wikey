@@ -16,7 +16,11 @@ CHECKSUM_PATH="$DMG_PATH.sha256"
 
 rm -rf "$DMG_ROOT"
 mkdir -p "$DMG_ROOT"
-cp -R "$APP_BUNDLE" "$DMG_ROOT/"
+ditto --rsrc --extattr "$APP_BUNDLE" "$DMG_ROOT/$APP_NAME.app"
+SPARKLE_LICENSE="$(find "$ROOT_DIR/.build-bundle/DerivedData/SourcePackages/checkouts" -path '*/Sparkle/LICENSE' -print -quit)"
+if [[ -n "$SPARKLE_LICENSE" ]]; then
+  cp "$SPARKLE_LICENSE" "$DMG_ROOT/Sparkle-LICENSE.txt"
+fi
 ln -s /Applications "$DMG_ROOT/Applications"
 
 rm -f "$DMG_PATH" "$CHECKSUM_PATH"
