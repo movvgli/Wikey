@@ -9,7 +9,9 @@ import Observation
 public final class PermissionCenter {
     public private(set) var accessibilityGranted = false
     public private(set) var inputMonitoringGranted = false
+    public private(set) var inputMonitoringRestartRecommended = false
     @ObservationIgnored private var activationObserver: NSObjectProtocol?
+    @ObservationIgnored private var refreshTask: Task<Void, Never>?
 
     public init() {
         refresh()
@@ -25,6 +27,7 @@ public final class PermissionCenter {
     }
 
     deinit {
+        refreshTask?.cancel()
         if let activationObserver {
             NotificationCenter.default.removeObserver(activationObserver)
         }
@@ -33,6 +36,9 @@ public final class PermissionCenter {
     public func refresh() {
         accessibilityGranted = AXIsProcessTrusted()
         inputMonitoringGranted = CGPreflightListenEventAccess()
+        if inputMonitoringGranted {
+            inputMonitoringRestartRecommended = false
+        }
     }
 
     public func requestAccessibility() {
@@ -43,12 +49,27 @@ public final class PermissionCenter {
 
     public func requestInputMonitoring() {
         _ = CGRequestListenEventAccess()
+        inputMonitoringRestartRecommended = true
         Task { @MainActor [weak self] in
             try? await Task.sleep(for: .milliseconds(700))
             guard let self else { return }
             self.refresh()
             if !self.inputMonitoringGranted {
                 self.openInputMonitoringSettings()
+            }
+        }
+    }
+
+    public func relaunchApplication() {
+        let configuration = NSWorkspace.OpenConfiguration()
+        configuration.activates = true
+        configuration.addsToRecentItems = false
+        configuration.createsNewApplicationInstance = true
+
+        NSWorkspace.shared.openApplication(at: Bundle.main.bundleURL, configuration: configuration) { _, error in
+            guard error == nil else { return }
+            Task { @MainActor in
+                NSApp.terminate(nil)
             }
         }
     }
@@ -67,9 +88,13 @@ public final class PermissionCenter {
     }
 
     private func scheduleRefresh() {
-        Task { @MainActor [weak self] in
-            try? await Task.sleep(for: .seconds(1))
-            self?.refresh()
+        refreshTask?.cancel()
+        refreshTask = Task { @MainActor [weak self] in
+            for _ in 0..<12 {
+                try? await Task.sleep(for: .milliseconds(500))
+                guard !Task.isCancelled, let self else { return }
+                self.refresh()
+            }
         }
     }
 }

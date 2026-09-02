@@ -28,7 +28,7 @@ public final class SequenceMonitor {
         guard let tap = CGEvent.tapCreate(
             tap: .cgSessionEventTap,
             place: .headInsertEventTap,
-            options: .defaultTap,
+            options: .listenOnly,
             eventsOfInterest: mask,
             callback: sequenceEventCallback,
             userInfo: Unmanaged.passUnretained(self).toOpaque()

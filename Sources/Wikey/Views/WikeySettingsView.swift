@@ -59,6 +59,28 @@ struct WikeySettingsView: View {
                         }
                     }
 
+                    if runtime.permissions.inputMonitoringRestartRecommended {
+                        HStack(spacing: 12) {
+                            Image(systemName: "arrow.clockwise.circle.fill")
+                                .foregroundStyle(.blue)
+                                .font(.title3)
+                                .frame(width: 30)
+                            VStack(alignment: .leading, spacing: 3) {
+                                Text("입력 모니터링을 켰다면 Wikey를 다시 열어 주세요")
+                                    .font(.headline)
+                                Text("macOS는 이 권한을 새로 시작한 앱에 적용합니다.")
+                                    .font(.subheadline)
+                                    .foregroundStyle(.secondary)
+                            }
+                            Spacer()
+                            Button("Wikey 다시 열기") {
+                                runtime.permissions.relaunchApplication()
+                            }
+                        }
+                        .padding(14)
+                        .background(Color.blue.opacity(0.07), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+                    }
+
                     Button("권한 상태 새로고침", systemImage: "arrow.clockwise") {
                         runtime.permissions.refresh()
                     }

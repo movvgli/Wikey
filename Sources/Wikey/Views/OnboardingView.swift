@@ -46,6 +46,21 @@ struct OnboardingView: View {
                         .stroke(Color(nsColor: .separatorColor).opacity(0.7), lineWidth: 1)
                 }
 
+                if runtime.permissions.inputMonitoringRestartRecommended {
+                    HStack(spacing: 10) {
+                        Image(systemName: "arrow.clockwise.circle.fill")
+                            .foregroundStyle(.blue)
+                        Text("입력 모니터링을 켠 뒤에는 Wikey를 다시 열어야 적용됩니다.")
+                            .font(.subheadline)
+                        Spacer()
+                        Button("다시 열기") {
+                            runtime.permissions.relaunchApplication()
+                        }
+                    }
+                    .padding(12)
+                    .background(Color.blue.opacity(0.07), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+                }
+
                 VStack(alignment: .leading, spacing: 5) {
                     Toggle("Mac 로그인 시 Wikey 실행", isOn: $launchAtLogin)
                         .toggleStyle(.switch)
