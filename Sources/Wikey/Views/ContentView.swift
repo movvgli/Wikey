@@ -419,12 +419,14 @@ private struct SidebarSectionHeader: View {
     var count: Int
 
     var body: some View {
-        HStack {
+        HStack(spacing: 6) {
             Text(title)
-            Spacer()
             Text("\(count)")
+                .font(.system(size: 9, weight: .semibold, design: .rounded))
                 .monospacedDigit()
-                .foregroundStyle(.tertiary)
+                .foregroundStyle(.secondary)
+                .frame(width: 17, height: 17)
+                .background(.quaternary, in: Circle())
         }
     }
 }
