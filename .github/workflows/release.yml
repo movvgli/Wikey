@@ -24,13 +24,16 @@ jobs:
             echo "Invalid release tag: $GITHUB_REF_NAME" >&2
             exit 1
           fi
+          IFS='.' read -r major minor patch <<< "$version"
+          build_number=$((10#$major * 1000000 + 10#$minor * 1000 + 10#$patch))
           echo "WIKEY_VERSION=$version" >> "$GITHUB_ENV"
+          echo "WIKEY_BUILD_NUMBER=$build_number" >> "$GITHUB_ENV"
 
       - name: Run tests
         run: swift test
 
       - name: Build preview DMG
-        run: ./script/package_release.sh "$WIKEY_VERSION" "$GITHUB_RUN_NUMBER"
+        run: ./script/package_release.sh "$WIKEY_VERSION" "$WIKEY_BUILD_NUMBER"
 
       - name: Verify checksum
         run: shasum -a 256 -c "dist/Wikey-$WIKEY_VERSION.dmg.sha256"
