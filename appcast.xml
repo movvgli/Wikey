@@ -1,0 +1,15 @@
+<?xml version="1.0" standalone="yes"?>
+<rss xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" version="2.0">
+    <channel>
+        <title>Wikey</title>
+        <item>
+            <title>1.1.1</title>
+            <pubDate>Thu, 03 Sep 2026 04:55:27 +0000</pubDate>
+            <link>https://github.com/movvgli/Wikey</link>
+            <sparkle:version>1001001</sparkle:version>
+            <sparkle:shortVersionString>1.1.1</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
+            <enclosure url="https://github.com/movvgli/Wikey/releases/download/v1.1.1/Wikey-1.1.1.dmg" length="5237138" type="application/octet-stream" sparkle:edSignature="VGNfCX0lVGLDjKxZgQu1Gy+dRwSZQ+U72jOXH/j6Ebk2DFmuC0nSilo8BETXz41+bccYtnzLTdfay8D6Y6Y2Aw=="/>
+        </item>
+    </channel>
+</rss>
