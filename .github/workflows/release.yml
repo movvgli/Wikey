@@ -101,7 +101,7 @@ jobs:
           else
             git worktree add --detach "$feed_worktree"
             git -C "$feed_worktree" switch --orphan update-feed
-            git -C "$feed_worktree" rm -rf .
+            git -C "$feed_worktree" rm -rf --ignore-unmatch .
           fi
           cp dist/appcast.xml "$feed_worktree/appcast.xml"
           git -C "$feed_worktree" add appcast.xml
