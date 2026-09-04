@@ -3,6 +3,16 @@
     <channel>
         <title>Wikey</title>
         <item>
+            <title>1.2.2</title>
+            <pubDate>Fri, 04 Sep 2026 07:47:29 +0000</pubDate>
+            <link>https://github.com/movvgli/Wikey</link>
+            <sparkle:version>1002002</sparkle:version>
+            <sparkle:shortVersionString>1.2.2</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
+            <sparkle:releaseNotesLink>https://raw.githubusercontent.com/movvgli/Wikey/update-feed/Wikey-1.2.2.md</sparkle:releaseNotesLink>
+            <enclosure url="https://github.com/movvgli/Wikey/releases/download/v1.2.2/Wikey-1.2.2.dmg" length="5776902" type="application/octet-stream" sparkle:edSignature="AFKj1TiA5YNNPhCLLLKCap7RXL9qM0ukC6ylYKslIDuXEdy9KnJFJsd/7tqm9HXJNaRIuNAvdy8q7qPR5ZN4Cg=="/>
+        </item>
+        <item>
             <title>1.2.1</title>
             <pubDate>Fri, 04 Sep 2026 06:15:04 +0000</pubDate>
             <link>https://github.com/movvgli/Wikey</link>
@@ -21,15 +31,6 @@
             <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
             <sparkle:releaseNotesLink>https://raw.githubusercontent.com/movvgli/Wikey/update-feed/Wikey-1.2.0.md</sparkle:releaseNotesLink>
             <enclosure url="https://github.com/movvgli/Wikey/releases/download/v1.2.0/Wikey-1.2.0.dmg" length="5590682" type="application/octet-stream" sparkle:edSignature="b3T1CbbKIto2xSwx9hgduoqtpITBvFunWpkpWrpMLppAPM0PfsABMhq7IGRpTkvHu2R8WWX0y0/xqK+LcfxLBg=="/>
-        </item>
-        <item>
-            <title>1.1.1</title>
-            <pubDate>Thu, 03 Sep 2026 04:55:27 +0000</pubDate>
-            <link>https://github.com/movvgli/Wikey</link>
-            <sparkle:version>1001001</sparkle:version>
-            <sparkle:shortVersionString>1.1.1</sparkle:shortVersionString>
-            <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
-            <enclosure url="https://github.com/movvgli/Wikey/releases/download/v1.1.1/Wikey-1.1.1.dmg" length="5237138" type="application/octet-stream" sparkle:edSignature="VGNfCX0lVGLDjKxZgQu1Gy+dRwSZQ+U72jOXH/j6Ebk2DFmuC0nSilo8BETXz41+bccYtnzLTdfay8D6Y6Y2Aw=="/>
         </item>
     </channel>
 </rss>
