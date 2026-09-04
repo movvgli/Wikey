@@ -38,4 +38,34 @@ struct WikeyStoreTests {
         let backups = try FileManager.default.contentsOfDirectory(atPath: root.path)
         #expect(backups.contains(where: { $0.hasPrefix("config-corrupt-") }))
     }
+
+    @Test func newWorkflowActionsRoundTrip() throws {
+        let targetID = UUID()
+        let actions: [WorkflowAction] = [
+            .pressKey(.enter),
+            .pressKey(.shiftEnter),
+            .runWorkflow(workflowID: targetID),
+        ]
+
+        let data = try JSONEncoder().encode(actions)
+        #expect(try JSONDecoder().decode([WorkflowAction].self, from: data) == actions)
+    }
+
+    @Test func deletingWorkflowRemovesReferences() throws {
+        let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
+        defer { try? FileManager.default.removeItem(at: root) }
+
+        let store = WikeyStore(rootURL: root)
+        store.load()
+        let sourceID = store.addWorkflow()
+        let targetID = store.addWorkflow()
+        let sourceIndex = try #require(store.workflows.firstIndex(where: { $0.id == sourceID }))
+        store.workflows[sourceIndex].actions = [.runWorkflow(workflowID: targetID)]
+        store.save()
+
+        store.deleteWorkflow(id: targetID)
+
+        #expect(store.workflows.count == 1)
+        #expect(store.workflows.first?.actions.isEmpty == true)
+    }
 }

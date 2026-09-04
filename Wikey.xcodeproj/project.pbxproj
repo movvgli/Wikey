@@ -9,10 +9,12 @@
 /* Begin PBXBuildFile section */
 		02FE059849B0EA93DA944EC6 /* WorkflowEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AA2E33F5834328B1676075C /* WorkflowEditorView.swift */; };
 		033DF5DBF070491C9B43C44B /* WikeySettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4F766E91A1B80A9C12FBAEC /* WikeySettingsView.swift */; };
+		08B3CA95AE96DAAE5D754B37 /* WorkflowReferenceSetupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F423893B1BA45A8F9760DDEC /* WorkflowReferenceSetupView.swift */; };
 		09E7C3E09C1886278FE0D381 /* WikeyDesignComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78E342F0F6965420E4F40F7C /* WikeyDesignComponents.swift */; };
 		0C7CCEF891E33A41F59495E8 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29F348C057BC64F22F800363 /* ContentView.swift */; };
 		20CF0164562147E06DC478F2 /* HotkeyRegistrar.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7262FE82D70589434BC129D /* HotkeyRegistrar.swift */; };
 		27A9C27A392B8F1F5A58FB7F /* LoginItemService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8560B8F9FAA2423F83B5AFD2 /* LoginItemService.swift */; };
+		386E00ABEB48AEA32143901F /* WorkflowDependencyGraphTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A58779AA8B13CB411D03F8 /* WorkflowDependencyGraphTests.swift */; };
 		445E014CC3B3C6F67694C884 /* LayoutZoneTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DED5C2DC0216363FC43B3BF0 /* LayoutZoneTests.swift */; };
 		55BF68D94F5D08BAC89802E5 /* WikeyApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1EF5D86CA973B6444063C36 /* WikeyApp.swift */; };
 		57FCA4BFF1808A3845F2E6B2 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E4044A7589BCC13D42395C5 /* OnboardingView.swift */; };
@@ -39,6 +41,7 @@
 		DD5B1C0F78ADC5846938C905 /* UpdateController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CFCF42AC1BEA3A2CEFF6D14 /* UpdateController.swift */; };
 		E24573A2C1C0FF57A601F03A /* ShortcutModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A806BBE6571A9A314CA4626 /* ShortcutModels.swift */; };
 		E77D93BDE77F2DACE4F10BFC /* ApplicationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D115422AEFE98EEB2398A213 /* ApplicationController.swift */; };
+		F8C4225DF9C0D8447F187BCD /* KeyboardService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BBFD811CFF41BB6E50326A3 /* KeyboardService.swift */; };
 		FAB9A8082885070D03068832 /* WikeyCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 40179216A1772150F1719EAC /* WikeyCore.framework */; };
 		FCA8C63E9E1624F4EB94572B /* WikeyStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A24D53D060BE24564F62CF55 /* WikeyStore.swift */; };
 /* End PBXBuildFile section */
@@ -110,6 +113,7 @@
 		8560B8F9FAA2423F83B5AFD2 /* LoginItemService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginItemService.swift; sourceTree = "<group>"; };
 		8CFCF42AC1BEA3A2CEFF6D14 /* UpdateController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateController.swift; sourceTree = "<group>"; };
 		928C51A8110C6A07CC483231 /* ShortcutRecorderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShortcutRecorderView.swift; sourceTree = "<group>"; };
+		9BBFD811CFF41BB6E50326A3 /* KeyboardService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardService.swift; sourceTree = "<group>"; };
 		9CD5FD16E604EF4F1646268C /* RichTextEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RichTextEditor.swift; sourceTree = "<group>"; };
 		A24D53D060BE24564F62CF55 /* WikeyStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WikeyStore.swift; sourceTree = "<group>"; };
 		A29E038D71C3173FDA10BF35 /* WikeyStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WikeyStoreTests.swift; sourceTree = "<group>"; };
@@ -125,7 +129,9 @@
 		D115422AEFE98EEB2398A213 /* ApplicationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApplicationController.swift; sourceTree = "<group>"; };
 		D3E3BAD7A516C118AD61DE4C /* PermissionCenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PermissionCenter.swift; sourceTree = "<group>"; };
 		DED5C2DC0216363FC43B3BF0 /* LayoutZoneTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LayoutZoneTests.swift; sourceTree = "<group>"; };
+		E7A58779AA8B13CB411D03F8 /* WorkflowDependencyGraphTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkflowDependencyGraphTests.swift; sourceTree = "<group>"; };
 		EB5E59681CF2AF25BFC5FF4B /* WorkflowRunner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkflowRunner.swift; sourceTree = "<group>"; };
+		F423893B1BA45A8F9760DDEC /* WorkflowReferenceSetupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkflowReferenceSetupView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -166,6 +172,7 @@
 				DED5C2DC0216363FC43B3BF0 /* LayoutZoneTests.swift */,
 				663A3FFA0154A8359CDC55F4 /* ShortcutModelsTests.swift */,
 				A29E038D71C3173FDA10BF35 /* WikeyStoreTests.swift */,
+				E7A58779AA8B13CB411D03F8 /* WorkflowDependencyGraphTests.swift */,
 			);
 			name = WikeyCoreTests;
 			path = Tests/WikeyCoreTests;
@@ -184,6 +191,7 @@
 				78E342F0F6965420E4F40F7C /* WikeyDesignComponents.swift */,
 				C4F766E91A1B80A9C12FBAEC /* WikeySettingsView.swift */,
 				3AA2E33F5834328B1676075C /* WorkflowEditorView.swift */,
+				F423893B1BA45A8F9760DDEC /* WorkflowReferenceSetupView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -194,6 +202,7 @@
 				D115422AEFE98EEB2398A213 /* ApplicationController.swift */,
 				744108B9609996B38F488896 /* ClipboardService.swift */,
 				B7262FE82D70589434BC129D /* HotkeyRegistrar.swift */,
+				9BBFD811CFF41BB6E50326A3 /* KeyboardService.swift */,
 				8560B8F9FAA2423F83B5AFD2 /* LoginItemService.swift */,
 				D3E3BAD7A516C118AD61DE4C /* PermissionCenter.swift */,
 				B8A71BEF5729FB22DA320117 /* SequenceMonitor.swift */,
@@ -455,6 +464,7 @@
 				B2DAC1456C2D128715B1C578 /* AutomationModels.swift in Sources */,
 				B5799D8F35C35736980A3568 /* ClipboardService.swift in Sources */,
 				20CF0164562147E06DC478F2 /* HotkeyRegistrar.swift in Sources */,
+				F8C4225DF9C0D8447F187BCD /* KeyboardService.swift in Sources */,
 				27A9C27A392B8F1F5A58FB7F /* LoginItemService.swift in Sources */,
 				63147077D02F807AD118A26A /* PermissionCenter.swift in Sources */,
 				BC6A1834D3C90304AFE9B0A3 /* SequenceMonitor.swift in Sources */,
@@ -482,6 +492,7 @@
 				09E7C3E09C1886278FE0D381 /* WikeyDesignComponents.swift in Sources */,
 				033DF5DBF070491C9B43C44B /* WikeySettingsView.swift in Sources */,
 				02FE059849B0EA93DA944EC6 /* WorkflowEditorView.swift in Sources */,
+				08B3CA95AE96DAAE5D754B37 /* WorkflowReferenceSetupView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -500,6 +511,7 @@
 				445E014CC3B3C6F67694C884 /* LayoutZoneTests.swift in Sources */,
 				AC96BF2982CDB8BFD3C83617 /* ShortcutModelsTests.swift in Sources */,
 				C550C2993B9C28E16D2DD1B2 /* WikeyStoreTests.swift in Sources */,
+				386E00ABEB48AEA32143901F /* WorkflowDependencyGraphTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -595,7 +607,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 1002002;
+				CURRENT_PROJECT_VERSION = 1002003;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -615,7 +627,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 15.0;
-				MARKETING_VERSION = 1.2.2;
+				MARKETING_VERSION = 1.2.3;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -662,7 +674,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 1002002;
+				CURRENT_PROJECT_VERSION = 1002003;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = "";
 				ENABLE_NS_ASSERTIONS = NO;
@@ -676,7 +688,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 15.0;
-				MARKETING_VERSION = 1.2.2;
+				MARKETING_VERSION = 1.2.3;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";

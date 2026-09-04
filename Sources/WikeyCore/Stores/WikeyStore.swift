@@ -108,6 +108,14 @@ public final class WikeyStore {
 
     public func deleteWorkflow(id: UUID) {
         state.workflows.removeAll { $0.id == id }
+        state.workflows = state.workflows.map { workflow in
+            var workflow = workflow
+            workflow.actions.removeAll {
+                if case .runWorkflow(let workflowID) = $0 { return workflowID == id }
+                return false
+            }
+            return workflow
+        }
         save()
     }
 

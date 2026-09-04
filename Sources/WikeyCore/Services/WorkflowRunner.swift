@@ -12,17 +12,20 @@ public final class WorkflowRunner {
     private let store: WikeyStore
     private let applications: ApplicationController
     private let clipboard: ClipboardService
+    private let keyboard: KeyboardService
     private let layouts: WindowLayoutController
 
     public init(
         store: WikeyStore,
         applications: ApplicationController,
         clipboard: ClipboardService,
+        keyboard: KeyboardService,
         layouts: WindowLayoutController
     ) {
         self.store = store
         self.applications = applications
         self.clipboard = clipboard
+        self.keyboard = keyboard
         self.layouts = layouts
     }
 
@@ -49,9 +52,28 @@ public final class WorkflowRunner {
     private func run(_ workflow: Workflow) async -> RunSummary {
         let startedAt = Date()
         let originalApplication = applications.frontmostApplication()
+        let failures = await runActions(
+            workflow.actions,
+            originalApplication: originalApplication,
+            executionStack: [workflow.id]
+        )
+
+        return RunSummary(
+            workflowName: workflow.name,
+            startedAt: startedAt,
+            finishedAt: Date(),
+            failures: failures
+        )
+    }
+
+    private func runActions(
+        _ actions: [WorkflowAction],
+        originalApplication: NSRunningApplication?,
+        executionStack: [UUID]
+    ) async -> [ActionFailure] {
         var failures: [ActionFailure] = []
 
-        for action in workflow.actions {
+        for action in actions {
             do {
                 switch action {
                 case .launchApplication(let bundleIdentifier, _):
@@ -78,17 +100,34 @@ public final class WorkflowRunner {
                     failures.append(contentsOf: layoutFailures.map {
                         ActionFailure(actionTitle: "\(action.title) · \($0.actionTitle)", message: $0.message)
                     })
+
+                case .pressKey(let key):
+                    try await keyboard.press(key, into: originalApplication)
+
+                case .runWorkflow(let workflowID):
+                    guard !executionStack.contains(workflowID) else {
+                        throw AutomationError.workflowCycleDetected
+                    }
+                    guard let nestedWorkflow = store.workflows.first(where: { $0.id == workflowID }) else {
+                        throw AutomationError.workflowNotFound
+                    }
+                    let nestedFailures = await runActions(
+                        nestedWorkflow.actions,
+                        originalApplication: originalApplication,
+                        executionStack: executionStack + [workflowID]
+                    )
+                    failures.append(contentsOf: nestedFailures.map {
+                        ActionFailure(
+                            actionTitle: "\(nestedWorkflow.name) · \($0.actionTitle)",
+                            message: $0.message
+                        )
+                    })
                 }
             } catch {
                 failures.append(ActionFailure(actionTitle: action.title, message: error.localizedDescription))
             }
         }
 
-        return RunSummary(
-            workflowName: workflow.name,
-            startedAt: startedAt,
-            finishedAt: Date(),
-            failures: failures
-        )
+        return failures
     }
 }

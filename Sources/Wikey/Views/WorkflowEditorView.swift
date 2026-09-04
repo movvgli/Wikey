@@ -14,9 +14,21 @@ struct WorkflowEditorView: View {
     @State private var showsTemplateActionSetup = false
     @State private var selectedTemplateID: UUID?
     @State private var selectedTemplateMode: TemplateDeliveryMode = .copyOnly
+    @State private var showsWorkflowActionSetup = false
+    @State private var selectedWorkflowID: UUID?
 
     private var isRunning: Bool {
         runtime.runner.runningWorkflowID == workflow.id
+    }
+
+    private var availableReferencedWorkflows: [Workflow] {
+        runtime.store.workflows.filter { candidate in
+            !WorkflowDependencyGraph.wouldCreateCycle(
+                from: workflow.id,
+                to: candidate.id,
+                in: runtime.store.workflows
+            )
+        }
     }
 
     var body: some View {
@@ -53,6 +65,8 @@ struct WorkflowEditorView: View {
                                     ),
                                     templates: runtime.store.templates,
                                     layouts: runtime.store.layouts,
+                                    workflows: runtime.store.workflows,
+                                    currentWorkflowID: workflow.id,
                                     moveUp: { move(index, offset: -1) },
                                     moveDown: { move(index, offset: 1) },
                                     delete: {
@@ -122,6 +136,14 @@ struct WorkflowEditorView: View {
                 selectedMode: $selectedTemplateMode,
                 onCancel: { showsTemplateActionSetup = false },
                 onAdd: addSelectedTemplateAction
+            )
+        }
+        .sheet(isPresented: $showsWorkflowActionSetup) {
+            WorkflowReferenceSetupView(
+                workflows: availableReferencedWorkflows,
+                selectedWorkflowID: $selectedWorkflowID,
+                onCancel: { showsWorkflowActionSetup = false },
+                onAdd: addSelectedWorkflowAction
             )
         }
     }
@@ -238,8 +260,21 @@ struct WorkflowEditorView: View {
             Button("웹사이트 열기", systemImage: "globe") {
                 workflow.actions.append(.openURL("https://"))
             }
+            Divider()
+            Button("Enter 입력", systemImage: "return") {
+                workflow.actions.append(.pressKey(.enter))
+            }
+            Button("Shift + Enter 입력", systemImage: "arrow.turn.down.left") {
+                workflow.actions.append(.pressKey(.shiftEnter))
+            }
+            Divider()
             Button("템플릿 복사…", systemImage: "doc.on.clipboard", action: beginTemplateActionSetup)
             .disabled(runtime.store.templates.isEmpty)
+            Button("다른 워크플로 실행…", systemImage: "arrow.triangle.branch") {
+                selectedWorkflowID = nil
+                showsWorkflowActionSetup = true
+            }
+            .disabled(availableReferencedWorkflows.isEmpty)
             Button("창 레이아웃 적용", systemImage: "rectangle.3.group") {
                 if let layout = runtime.store.layouts.first {
                     workflow.actions.append(.applyLayout(layoutID: layout.id))
@@ -287,6 +322,13 @@ struct WorkflowEditorView: View {
             .copyTemplate(templateID: selectedTemplateID, mode: selectedTemplateMode)
         )
         showsTemplateActionSetup = false
+    }
+
+    private func addSelectedWorkflowAction() {
+        guard let selectedWorkflowID,
+              availableReferencedWorkflows.contains(where: { $0.id == selectedWorkflowID }) else { return }
+        workflow.actions.append(.runWorkflow(workflowID: selectedWorkflowID))
+        showsWorkflowActionSetup = false
     }
 
     private func chooseApplication() {
@@ -457,7 +499,7 @@ private struct EmptyActionsView: View {
             VStack(alignment: .leading, spacing: 3) {
                 Text("첫 동작을 추가해 보세요")
                     .font(.headline)
-                Text("앱 실행, 웹사이트 열기, 템플릿 복사, 창 배치를 연결할 수 있습니다.")
+                Text("앱, 키 입력, 템플릿과 다른 워크플로를 순서대로 연결할 수 있습니다.")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
             }
@@ -494,6 +536,8 @@ private struct FlowActionRow: View {
     @Binding var action: WorkflowAction
     var templates: [RichTemplate]
     var layouts: [WindowLayout]
+    var workflows: [Workflow]
+    var currentWorkflowID: UUID
     var moveUp: () -> Void
     var moveDown: () -> Void
     var delete: () -> Void
@@ -571,6 +615,8 @@ private struct FlowActionRow: View {
         case .copyTemplate: "템플릿 복사"
         case .openURL: "웹사이트 열기"
         case .applyLayout: "창 배치"
+        case .pressKey(let key): "\(key.title) 입력"
+        case .runWorkflow: "워크플로 실행"
         }
     }
 
@@ -585,6 +631,10 @@ private struct FlowActionRow: View {
             return URL(string: url)?.host ?? url
         case .applyLayout(let layoutID):
             return layouts.first(where: { $0.id == layoutID })?.name ?? "레이아웃 선택"
+        case .pressKey(let key):
+            return key == .enter ? "현재 앱에 Enter 키를 입력합니다." : "현재 앱에 Shift + Enter 키를 입력합니다."
+        case .runWorkflow(let workflowID):
+            return workflows.first(where: { $0.id == workflowID })?.name ?? "워크플로 선택"
         }
     }
 
@@ -641,6 +691,54 @@ private struct FlowActionRow: View {
             ) {
                 ForEach(layouts) { Text($0.name).tag($0.id) }
             }
+
+        case .pressKey(let key):
+            Picker(
+                "키 입력",
+                selection: Binding(
+                    get: { key },
+                    set: { action = .pressKey($0) }
+                )
+            ) {
+                ForEach(WorkflowKeyPress.allCases, id: \.self) { key in
+                    Text(key.title).tag(key)
+                }
+            }
+
+        case .runWorkflow(let workflowID):
+            VStack(alignment: .leading, spacing: 10) {
+                Picker(
+                    "워크플로",
+                    selection: Binding(
+                        get: { workflowID },
+                        set: { action = .runWorkflow(workflowID: $0) }
+                    )
+                ) {
+                    ForEach(referenceCandidates(including: workflowID)) { workflow in
+                        Text(workflow.name).tag(workflow.id)
+                    }
+                }
+
+                if WorkflowDependencyGraph.wouldCreateCycle(
+                    from: currentWorkflowID,
+                    to: workflowID,
+                    in: workflows
+                ) {
+                    Label("서로 반복 실행되는 연결입니다. 다른 워크플로를 선택하세요.", systemImage: "exclamationmark.triangle.fill")
+                        .font(.caption)
+                        .foregroundStyle(.orange)
+                }
+            }
+        }
+    }
+
+    private func referenceCandidates(including selectedID: UUID) -> [Workflow] {
+        workflows.filter { candidate in
+            candidate.id == selectedID || !WorkflowDependencyGraph.wouldCreateCycle(
+                from: currentWorkflowID,
+                to: candidate.id,
+                in: workflows
+            )
         }
     }
 }
@@ -746,6 +844,8 @@ private struct ActionIcon: View {
         case .copyTemplate: "doc.on.clipboard"
         case .openURL: "globe"
         case .applyLayout: "rectangle.3.group"
+        case .pressKey: "return"
+        case .runWorkflow: "arrow.triangle.branch"
         }
     }
 }

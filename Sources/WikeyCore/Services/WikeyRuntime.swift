@@ -9,6 +9,7 @@ public final class WikeyRuntime {
     public let loginItem: LoginItemService
     public let applications: ApplicationController
     public let clipboard: ClipboardService
+    public let keyboard: KeyboardService
     public let layoutController: WindowLayoutController
     public let hotkeys: HotkeyRegistrar
     public let runner: WorkflowRunner
@@ -20,6 +21,7 @@ public final class WikeyRuntime {
         let store = WikeyStore(rootURL: storeRootURL)
         let applications = ApplicationController()
         let clipboard = ClipboardService()
+        let keyboard = KeyboardService()
         let layoutController = WindowLayoutController(applications: applications)
         let hotkeys = HotkeyRegistrar()
 
@@ -28,12 +30,14 @@ public final class WikeyRuntime {
         self.loginItem = LoginItemService()
         self.applications = applications
         self.clipboard = clipboard
+        self.keyboard = keyboard
         self.layoutController = layoutController
         self.hotkeys = hotkeys
         self.runner = WorkflowRunner(
             store: store,
             applications: applications,
             clipboard: clipboard,
+            keyboard: keyboard,
             layouts: layoutController
         )
 

@@ -34,11 +34,25 @@ public enum TemplateDeliveryMode: String, Codable, CaseIterable, Sendable {
     }
 }
 
+public enum WorkflowKeyPress: String, Codable, CaseIterable, Sendable {
+    case enter
+    case shiftEnter
+
+    public var title: String {
+        switch self {
+        case .enter: "Enter"
+        case .shiftEnter: "Shift + Enter"
+        }
+    }
+}
+
 public enum WorkflowAction: Identifiable, Codable, Hashable, Sendable {
     case launchApplication(bundleIdentifier: String, displayName: String)
     case copyTemplate(templateID: UUID, mode: TemplateDeliveryMode)
     case openURL(String)
     case applyLayout(layoutID: UUID)
+    case pressKey(WorkflowKeyPress)
+    case runWorkflow(workflowID: UUID)
 
     public var id: String {
         switch self {
@@ -46,6 +60,8 @@ public enum WorkflowAction: Identifiable, Codable, Hashable, Sendable {
         case .copyTemplate(let id, _): "template:\(id)"
         case .openURL(let url): "url:\(url)"
         case .applyLayout(let id): "layout:\(id)"
+        case .pressKey(let key): "key:\(key.rawValue)"
+        case .runWorkflow(let id): "workflow:\(id)"
         }
     }
 
@@ -55,7 +71,36 @@ public enum WorkflowAction: Identifiable, Codable, Hashable, Sendable {
         case .copyTemplate: "템플릿 복사"
         case .openURL: "웹사이트 열기"
         case .applyLayout: "창 레이아웃 적용"
+        case .pressKey(let key): "\(key.title) 입력"
+        case .runWorkflow: "다른 워크플로 실행"
         }
+    }
+}
+
+public enum WorkflowDependencyGraph {
+    public static func wouldCreateCycle(
+        from sourceID: UUID,
+        to targetID: UUID,
+        in workflows: [Workflow]
+    ) -> Bool {
+        if sourceID == targetID { return true }
+
+        let workflowsByID = Dictionary(workflows.map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first })
+        var pending = [targetID]
+        var visited = Set<UUID>()
+
+        while let currentID = pending.popLast() {
+            if currentID == sourceID { return true }
+            guard visited.insert(currentID).inserted,
+                  let current = workflowsByID[currentID] else { continue }
+
+            pending.append(contentsOf: current.actions.compactMap { action in
+                guard case .runWorkflow(let workflowID) = action else { return nil }
+                return workflowID
+            })
+        }
+
+        return false
     }
 }
 
