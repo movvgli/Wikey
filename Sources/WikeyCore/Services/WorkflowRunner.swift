@@ -122,6 +122,14 @@ public final class WorkflowRunner {
                             message: $0.message
                         )
                     })
+
+                case .pasteImages(let filePaths):
+                    try clipboard.copyImages(at: filePaths)
+                    try await clipboard.paste(into: originalApplication)
+
+                case .pasteFiles(let filePaths):
+                    try clipboard.copyFiles(at: filePaths)
+                    try await clipboard.paste(into: originalApplication)
                 }
             } catch {
                 failures.append(ActionFailure(actionTitle: action.title, message: error.localizedDescription))

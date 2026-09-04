@@ -55,6 +55,8 @@ public enum AutomationError: LocalizedError {
     case layoutNotFound
     case permissionRequired(String)
     case clipboardWriteFailed
+    case imageNotFound(String)
+    case fileNotFound(String)
     case keyboardEventCreationFailed
     case workflowNotFound
     case workflowCycleDetected
@@ -71,7 +73,9 @@ public enum AutomationError: LocalizedError {
         case .templateNotFound: "템플릿을 찾을 수 없습니다."
         case .layoutNotFound: "레이아웃을 찾을 수 없습니다."
         case .permissionRequired(let name): "\(name) 권한이 필요합니다."
-        case .clipboardWriteFailed: "클립보드에 템플릿을 기록하지 못했습니다."
+        case .clipboardWriteFailed: "클립보드에 내용을 기록하지 못했습니다."
+        case .imageNotFound(let name): "이미지를 찾거나 열 수 없습니다: \(name)"
+        case .fileNotFound(let name): "파일을 찾을 수 없습니다: \(name)"
         case .keyboardEventCreationFailed: "키 입력을 만들지 못했습니다."
         case .workflowNotFound: "연결된 워크플로를 찾을 수 없습니다."
         case .workflowCycleDetected: "워크플로가 서로 반복 실행되도록 연결되어 중단했습니다."

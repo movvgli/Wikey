@@ -45,6 +45,8 @@ struct WikeyStoreTests {
             .pressKey(.enter),
             .pressKey(.shiftEnter),
             .runWorkflow(workflowID: targetID),
+            .pasteImages(filePaths: ["/tmp/sample-one.png", "/tmp/sample-two.jpg"]),
+            .pasteFiles(filePaths: ["/tmp/brief.pdf", "/tmp/archive.zip"]),
         ]
 
         let data = try JSONEncoder().encode(actions)

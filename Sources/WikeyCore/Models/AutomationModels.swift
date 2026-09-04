@@ -53,6 +53,8 @@ public enum WorkflowAction: Identifiable, Codable, Hashable, Sendable {
     case applyLayout(layoutID: UUID)
     case pressKey(WorkflowKeyPress)
     case runWorkflow(workflowID: UUID)
+    case pasteImages(filePaths: [String])
+    case pasteFiles(filePaths: [String])
 
     public var id: String {
         switch self {
@@ -62,6 +64,8 @@ public enum WorkflowAction: Identifiable, Codable, Hashable, Sendable {
         case .applyLayout(let id): "layout:\(id)"
         case .pressKey(let key): "key:\(key.rawValue)"
         case .runWorkflow(let id): "workflow:\(id)"
+        case .pasteImages(let paths): "images:\(paths.joined(separator: "|"))"
+        case .pasteFiles(let paths): "files:\(paths.joined(separator: "|"))"
         }
     }
 
@@ -73,6 +77,8 @@ public enum WorkflowAction: Identifiable, Codable, Hashable, Sendable {
         case .applyLayout: "창 레이아웃 적용"
         case .pressKey(let key): "\(key.title) 입력"
         case .runWorkflow: "다른 워크플로 실행"
+        case .pasteImages: "이미지 붙여넣기"
+        case .pasteFiles: "파일 붙여넣기"
         }
     }
 }

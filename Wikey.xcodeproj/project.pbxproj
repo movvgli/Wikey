@@ -36,6 +36,7 @@
 		BC6A1834D3C90304AFE9B0A3 /* SequenceMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8A71BEF5729FB22DA320117 /* SequenceMonitor.swift */; };
 		C550C2993B9C28E16D2DD1B2 /* WikeyStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A29E038D71C3173FDA10BF35 /* WikeyStoreTests.swift */; };
 		C6AD3D7ACA38FD462B1A8B80 /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = B66D693FB7A487E2063ACB81 /* Sparkle */; };
+		C8F8C8ACF5F699D21CB5F3D0 /* ClipboardServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A09383B53E374BC48B26ACE /* ClipboardServiceTests.swift */; };
 		CF2B941163616EA8EBA6622D /* WindowLayoutController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5C17D07296F5224CC879898 /* WindowLayoutController.swift */; };
 		DB1F394805DE2D7195B28F28 /* WikeyCore.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 40179216A1772150F1719EAC /* WikeyCore.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		DD5B1C0F78ADC5846938C905 /* UpdateController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CFCF42AC1BEA3A2CEFF6D14 /* UpdateController.swift */; };
@@ -99,6 +100,7 @@
 		0846B804A546C6724A579006 /* WikeyCoreTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = WikeyCoreTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		1F8F86E61039D8E0A96453B2 /* WikeyRuntime.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WikeyRuntime.swift; sourceTree = "<group>"; };
 		29F348C057BC64F22F800363 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		2A09383B53E374BC48B26ACE /* ClipboardServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipboardServiceTests.swift; sourceTree = "<group>"; };
 		2AAC3E4BFBB08DCCCA85D5BC /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		3AA2E33F5834328B1676075C /* WorkflowEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkflowEditorView.swift; sourceTree = "<group>"; };
 		40179216A1772150F1719EAC /* WikeyCore.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = WikeyCore.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -169,6 +171,7 @@
 		33094601B28C24084903EAF3 /* WikeyCoreTests */ = {
 			isa = PBXGroup;
 			children = (
+				2A09383B53E374BC48B26ACE /* ClipboardServiceTests.swift */,
 				DED5C2DC0216363FC43B3BF0 /* LayoutZoneTests.swift */,
 				663A3FFA0154A8359CDC55F4 /* ShortcutModelsTests.swift */,
 				A29E038D71C3173FDA10BF35 /* WikeyStoreTests.swift */,
@@ -508,6 +511,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C8F8C8ACF5F699D21CB5F3D0 /* ClipboardServiceTests.swift in Sources */,
 				445E014CC3B3C6F67694C884 /* LayoutZoneTests.swift in Sources */,
 				AC96BF2982CDB8BFD3C83617 /* ShortcutModelsTests.swift in Sources */,
 				C550C2993B9C28E16D2DD1B2 /* WikeyStoreTests.swift in Sources */,
@@ -607,7 +611,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 1002003;
+				CURRENT_PROJECT_VERSION = 1002004;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -627,7 +631,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 15.0;
-				MARKETING_VERSION = 1.2.3;
+				MARKETING_VERSION = 1.2.4;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -674,7 +678,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 1002003;
+				CURRENT_PROJECT_VERSION = 1002004;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = "";
 				ENABLE_NS_ASSERTIONS = NO;
@@ -688,7 +692,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 15.0;
-				MARKETING_VERSION = 1.2.3;
+				MARKETING_VERSION = 1.2.4;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";

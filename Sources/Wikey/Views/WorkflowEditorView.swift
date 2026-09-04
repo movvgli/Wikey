@@ -270,6 +270,16 @@ struct WorkflowEditorView: View {
             Divider()
             Button("템플릿 복사…", systemImage: "doc.on.clipboard", action: beginTemplateActionSetup)
             .disabled(runtime.store.templates.isEmpty)
+            Button("이미지 붙여넣기…", systemImage: "photo.on.rectangle") {
+                if let paths = chooseFiles(title: "붙여넣을 이미지 선택", contentType: .image) {
+                    workflow.actions.append(.pasteImages(filePaths: paths))
+                }
+            }
+            Button("파일 붙여넣기…", systemImage: "paperclip") {
+                if let paths = chooseFiles(title: "붙여넣을 파일 선택", contentType: .item) {
+                    workflow.actions.append(.pasteFiles(filePaths: paths))
+                }
+            }
             Button("다른 워크플로 실행…", systemImage: "arrow.triangle.branch") {
                 selectedWorkflowID = nil
                 showsWorkflowActionSetup = true
@@ -343,6 +353,18 @@ struct WorkflowEditorView: View {
             ?? (bundle.object(forInfoDictionaryKey: "CFBundleName") as? String)
             ?? url.deletingPathExtension().lastPathComponent
         workflow.actions.append(.launchApplication(bundleIdentifier: identifier, displayName: name))
+    }
+
+    private func chooseFiles(title: String, contentType: UTType) -> [String]? {
+        let panel = NSOpenPanel()
+        panel.title = title
+        panel.allowedContentTypes = [contentType]
+        panel.allowsMultipleSelection = true
+        panel.canChooseDirectories = false
+        panel.canChooseFiles = true
+        guard panel.runModal() == .OK else { return nil }
+        let paths = panel.urls.map(\.path)
+        return paths.isEmpty ? nil : paths
     }
 }
 
@@ -499,7 +521,7 @@ private struct EmptyActionsView: View {
             VStack(alignment: .leading, spacing: 3) {
                 Text("첫 동작을 추가해 보세요")
                     .font(.headline)
-                Text("앱, 키 입력, 템플릿과 다른 워크플로를 순서대로 연결할 수 있습니다.")
+                Text("앱, 키 입력, 템플릿, 이미지, 파일과 다른 워크플로를 순서대로 연결할 수 있습니다.")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
             }
@@ -617,6 +639,8 @@ private struct FlowActionRow: View {
         case .applyLayout: "창 배치"
         case .pressKey(let key): "\(key.title) 입력"
         case .runWorkflow: "워크플로 실행"
+        case .pasteImages: "이미지 붙여넣기"
+        case .pasteFiles: "파일 붙여넣기"
         }
     }
 
@@ -635,6 +659,10 @@ private struct FlowActionRow: View {
             return key == .enter ? "현재 앱에 Enter 키를 입력합니다." : "현재 앱에 Shift + Enter 키를 입력합니다."
         case .runWorkflow(let workflowID):
             return workflows.first(where: { $0.id == workflowID })?.name ?? "워크플로 선택"
+        case .pasteImages(let filePaths):
+            return selectedFileSummary(filePaths, itemName: "이미지")
+        case .pasteFiles(let filePaths):
+            return selectedFileSummary(filePaths, itemName: "파일")
         }
     }
 
@@ -729,7 +757,54 @@ private struct FlowActionRow: View {
                         .foregroundStyle(.orange)
                 }
             }
+
+        case .pasteImages(let filePaths):
+            selectedFilesEditor(filePaths, kind: .image)
+
+        case .pasteFiles(let filePaths):
+            selectedFilesEditor(filePaths, kind: .item)
         }
+    }
+
+    private func selectedFileSummary(_ filePaths: [String], itemName: String) -> String {
+        guard let firstPath = filePaths.first else { return "\(itemName) 선택" }
+        let firstName = URL(fileURLWithPath: firstPath).lastPathComponent
+        return filePaths.count == 1 ? firstName : "\(firstName) 외 \(filePaths.count - 1)개"
+    }
+
+    @ViewBuilder
+    private func selectedFilesEditor(_ filePaths: [String], kind: UTType) -> some View {
+        VStack(alignment: .leading, spacing: 12) {
+            ForEach(filePaths, id: \.self) { path in
+                Label(URL(fileURLWithPath: path).lastPathComponent, systemImage: kind == .image ? "photo" : "doc")
+                    .lineLimit(1)
+            }
+
+            if filePaths.contains(where: { !FileManager.default.fileExists(atPath: $0) }) {
+                Label("이동되거나 삭제된 항목이 있습니다. 다시 선택해 주세요.", systemImage: "exclamationmark.triangle.fill")
+                    .font(.caption)
+                    .foregroundStyle(.orange)
+            }
+
+            Button(kind == .image ? "이미지 다시 선택…" : "파일 다시 선택…") {
+                guard let paths = chooseReplacementFiles(kind: kind) else { return }
+                action = kind == .image
+                    ? .pasteImages(filePaths: paths)
+                    : .pasteFiles(filePaths: paths)
+            }
+        }
+    }
+
+    private func chooseReplacementFiles(kind: UTType) -> [String]? {
+        let panel = NSOpenPanel()
+        panel.title = kind == .image ? "붙여넣을 이미지 선택" : "붙여넣을 파일 선택"
+        panel.allowedContentTypes = [kind]
+        panel.allowsMultipleSelection = true
+        panel.canChooseDirectories = false
+        panel.canChooseFiles = true
+        guard panel.runModal() == .OK else { return nil }
+        let paths = panel.urls.map(\.path)
+        return paths.isEmpty ? nil : paths
     }
 
     private func referenceCandidates(including selectedID: UUID) -> [Workflow] {
@@ -846,6 +921,8 @@ private struct ActionIcon: View {
         case .applyLayout: "rectangle.3.group"
         case .pressKey: "return"
         case .runWorkflow: "arrow.triangle.branch"
+        case .pasteImages: "photo.on.rectangle"
+        case .pasteFiles: "paperclip"
         }
     }
 }
