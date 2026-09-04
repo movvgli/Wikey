@@ -29,6 +29,8 @@
 		854F4322866212E982763957 /* RichTextEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CD5FD16E604EF4F1646268C /* RichTextEditor.swift */; };
 		8C4980DCEAB4DBFB4490CF2A /* TemplateEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5D474D7A2FE6E9C6853A5B0 /* TemplateEditorView.swift */; };
 		927F0D80C51F1791461D8FEA /* WikeyRuntime.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F8F86E61039D8E0A96453B2 /* WikeyRuntime.swift */; };
+		9321B69E644F99C715153975 /* InstalledApplicationCatalog.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9A9022F68765B1273395BCD /* InstalledApplicationCatalog.swift */; };
+		A29D31B4C0383875CBDE463E /* ApplicationsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C8650191882F2C13EE06D44 /* ApplicationsView.swift */; };
 		A82F0ABC9CA30EED0A8635F2 /* ShortcutRecorderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 928C51A8110C6A07CC483231 /* ShortcutRecorderView.swift */; };
 		AC96BF2982CDB8BFD3C83617 /* ShortcutModelsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 663A3FFA0154A8359CDC55F4 /* ShortcutModelsTests.swift */; };
 		B2DAC1456C2D128715B1C578 /* AutomationModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7EDE41677010F0CFC513F4F7 /* AutomationModels.swift */; };
@@ -98,6 +100,7 @@
 
 /* Begin PBXFileReference section */
 		0846B804A546C6724A579006 /* WikeyCoreTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = WikeyCoreTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		0C8650191882F2C13EE06D44 /* ApplicationsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApplicationsView.swift; sourceTree = "<group>"; };
 		1F8F86E61039D8E0A96453B2 /* WikeyRuntime.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WikeyRuntime.swift; sourceTree = "<group>"; };
 		29F348C057BC64F22F800363 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		2A09383B53E374BC48B26ACE /* ClipboardServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipboardServiceTests.swift; sourceTree = "<group>"; };
@@ -125,6 +128,7 @@
 		B48F73680E3E23180A8E8089 /* LayoutEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LayoutEditorView.swift; sourceTree = "<group>"; };
 		B7262FE82D70589434BC129D /* HotkeyRegistrar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotkeyRegistrar.swift; sourceTree = "<group>"; };
 		B8A71BEF5729FB22DA320117 /* SequenceMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SequenceMonitor.swift; sourceTree = "<group>"; };
+		B9A9022F68765B1273395BCD /* InstalledApplicationCatalog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstalledApplicationCatalog.swift; sourceTree = "<group>"; };
 		C4F766E91A1B80A9C12FBAEC /* WikeySettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WikeySettingsView.swift; sourceTree = "<group>"; };
 		C5C17D07296F5224CC879898 /* WindowLayoutController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindowLayoutController.swift; sourceTree = "<group>"; };
 		C5D474D7A2FE6E9C6853A5B0 /* TemplateEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TemplateEditorView.swift; sourceTree = "<group>"; };
@@ -181,9 +185,18 @@
 			path = Tests/WikeyCoreTests;
 			sourceTree = "<group>";
 		};
+		36B74026C6CDD2E3AD67AEDF /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				B9A9022F68765B1273395BCD /* InstalledApplicationCatalog.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
 		39F44E29A870DC1047815552 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				0C8650191882F2C13EE06D44 /* ApplicationsView.swift */,
 				29F348C057BC64F22F800363 /* ContentView.swift */,
 				B48F73680E3E23180A8E8089 /* LayoutEditorView.swift */,
 				785E1FA6D60362D2E231CFB0 /* MenuBarContentView.swift */,
@@ -221,6 +234,7 @@
 			children = (
 				B92CAD5775CD37E519C65D37 /* App */,
 				C782BDC5F620EEE383BFC9A4 /* Resources */,
+				36B74026C6CDD2E3AD67AEDF /* Services */,
 				39F44E29A870DC1047815552 /* Views */,
 			);
 			name = Wikey;
@@ -483,7 +497,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A29D31B4C0383875CBDE463E /* ApplicationsView.swift in Sources */,
 				0C7CCEF891E33A41F59495E8 /* ContentView.swift in Sources */,
+				9321B69E644F99C715153975 /* InstalledApplicationCatalog.swift in Sources */,
 				764F388AE8FB73D0D099FA32 /* LayoutEditorView.swift in Sources */,
 				590245A0CFE67869BF4CF7D9 /* MenuBarContentView.swift in Sources */,
 				57FCA4BFF1808A3845F2E6B2 /* OnboardingView.swift in Sources */,

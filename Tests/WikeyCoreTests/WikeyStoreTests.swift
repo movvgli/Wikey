@@ -12,6 +12,14 @@ struct WikeyStoreTests {
         store.load()
         let workflowID = store.addWorkflow()
         let templateID = store.addTemplate()
+        let appGesture = ShortcutGesture(steps: [
+            KeyChord(keyCode: 0, modifiers: [.control, .option]),
+        ])
+        store.setApplicationShortcut(
+            bundleIdentifier: "com.apple.TextEdit",
+            displayName: "텍스트 편집기",
+            shortcut: appGesture
+        )
         let document = NSAttributedString(
             string: "서식 템플릿",
             attributes: [.font: NSFont.boldSystemFont(ofSize: 15), .link: URL(string: "https://example.com")!]
@@ -22,7 +30,25 @@ struct WikeyStoreTests {
         reloaded.load()
         #expect(reloaded.workflows.first?.id == workflowID)
         #expect(reloaded.templateDocument(id: templateID).string == "서식 템플릿")
+        #expect(reloaded.applicationShortcuts.first?.bundleIdentifier == "com.apple.TextEdit")
+        #expect(reloaded.applicationShortcuts.first?.shortcut == appGesture)
         #expect(reloaded.lastPersistenceError == nil)
+    }
+
+    @Test func legacyStateWithoutApplicationShortcutsStillLoads() throws {
+        let data = Data(
+            """
+            {
+              "schemaVersion": 1,
+              "workflows": [],
+              "templates": [],
+              "layouts": []
+            }
+            """.utf8
+        )
+
+        let state = try JSONDecoder().decode(PersistedState.self, from: data)
+        #expect(state.applicationShortcuts.isEmpty)
     }
 
     @Test func corruptStateStartsEmptyAndCreatesBackup() throws {
@@ -68,6 +94,26 @@ struct WikeyStoreTests {
         store.deleteWorkflow(id: targetID)
 
         #expect(store.workflows.count == 1)
+        #expect(store.workflows.first?.actions.isEmpty == true)
+    }
+
+    @Test func deletingTemplateRemovesWorkflowActions() throws {
+        let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
+        defer { try? FileManager.default.removeItem(at: root) }
+
+        let store = WikeyStore(rootURL: root)
+        store.load()
+        let workflowID = store.addWorkflow()
+        let templateID = store.addTemplate()
+        let workflowIndex = try #require(store.workflows.firstIndex(where: { $0.id == workflowID }))
+        store.workflows[workflowIndex].actions = [
+            .copyTemplate(templateID: templateID, mode: .copyAndPaste),
+        ]
+        store.save()
+
+        store.deleteTemplate(id: templateID)
+
+        #expect(store.templates.isEmpty)
         #expect(store.workflows.first?.actions.isEmpty == true)
     }
 }

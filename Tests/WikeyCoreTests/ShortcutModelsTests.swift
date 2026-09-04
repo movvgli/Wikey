@@ -37,4 +37,22 @@ struct ShortcutModelsTests {
         let conflicts = ShortcutConflictDetector.conflicts(in: [single, sequence])
         #expect(conflicts.count == 2)
     }
+
+    @Test func applicationShortcutConflictsWithWorkflow() {
+        let gesture = ShortcutGesture(steps: [KeyChord(keyCode: 1, modifiers: [.command, .shift])])
+        let workflow = Workflow(name: "메시지 보내기", shortcut: gesture)
+        let application = ApplicationShortcut(
+            bundleIdentifier: "com.apple.Safari",
+            displayName: "Safari",
+            shortcut: gesture
+        )
+
+        let conflicts = ShortcutConflictDetector.conflicts(
+            workflows: [workflow],
+            applicationShortcuts: [application]
+        )
+
+        #expect(conflicts.workflows[workflow.id] != nil)
+        #expect(conflicts.applications[application.id] != nil)
+    }
 }

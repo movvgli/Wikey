@@ -90,26 +90,84 @@ public struct ShortcutGesture: Codable, Hashable, Sendable {
     }
 }
 
+private enum ShortcutConflictTarget {
+    case workflow(UUID)
+    case application(UUID)
+}
+
 public enum ShortcutConflictDetector {
     public static func conflicts(in workflows: [Workflow]) -> [UUID: String] {
-        let enabled = workflows.filter { $0.isEnabled && $0.shortcut.validationMessage == nil }
-        var result: [UUID: String] = [:]
+        conflicts(workflows: workflows, applicationShortcuts: []).workflows
+    }
 
-        for index in enabled.indices {
-            for otherIndex in enabled.indices where otherIndex > index {
-                let lhs = enabled[index]
-                let rhs = enabled[otherIndex]
+    public struct Result: Sendable {
+        public var workflows: [UUID: String]
+        public var applications: [UUID: String]
+
+        public init(workflows: [UUID: String] = [:], applications: [UUID: String] = [:]) {
+            self.workflows = workflows
+            self.applications = applications
+        }
+    }
+
+    public static func conflicts(
+        workflows: [Workflow],
+        applicationShortcuts: [ApplicationShortcut]
+    ) -> Result {
+        struct Candidate {
+            var target: ShortcutConflictTarget
+            var name: String
+            var shortcut: ShortcutGesture
+        }
+
+        let candidates = workflows.compactMap { workflow -> Candidate? in
+            guard workflow.isEnabled, workflow.shortcut.validationMessage == nil else { return nil }
+            return Candidate(target: .workflow(workflow.id), name: workflow.name, shortcut: workflow.shortcut)
+        } + applicationShortcuts.compactMap { application -> Candidate? in
+            guard application.shortcut.validationMessage == nil else { return nil }
+            return Candidate(
+                target: .application(application.id),
+                name: application.displayName,
+                shortcut: application.shortcut
+            )
+        }
+
+        var result = Result()
+
+        for index in candidates.indices {
+            for otherIndex in candidates.indices where otherIndex > index {
+                let lhs = candidates[index]
+                let rhs = candidates[otherIndex]
+                let lhsMessage: String?
+                let rhsMessage: String?
                 if lhs.shortcut == rhs.shortcut {
-                    result[lhs.id] = "‘\(rhs.name)’과 단축키가 같습니다."
-                    result[rhs.id] = "‘\(lhs.name)’과 단축키가 같습니다."
+                    lhsMessage = "‘\(rhs.name)’과 단축키가 같습니다."
+                    rhsMessage = "‘\(lhs.name)’과 단축키가 같습니다."
                 } else if lhs.shortcut.steps.first == rhs.shortcut.steps.first,
                           lhs.shortcut.steps.count != rhs.shortcut.steps.count {
-                    result[lhs.id] = "단일 단축키와 연속 단축키의 첫 단계가 겹칩니다."
-                    result[rhs.id] = "단일 단축키와 연속 단축키의 첫 단계가 겹칩니다."
+                    lhsMessage = "단일 단축키와 연속 단축키의 첫 단계가 겹칩니다."
+                    rhsMessage = "단일 단축키와 연속 단축키의 첫 단계가 겹칩니다."
+                } else {
+                    lhsMessage = nil
+                    rhsMessage = nil
                 }
+
+                if let lhsMessage { set(lhsMessage, for: lhs.target, in: &result) }
+                if let rhsMessage { set(rhsMessage, for: rhs.target, in: &result) }
             }
         }
         return result
+    }
+
+    private static func set(
+        _ message: String,
+        for target: ShortcutConflictTarget,
+        in result: inout Result
+    ) {
+        switch target {
+        case .workflow(let id): result.workflows[id] = message
+        case .application(let id): result.applications[id] = message
+        }
     }
 }
 

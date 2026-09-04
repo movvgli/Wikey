@@ -23,6 +23,11 @@ public final class WikeyStore {
         set { state.layouts = newValue }
     }
 
+    public var applicationShortcuts: [ApplicationShortcut] {
+        get { state.applicationShortcuts }
+        set { state.applicationShortcuts = newValue }
+    }
+
     private let rootURL: URL
     private let stateURL: URL
     private let templatesURL: URL
@@ -104,6 +109,32 @@ public final class WikeyStore {
         state.layouts.append(layout)
         save()
         return layout.id
+    }
+
+    public func setApplicationShortcut(
+        bundleIdentifier: String,
+        displayName: String,
+        shortcut: ShortcutGesture
+    ) {
+        if let index = state.applicationShortcuts.firstIndex(where: {
+            $0.bundleIdentifier == bundleIdentifier
+        }) {
+            if shortcut.steps.isEmpty {
+                state.applicationShortcuts.remove(at: index)
+            } else {
+                state.applicationShortcuts[index].displayName = displayName
+                state.applicationShortcuts[index].shortcut = shortcut
+            }
+        } else if !shortcut.steps.isEmpty {
+            state.applicationShortcuts.append(
+                ApplicationShortcut(
+                    bundleIdentifier: bundleIdentifier,
+                    displayName: displayName,
+                    shortcut: shortcut
+                )
+            )
+        }
+        save()
     }
 
     public func deleteWorkflow(id: UUID) {

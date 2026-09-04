@@ -56,9 +56,42 @@ struct ShortcutRecorderView: View {
     }
 }
 
+struct CompactShortcutRecorderView: View {
+    @Binding var shortcut: ShortcutGesture
+    @State private var recordingRequest = 0
+
+    var body: some View {
+        HStack(spacing: 8) {
+            KeyRecorderRepresentable(
+                shortcut: $shortcut,
+                stepCount: 1,
+                recordingRequest: recordingRequest
+            )
+                .frame(width: 190, height: 36)
+
+            Button {
+                if shortcut.steps.isEmpty {
+                    recordingRequest += 1
+                } else {
+                    shortcut = ShortcutGesture()
+                }
+            } label: {
+                Image(systemName: shortcut.steps.isEmpty ? "plus.circle" : "xmark.circle.fill")
+                    .font(.system(size: 15, weight: .medium))
+                    .foregroundStyle(shortcut.steps.isEmpty ? Color.secondary : Color.wikeyAccent)
+                    .frame(width: 28, height: 28)
+                    .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .help(shortcut.steps.isEmpty ? "단축키 지정" : "단축키 지우기")
+        }
+    }
+}
+
 private struct KeyRecorderRepresentable: NSViewRepresentable {
     @Binding var shortcut: ShortcutGesture
     var stepCount: Int
+    var recordingRequest: Int = 0
 
     func makeCoordinator() -> Coordinator { Coordinator(shortcut: $shortcut) }
 
@@ -76,16 +109,26 @@ private struct KeyRecorderRepresentable: NSViewRepresentable {
         if !control.isRecording, control.shortcut != shortcut {
             control.shortcut = shortcut
         }
+        if context.coordinator.lastRecordingRequest != recordingRequest {
+            context.coordinator.lastRecordingRequest = recordingRequest
+            control.beginRecording()
+        }
     }
 
     final class Coordinator {
         var shortcut: Binding<ShortcutGesture>
+        var lastRecordingRequest = 0
         init(shortcut: Binding<ShortcutGesture>) { self.shortcut = shortcut }
     }
 }
 
 private final class KeyRecorderControl: NSControl {
-    var shortcut = ShortcutGesture() { didSet { needsDisplay = true } }
+    var shortcut = ShortcutGesture() {
+        didSet {
+            needsDisplay = true
+            setAccessibilityValue(shortcut.displayName)
+        }
+    }
     var maximumSteps = 1
     var onChange: ((ShortcutGesture) -> Void)?
     private(set) var isRecording = false
@@ -93,11 +136,25 @@ private final class KeyRecorderControl: NSControl {
 
     override var acceptsFirstResponder: Bool { true }
 
+    override func viewDidMoveToWindow() {
+        super.viewDidMoveToWindow()
+        setAccessibilityElement(true)
+        setAccessibilityRole(.button)
+        setAccessibilityLabel("단축키 입력")
+        setAccessibilityHelp("클릭한 뒤 원하는 단축키를 누르세요.")
+        setAccessibilityValue(shortcut.displayName)
+    }
+
     override func mouseDown(with event: NSEvent) {
+        beginRecording()
+    }
+
+    func beginRecording() {
         window?.makeFirstResponder(self)
         captured = []
         isRecording = true
         needsDisplay = true
+        setAccessibilityValue("지금 단축키를 누르세요")
     }
 
     override func keyDown(with event: NSEvent) {

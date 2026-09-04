@@ -22,6 +22,25 @@ public struct Workflow: Identifiable, Codable, Hashable, Sendable {
     }
 }
 
+public struct ApplicationShortcut: Identifiable, Codable, Hashable, Sendable {
+    public var id: UUID
+    public var bundleIdentifier: String
+    public var displayName: String
+    public var shortcut: ShortcutGesture
+
+    public init(
+        id: UUID = UUID(),
+        bundleIdentifier: String,
+        displayName: String,
+        shortcut: ShortcutGesture = .init()
+    ) {
+        self.id = id
+        self.bundleIdentifier = bundleIdentifier
+        self.displayName = displayName
+        self.shortcut = shortcut
+    }
+}
+
 public enum TemplateDeliveryMode: String, Codable, CaseIterable, Sendable {
     case copyOnly
     case copyAndPaste
@@ -230,17 +249,40 @@ public struct PersistedState: Codable, Sendable {
     public var workflows: [Workflow]
     public var templates: [RichTemplate]
     public var layouts: [WindowLayout]
+    public var applicationShortcuts: [ApplicationShortcut]
 
     public init(
         schemaVersion: Int = 1,
         workflows: [Workflow] = [],
         templates: [RichTemplate] = [],
-        layouts: [WindowLayout] = []
+        layouts: [WindowLayout] = [],
+        applicationShortcuts: [ApplicationShortcut] = []
     ) {
         self.schemaVersion = schemaVersion
         self.workflows = workflows
         self.templates = templates
         self.layouts = layouts
+        self.applicationShortcuts = applicationShortcuts
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case schemaVersion
+        case workflows
+        case templates
+        case layouts
+        case applicationShortcuts
+    }
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        schemaVersion = try container.decode(Int.self, forKey: .schemaVersion)
+        workflows = try container.decode([Workflow].self, forKey: .workflows)
+        templates = try container.decode([RichTemplate].self, forKey: .templates)
+        layouts = try container.decode([WindowLayout].self, forKey: .layouts)
+        applicationShortcuts = try container.decodeIfPresent(
+            [ApplicationShortcut].self,
+            forKey: .applicationShortcuts
+        ) ?? []
     }
 }
 

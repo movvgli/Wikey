@@ -15,6 +15,7 @@ public final class WikeyRuntime {
     public let runner: WorkflowRunner
 
     public private(set) var lastRun: RunSummary?
+    public private(set) var applicationLaunchErrors: [UUID: String] = [:]
     public private(set) var hasStarted = false
 
     public init(storeRootURL: URL? = nil) {
@@ -44,6 +45,11 @@ public final class WikeyRuntime {
         hotkeys.onWorkflow = { [weak runner = self.runner] id in
             Task { @MainActor in runner?.submit(workflowID: id) }
         }
+        hotkeys.onApplication = { [weak self] id in
+            Task { @MainActor in
+                await self?.launchApplicationShortcut(id: id)
+            }
+        }
         self.runner.onSummary = { [weak self] summary in
             self?.lastRun = summary
         }
@@ -64,10 +70,36 @@ public final class WikeyRuntime {
     }
 
     public func reloadHotkeys() {
-        hotkeys.configure(workflows: store.workflows)
+        hotkeys.configure(
+            workflows: store.workflows,
+            applicationShortcuts: store.applicationShortcuts
+        )
     }
 
     public func run(workflowID: UUID) {
         runner.submit(workflowID: workflowID)
+    }
+
+    public func setApplicationShortcut(
+        bundleIdentifier: String,
+        displayName: String,
+        shortcut: ShortcutGesture
+    ) {
+        store.setApplicationShortcut(
+            bundleIdentifier: bundleIdentifier,
+            displayName: displayName,
+            shortcut: shortcut
+        )
+        reloadHotkeys()
+    }
+
+    private func launchApplicationShortcut(id: UUID) async {
+        guard let application = store.applicationShortcuts.first(where: { $0.id == id }) else { return }
+        do {
+            _ = try await applications.launch(bundleIdentifier: application.bundleIdentifier)
+            applicationLaunchErrors[id] = nil
+        } catch {
+            applicationLaunchErrors[id] = error.localizedDescription
+        }
     }
 }

@@ -6,6 +6,7 @@ enum SidebarSelection: Hashable {
     case overview
     case workflowCollection
     case workflow(UUID)
+    case applications
     case templateCollection
     case template(UUID)
     case layoutCollection
@@ -73,6 +74,8 @@ struct ContentView: View {
             } else {
                 ContentUnavailableView("워크플로를 찾을 수 없습니다", systemImage: "bolt.slash")
             }
+        case .applications:
+            ApplicationsView()
         case .templateCollection:
             TemplateLibraryView(
                 templates: runtime.store.templates,
@@ -83,7 +86,8 @@ struct ContentView: View {
             if let binding = templateBinding(id) {
                 TemplateEditorView(
                     template: binding,
-                    onBack: { selection = .templateCollection }
+                    onBack: { selection = .templateCollection },
+                    onDelete: { deleteTemplate(id) }
                 )
             } else {
                 ContentUnavailableView("템플릿을 찾을 수 없습니다", systemImage: "doc.badge.ellipsis")
@@ -175,7 +179,8 @@ struct ContentView: View {
 
     private func deleteTemplate(_ id: UUID) {
         runtime.store.deleteTemplate(id: id)
-        selection = .overview
+        runtime.reloadHotkeys()
+        selection = .templateCollection
     }
 
     private func deleteLayout(_ id: UUID) {
@@ -599,6 +604,10 @@ private struct WikeySidebar: View {
         return selection == .templateCollection
     }
 
+    private var isApplicationSection: Bool {
+        selection == .applications
+    }
+
     private var isLayoutSection: Bool {
         if case .layout = selection { return true }
         return selection == .layoutCollection
@@ -626,6 +635,12 @@ private struct WikeySidebar: View {
                             systemImage: "point.3.connected.trianglepath.dotted",
                             isActive: isWorkflowSection,
                             action: { select(.workflowCollection) }
+                        )
+                        SidebarNavigationRow(
+                            title: "앱",
+                            systemImage: "app.dashed",
+                            isActive: isApplicationSection,
+                            action: { select(.applications) }
                         )
                         SidebarNavigationRow(
                             title: "템플릿",

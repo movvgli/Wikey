@@ -5,8 +5,10 @@ struct TemplateEditorView: View {
     @Environment(WikeyRuntime.self) private var runtime
     @Binding var template: RichTemplate
     var onBack: () -> Void
+    var onDelete: () -> Void
     @State private var editor = RichTextEditorController()
     @State private var copyState: CopyState = .idle
+    @State private var showsDeleteConfirmation = false
 
     private enum CopyState {
         case idle
@@ -30,6 +32,19 @@ struct TemplateEditorView: View {
                     .foregroundStyle(copyState == .copied ? Color.green : Color.orange)
                     .transition(.opacity)
                 }
+                Button(role: .destructive) {
+                    showsDeleteConfirmation = true
+                } label: {
+                    Image(systemName: "trash")
+                        .font(.system(size: 14, weight: .medium))
+                        .frame(width: 30, height: 30)
+                        .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .foregroundStyle(.red)
+                .background(Color.red.opacity(0.07), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+                .help("템플릿 삭제")
+                .accessibilityLabel("템플릿 삭제")
                 Button("클립보드에 복사", systemImage: "doc.on.doc", action: copyTemplate)
                     .buttonStyle(.borderedProminent)
                     .controlSize(.large)
@@ -81,6 +96,12 @@ struct TemplateEditorView: View {
             editor.onDocumentChange = { [weak runtime] document in
                 runtime?.store.saveTemplateDocument(document, for: template.id)
             }
+        }
+        .alert("템플릿을 삭제할까요?", isPresented: $showsDeleteConfirmation) {
+            Button("취소", role: .cancel) {}
+            Button("삭제", role: .destructive, action: onDelete)
+        } message: {
+            Text("‘\(template.name)’과 이 템플릿을 사용하는 워크플로 동작이 함께 삭제됩니다.")
         }
     }
 
