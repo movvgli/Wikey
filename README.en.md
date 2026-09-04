@@ -2,90 +2,82 @@
   <img src="Sources/Wikey/Resources/Assets.xcassets/AppIcon.appiconset/icon_128x128@2x.png" width="128" alt="Wikey app icon">
 </p>
 
-# Wikey
+<h1 align="center">Wikey</h1>
 
-Wikey is a macOS app that bundles everyday tasks behind a shortcut.
+<p align="center">
+  Finish repetitive work with one shortcut on macOS
+</p>
 
-Launch apps, open websites, paste rich templates, and arrange multiple windows across your displays. All settings stay on your Mac.
+<p align="center">
+  <a href="https://github.com/movvgli/Wikey/releases/latest"><strong>Download the latest release</strong></a>
+  · <a href="README.md">한국어</a>
+  · <a href="docs/INSTALL.md">Installation</a>
+  · <a href="docs/PRIVACY.md">Privacy</a>
+</p>
 
 ![Wikey home](docs/images/home.png)
 
-[한국어](README.md) · [Installation](docs/INSTALL.md) · [Privacy](docs/PRIVACY.md)
+Wikey connects app launches, websites, reusable rich-text templates, and window layouts into workflows that run in order. Assign a one- or two-step global shortcut and start the workflow from anywhere on your Mac.
+
+All workflows and templates stay on your Mac and are not sent to an external server.
+
+## Quick start
+
+1. Download `Wikey-version.dmg` from the [latest release](https://github.com/movvgli/Wikey/releases/latest).
+2. Move Wikey to **Applications** and launch it.
+3. Use the first-run introduction to review the core features and enable only the permissions you need.
+4. Create a workflow, add actions, and assign a shortcut.
+
+Release builds are signed with Developer ID and notarized by Apple. Wikey requires macOS 15 or later.
 
 ## Features
 
-- Global single-chord shortcuts
-- Two-step shortcut sequences
-- App launching and URLs in the default browser
-- Rich templates with formatting, links, lists, and inline images
-- Copy-only and automatic paste modes
-- Multi-display layouts with full, half, third, two-thirds, and quadrant zones
-- Launch at login and quick access from the menu bar
-- In-app update checks, downloads, and installation
+| Feature | What it does |
+| --- | --- |
+| Workflows | Connect multiple actions and run them from top to bottom. |
+| Global shortcuts | Use a single chord or a sequence of up to two chords. |
+| Apps and websites | Launch apps and open URLs in the default browser. |
+| Rich templates | Copy or automatically paste formatted text, links, lists, and inline images. |
+| Window layouts | Arrange apps across displays in full, half, third, two-thirds, and quadrant zones. |
+| Quick access | Run workflows from the menu bar and prepare Wikey at login. |
+| Updates | Check, download, and install new versions inside the app. |
 
-Workflow actions run from top to bottom. If one action fails, Wikey records the failure and continues with the remaining actions when possible.
+If an action fails, Wikey records the failure and continues with the remaining actions when possible.
 
-## Requirements
+## Permissions and privacy
 
-- macOS 15 or later
-- Xcode and a Swift 6 toolchain when building from source
-
-## Install
-
-DMGs in GitHub Releases are currently unnotarized preview builds. macOS may show a warning that it cannot verify the developer. See [Installation](docs/INSTALL.md) for the current installation and permission steps.
-
-Starting with Wikey 1.1.0, the app checks for updates once per day. You can also use **Wikey → Check for Updates…** or **Settings → Updates**. Version 1.0.0 has no updater, so it requires one final manual installation of 1.1.0.
-
-Build and run from source:
-
-```sh
-./script/build_and_run.sh
-```
-
-Run tests:
-
-```sh
-swift test
-```
-
-To regenerate the Xcode project, install [XcodeGen](https://github.com/yonaskolb/XcodeGen), then run:
-
-```sh
-xcodegen generate
-```
-
-## Permissions
-
-Wikey only asks for permissions needed by the features you use.
+Wikey asks only for the macOS permissions required by the features you use.
 
 | Permission | Used for |
 | --- | --- |
 | Accessibility | Moving and resizing other app windows; automatic paste |
 | Input Monitoring | Reading the second chord in a two-step shortcut |
 
-Single-chord shortcuts, app launching, opening websites, and copying to the clipboard work without these permissions.
+Single-chord shortcuts, app launching, websites, and clipboard copy work without these permissions. See the [privacy guide](docs/PRIVACY.md) for details.
 
-## Build a DMG
+## Updates
 
-Create an ad-hoc signed DMG for local testing:
+Wikey checks for a new version once per day while it is running. You can also use **Wikey → Check for Updates…** or **Settings → Updates**. Automatic downloads remain under your control.
+
+## Development
+
+Requirements:
+
+- macOS 15 or later
+- Xcode and a Swift 6 toolchain
+- [XcodeGen](https://github.com/yonaskolb/XcodeGen) when regenerating the Xcode project
 
 ```sh
-./script/package_release.sh 1.0.0 1
+./script/build_and_run.sh
+swift test
+xcodegen generate
 ```
 
-This produces `dist/Wikey-1.0.0.dmg` and its SHA-256 checksum. Once a Developer ID certificate and notary profile are available, the same script can sign and notarize the release:
-
-```sh
-WIKEY_CODESIGN_IDENTITY="Developer ID Application: Name (TEAMID)" \
-WIKEY_NOTARY_PROFILE="wikey-notary" \
-./script/package_release.sh 1.0.0 1
-```
-
-See [Distribution](docs/DISTRIBUTION.md) for the release checklist.
+See [Distribution](docs/DISTRIBUTION.md) for packaging and notarization steps.
 
 ## Contributing
 
-Bug reports and focused improvements are welcome. Read [Contributing](CONTRIBUTING.md) and the [Code of Conduct](CODE_OF_CONDUCT.md) before starting. Please report security issues through the process in [Security](SECURITY.md), not a public issue.
+Bug reports and focused improvements are welcome. Read [Contributing](CONTRIBUTING.md) and the [Code of Conduct](CODE_OF_CONDUCT.md). Please report security issues through [Security](SECURITY.md), not a public issue.
 
 ## License
 
