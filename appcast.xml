@@ -3,6 +3,16 @@
     <channel>
         <title>Wikey</title>
         <item>
+            <title>1.2.0</title>
+            <pubDate>Fri, 04 Sep 2026 05:00:53 +0000</pubDate>
+            <link>https://github.com/movvgli/Wikey</link>
+            <sparkle:version>1002000</sparkle:version>
+            <sparkle:shortVersionString>1.2.0</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
+            <sparkle:releaseNotesLink>https://raw.githubusercontent.com/movvgli/Wikey/update-feed/Wikey-1.2.0.md</sparkle:releaseNotesLink>
+            <enclosure url="https://github.com/movvgli/Wikey/releases/download/v1.2.0/Wikey-1.2.0.dmg" length="5590682" type="application/octet-stream" sparkle:edSignature="b3T1CbbKIto2xSwx9hgduoqtpITBvFunWpkpWrpMLppAPM0PfsABMhq7IGRpTkvHu2R8WWX0y0/xqK+LcfxLBg=="/>
+        </item>
+        <item>
             <title>1.1.1</title>
             <pubDate>Thu, 03 Sep 2026 04:55:27 +0000</pubDate>
             <link>https://github.com/movvgli/Wikey</link>
