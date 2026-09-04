@@ -1,70 +1,63 @@
-# Wikey 1.2.0 Design QA
+# Wikey Workflow Card Design QA
 
 ## Comparison target
 
-- Source visual truth: selected Flow Canvas concept image
-- Final installed-app screenshot: local QA capture
-- Combined comparison: local side-by-side QA capture
-- Viewport: native macOS window at 1120 x 760 points in light appearance
-- Source dimensions: 1488 x 1058 px, aspect-fitted without cropping into the comparison panel
-- Implementation dimensions: Retina capture normalized from 2240 x 1520 px to 1120 x 760 px for the 1120 x 760-point window
-- Tested state: first real workflow selected, shortcut `⌥2`, one template-copy action, idle
-
-## Required fidelity surfaces
-
-- Native macOS traffic-light controls with content extending into the title-bar area
-- Custom left sidebar with brand, primary navigation, workflow collection, shortcut badges, and trash action
-- Back control, editable title, autosave state, time, and workflow overflow menu
-- Separate shortcut card and shortcut editor
-- Purple trigger, vertical connector, numbered action cards, and compact action menus
-- Full-width dashed add-action control and persistent bottom test-run bar
+- Baseline workflow list: `$HOME/Pictures/Screenshots/스크린샷 2026-09-04 오후 1.48.32.webp`
+- Source visual truth: `$HOME/Pictures/Screenshots/스크린샷 2026-09-04 오후 1.48.28.webp`
+- Rendered implementation: `/private/tmp/wikey-workflow-card-installed.png`
+- Normalized workflow-card crop: `/private/tmp/wikey-workflow-card-installed-detail.png`
+- Combined comparison: `/private/tmp/wikey-workflow-card-installed-comparison.png`
+- Window viewport: 1120 x 760 points in macOS light appearance
+- Full implementation capture: 2240 x 1520 pixels at 2x density
+- Source and normalized comparison regions: 1622 x 374 pixels at matching density
+- State: installed app Home, two enabled workflows, one action each, normal enabled shortcut state
 
 ## Findings
 
 - No actionable P0, P1, or P2 visual or interaction findings remain.
-- The final implementation follows the selected Flow Canvas hierarchy rather than the previous form-style editor.
-- Sidebar selection, workflow selection, trigger marker, connector, action marker, and primary action share the selected indigo treatment.
-- Card radius, border weight, shadow softness, spacing rhythm, typography hierarchy, and persistent bottom bar match the visual source at the tested window size.
-- The final installed app preserves real user content. The source contains five example workflows and four example actions; the implementation shows the user's two workflows and the selected workflow's one real action. This is an intentional data difference, not a layout mismatch.
-- The source's small pencil glyph beside the workflow title is intentionally omitted by the user's explicit follow-up request. The title remains directly editable.
-- All visible primary controls remain functional: navigation, workflow selection, shortcut editing, workflow menu, action menu, add-action menu, and test run.
-- Every primary sidebar row and saved-workflow row now exposes its full 232-point width as the pointer target instead of limiting interaction to rendered text and icons.
-- The trash action was reduced from a 64-point card treatment to a compact 42-point footer control, preserving a comfortable hit target while matching the source's lighter visual weight.
-- The updater is not started in an unconfigured development build, preventing the recurring `Unable to Check For Updates` alert. The signed installed build retains its configured update feed.
+- Each workflow is now presented as its own rounded card rather than as a row inside one shared panel.
+- Card width, radius, border, padding, icon tile, two-line text hierarchy, and 12-point vertical gap match the template cards.
+- Workflow-specific controls intentionally replace template-specific content: the workflow card keeps its shortcut badge and independent run button instead of the template chevron.
+- The installed-app comparison shows the normal Wikey accent bolt and enabled play controls. A separate development-build pass also confirmed the warning icon and disabled control appear for a real shortcut conflict.
 
-## Visual evidence
+## Required fidelity surfaces
 
-- Full view: the combined comparison places the selected source and final installed Wikey capture in one image. Sidebar density, footer scale, title hierarchy, shortcut card, flow rail, action card, add control, and bottom run bar were judged together.
-- Focused regions: no extra crop was needed because the complete sidebar and its 42-point trash footer remain legible at the normalized 760-pixel height. Accessibility bounds supplied the exact hit-region measurements that a screenshot cannot show.
+- Fonts and typography: both surfaces use the same system headline and subheadline hierarchy, optical weight, line spacing, and single-line truncation.
+- Spacing and layout rhythm: both use 18-point card padding, a 44-point icon tile, a 14-point continuous corner radius, and a 12-point gap between cards.
+- Colors and visual tokens: both use the adaptive control background, separator border, subtle shadow, and Wikey accent treatment; warning orange appears only for a real conflict.
+- Image and icon quality: no raster artwork is required. Standard SF Symbols remain sharp at native density and match the existing macOS interface.
+- Copy and content: workflow names and action counts are preserved. Shortcut badges and run controls remain visible and functional according to workflow state.
+
+## Interaction verification
+
+- Clicking the first workflow card opened `신규 카톡방 개설` in the workflow editor.
+- The card's full primary region, including the shortcut badge, is exposed as one edit button.
+- The run button remains a separate control and does not trigger editor navigation.
+- Back navigation returned to the same card list, and template navigation confirmed the shared visual dimensions.
+- The installed app exposed both run buttons as enabled independent controls. The buttons were not activated during visual QA because doing so would execute the user's live KakaoTalk workflows.
+- A separate development-state check confirmed that the disabled run state exposes the shortcut-conflict explanation instead of silently failing.
+- Automated verification passed: 9 tests in 3 suites.
+
+## Full-view and focused comparison evidence
+
+- Full view: the 1120 x 760 implementation capture confirms the cards sit correctly beneath the existing header and permission notice without changing the surrounding page hierarchy.
+- Focused region: the source template cards and implementation workflow cards were cropped to the same 1622 x 374 pixel region and stacked in one comparison image. Card geometry, spacing, text baseline, icon alignment, and trailing-control alignment match.
+- No additional crop was required because the focused comparison keeps both complete cards and all important details legible.
 
 ## Comparison history
 
-1. Initial implementation reused the existing editor structure and only borrowed the concept's color and card styling. This was a P1 fidelity failure.
-2. Rebuilt the editor around the selected visual: exact custom sidebar, separate shortcut card, flow trigger, numbered connector, compact action cards, dashed add control, and bottom run bar.
-3. The next comparison found P2 issues in the title-bar gap, menu placement, sidebar toggle, flow spacing, and short add-action region.
-4. Removed the title text and unused sidebar toolbar control while preserving native traffic lights; moved the workflow menu beside autosave; aligned vertical spacing; extended the add-action card and connector endpoint.
-5. The final installed-app comparison shows no remaining P0, P1, or P2 issue. Only user-data count, workflow name, and current time differ from the illustrative source.
-6. Follow-up usability pass found P1 interaction friction because sidebar hit testing followed only rendered label content, plus a P2 oversized trash footer. Added rectangular content shapes and full-width button frames to both sidebar row types, then reduced the trash container to 42 points.
-7. Post-fix interaction evidence: clicking the far-right empty area of the layout row opened the layout collection, and clicking the far-right empty area of the first workflow row opened `신규 카톡방 개설`. The final installed-app comparison confirms the smaller trash control remains aligned with the source.
-8. User-requested follow-up removed the pencil glyph beside the workflow title without changing title editing. The final installed-app capture confirms the title alignment closes cleanly with no gap or wrapping regression.
+1. The baseline workflow design grouped both workflows inside one large shared panel with a divider.
+2. The first implementation pass replaced the shared panel with separate cards and reused the template card measurements and visual tokens.
+3. The same-size focused comparison found no actionable P0, P1, or P2 mismatch, so no corrective visual iteration was required.
 
-## Verification
+## Implementation checklist
 
-- [x] Source and implementation reviewed in one side-by-side comparison image
-- [x] Native 1120 x 760 window checked in the same selected workflow state
-- [x] Real workflow data preserved
-- [x] Navigation and workflow rows verified using clicks in empty space away from their labels
-- [x] Sidebar accessibility bounds verified at 232 x 36 points for navigation and 232 x 38 points for workflows
-- [x] Trash footer reduced and visually rechecked at 42 points tall
-- [x] Workflow-title pencil glyph removed while direct title editing remains available
-- [x] Recurring development updater alert removed and manually rechecked
-- [x] Full automated suite passed: 9 tests in 3 suites
-- [x] Installed version verified: 1.2.0 (1002000)
-- [x] Installed bundle passed strict deep code-signature verification
-
-## Distribution verification
-
-- Apple notarization completed successfully for the signed Wikey 1.2.0 DMG.
-- The notarization ticket is stapled to the DMG and passes Gatekeeper assessment as a Notarized Developer ID build.
+- [x] Separate card per workflow
+- [x] Template-matched card geometry and spacing
+- [x] Full primary card region opens the editor
+- [x] Independent shortcut and run controls preserved
+- [x] Hover, disabled, running, and conflict states preserved
+- [x] Build and automated tests pass
+- [x] Live macOS interaction checked
 
 final result: passed

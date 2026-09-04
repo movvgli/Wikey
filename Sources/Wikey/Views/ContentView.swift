@@ -278,20 +278,15 @@ private struct OverviewView: View {
                             }
                         }
                     } else {
-                        PlainPanel {
-                            VStack(spacing: 0) {
-                                ForEach(Array(activeWorkflows.enumerated()), id: \.element.id) { index, workflow in
-                                    WorkflowQuickRunRow(
-                                        workflow: workflow,
-                                        isRunning: runtime.runner.runningWorkflowID == workflow.id,
-                                        hasConflict: runtime.hotkeys.registrationErrors[workflow.id] != nil,
-                                        open: { openWorkflow(workflow.id) },
-                                        run: { runtime.run(workflowID: workflow.id) }
-                                    )
-                                    if index < activeWorkflows.count - 1 {
-                                        Divider().padding(.leading, 42)
-                                    }
-                                }
+                        LazyVStack(spacing: 12) {
+                            ForEach(activeWorkflows) { workflow in
+                                WorkflowQuickRunCard(
+                                    workflow: workflow,
+                                    isRunning: runtime.runner.runningWorkflowID == workflow.id,
+                                    hasConflict: runtime.hotkeys.registrationErrors[workflow.id] != nil,
+                                    open: { openWorkflow(workflow.id) },
+                                    run: { runtime.run(workflowID: workflow.id) }
+                                )
                             }
                         }
                     }
@@ -351,46 +346,89 @@ private struct SetupNotice: View {
     }
 }
 
-private struct WorkflowQuickRunRow: View {
+private struct WorkflowQuickRunCard: View {
     var workflow: Workflow
     var isRunning: Bool
     var hasConflict: Bool
     var open: () -> Void
     var run: () -> Void
+    @State private var isHovering = false
 
     var body: some View {
-        HStack(spacing: 12) {
-            Image(systemName: hasConflict ? "exclamationmark.triangle" : "bolt.fill")
-                .foregroundStyle(hasConflict ? Color.orange : Color.accentColor)
-                .frame(width: 24)
+        HStack(spacing: 0) {
             Button(action: open) {
-                VStack(alignment: .leading, spacing: 3) {
-                    Text(workflow.name)
-                        .font(.headline)
-                        .foregroundStyle(.primary)
-                    Text("동작 \(workflow.actions.count)개")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+                HStack(spacing: 16) {
+                    Image(systemName: hasConflict ? "exclamationmark.triangle.fill" : "bolt.fill")
+                        .font(.system(size: 20, weight: .semibold))
+                        .foregroundStyle(hasConflict ? Color.orange : Color.wikeyAccent)
+                        .frame(width: 44, height: 44)
+                        .background(
+                            (hasConflict ? Color.orange : Color.wikeyAccent).opacity(0.08),
+                            in: RoundedRectangle(cornerRadius: 11, style: .continuous)
+                        )
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(workflow.name)
+                            .font(.headline)
+                            .foregroundStyle(.primary)
+                            .lineLimit(1)
+                        Text("동작 \(workflow.actions.count)개")
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                    }
+                    Spacer(minLength: 12)
+                    ShortcutBadge(
+                        text: workflow.shortcut.steps.isEmpty ? "미지정" : workflow.shortcut.displayName,
+                        isMuted: workflow.shortcut.steps.isEmpty
+                    )
                 }
+                .padding(.leading, 18)
+                .padding(.trailing, 14)
+                .padding(.vertical, 18)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
-            ShortcutBadge(text: workflow.shortcut.displayName, isMuted: workflow.shortcut.steps.isEmpty)
+            .help("워크플로 편집")
+
             Button {
                 run()
             } label: {
                 if isRunning {
-                    ProgressView().controlSize(.small)
+                    ProgressView()
+                        .controlSize(.small)
+                        .frame(width: 28, height: 28)
                 } else {
                     Image(systemName: "play.fill")
+                        .font(.system(size: 14, weight: .semibold))
+                        .frame(width: 28, height: 28)
+                        .contentShape(Rectangle())
                 }
             }
-            .buttonStyle(.borderless)
-            .help("실행")
+            .buttonStyle(.plain)
+            .foregroundStyle(hasConflict ? Color.secondary : Color.wikeyAccent)
+            .help(hasConflict ? "단축키 충돌을 해결한 뒤 실행할 수 있습니다" : "워크플로 실행")
             .disabled(hasConflict || isRunning || workflow.actions.isEmpty)
+            .padding(.trailing, 18)
         }
-        .padding(.vertical, 9)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(
+            Color(nsColor: .controlBackgroundColor),
+            in: RoundedRectangle(cornerRadius: 14, style: .continuous)
+        )
+        .overlay {
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .stroke(
+                    isHovering ? Color.wikeyAccent.opacity(0.22) : Color(nsColor: .separatorColor).opacity(0.3),
+                    lineWidth: 1
+                )
+        }
+        .shadow(color: .black.opacity(isHovering ? 0.06 : 0.04), radius: isHovering ? 12 : 10, y: 3)
+        .contentShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+        .onHover { hovering in
+            withAnimation(.easeOut(duration: 0.14)) {
+                isHovering = hovering
+            }
+        }
     }
 }
 
