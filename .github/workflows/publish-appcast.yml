@@ -1,0 +1,113 @@
+name: Publish signed update feed
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Released semantic version without the v prefix
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: macos-15
+    timeout-minutes: 30
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Validate release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ inputs.version }}
+        run: |
+          if [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Invalid version: $VERSION" >&2
+            exit 1
+          fi
+          gh release view "v$VERSION" --repo "$GITHUB_REPOSITORY" >/dev/null
+
+      - name: Resolve Sparkle tools
+        env:
+          VERSION: ${{ inputs.version }}
+        run: ./script/build_bundle.sh "$VERSION" "$GITHUB_RUN_NUMBER"
+
+      - name: Download notarized release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ inputs.version }}
+        run: |
+          mkdir -p feed
+          gh release download "v$VERSION" \
+            --repo "$GITHUB_REPOSITORY" \
+            --pattern "Wikey-$VERSION.dmg" \
+            --dir feed
+          gh release view "v$VERSION" \
+            --repo "$GITHUB_REPOSITORY" \
+            --json body \
+            --jq .body > "feed/Wikey-$VERSION.md"
+          git fetch origin update-feed:refs/remotes/origin/update-feed || true
+          if git show-ref --verify --quiet refs/remotes/origin/update-feed; then
+            git show origin/update-feed:appcast.xml > feed/appcast.xml
+          fi
+
+      - name: Generate signed appcast
+        env:
+          SPARKLE_ED_PRIVATE_KEY: ${{ secrets.SPARKLE_ED_PRIVATE_KEY }}
+          VERSION: ${{ inputs.version }}
+        run: |
+          if [[ -z "$SPARKLE_ED_PRIVATE_KEY" ]]; then
+            echo "SPARKLE_ED_PRIVATE_KEY is not configured." >&2
+            exit 1
+          fi
+          appcast_tool="$(find .build-bundle/DerivedData/SourcePackages/artifacts -type f -name generate_appcast -print -quit)"
+          if [[ -z "$appcast_tool" ]]; then
+            echo "Sparkle generate_appcast tool was not found." >&2
+            exit 1
+          fi
+          printf '%s' "$SPARKLE_ED_PRIVATE_KEY" | "$appcast_tool" \
+            --ed-key-file - \
+            --download-url-prefix "https://github.com/$GITHUB_REPOSITORY/releases/download/v$VERSION/" \
+            --link "https://github.com/$GITHUB_REPOSITORY" \
+            --maximum-versions 3 \
+            feed
+          grep -q "<sparkle:shortVersionString>$VERSION</sparkle:shortVersionString>" feed/appcast.xml
+
+      - name: Attach appcast to release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ inputs.version }}
+        run: |
+          gh release upload "v$VERSION" feed/appcast.xml \
+            --repo "$GITHUB_REPOSITORY" \
+            --clobber
+
+      - name: Publish update feed branch
+        run: |
+          feed_parent="$(mktemp -d)"
+          feed_worktree="$feed_parent/feed"
+          if git show-ref --verify --quiet refs/remotes/origin/update-feed; then
+            git worktree add --detach "$feed_worktree" origin/update-feed
+            git -C "$feed_worktree" switch -C update-feed
+          else
+            git worktree add --detach "$feed_worktree"
+            git -C "$feed_worktree" switch --orphan update-feed
+            git -C "$feed_worktree" rm -rf --ignore-unmatch .
+          fi
+          cp feed/appcast.xml "$feed_worktree/appcast.xml"
+          git -C "$feed_worktree" add appcast.xml
+          if git -C "$feed_worktree" diff --cached --quiet; then
+            echo "Update feed is already current."
+            exit 0
+          fi
+          git -C "$feed_worktree" \
+            -c user.name='github-actions[bot]' \
+            -c user.email='41898282+github-actions[bot]@users.noreply.github.com' \
+            commit -m "Update appcast for v${{ inputs.version }}"
+          git -C "$feed_worktree" push origin update-feed

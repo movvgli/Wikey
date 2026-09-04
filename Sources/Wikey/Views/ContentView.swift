@@ -1,12 +1,17 @@
+import AppKit
 import SwiftUI
 import WikeyCore
 
 enum SidebarSelection: Hashable {
     case overview
+    case workflowCollection
     case workflow(UUID)
+    case templateCollection
     case template(UUID)
+    case layoutCollection
     case layout(UUID)
     case settings
+    case trash
 }
 
 struct ContentView: View {
@@ -17,74 +22,23 @@ struct ContentView: View {
 
     var body: some View {
         NavigationSplitView {
-            List(selection: $selection) {
-                Label("홈", systemImage: "house")
-                    .tag(SidebarSelection.overview)
-
-                Section {
-                    ForEach(runtime.store.workflows) { workflow in
-                        WorkflowSidebarRow(workflow: workflow)
-                            .tag(SidebarSelection.workflow(workflow.id))
-                            .contextMenu {
-                                Button("삭제", role: .destructive) { deleteWorkflow(workflow.id) }
-                            }
-                    }
-                    SidebarAddButton(title: "워크플로 추가", action: addWorkflow)
-                } header: {
-                    SidebarSectionHeader(title: "워크플로", count: runtime.store.workflows.count)
-                }
-
-                Section {
-                    ForEach(runtime.store.templates) { template in
-                        Label(template.name, systemImage: "doc.on.clipboard")
-                            .lineLimit(1)
-                            .tag(SidebarSelection.template(template.id))
-                            .contextMenu {
-                                Button("삭제", role: .destructive) { deleteTemplate(template.id) }
-                            }
-                    }
-                    SidebarAddButton(title: "템플릿 추가", action: addTemplate)
-                } header: {
-                    SidebarSectionHeader(title: "템플릿", count: runtime.store.templates.count)
-                }
-
-                Section {
-                    ForEach(runtime.store.layouts) { layout in
-                        Label(layout.name, systemImage: "rectangle.3.group")
-                            .lineLimit(1)
-                            .tag(SidebarSelection.layout(layout.id))
-                            .contextMenu {
-                                Button("삭제", role: .destructive) { deleteLayout(layout.id) }
-                            }
-                    }
-                    SidebarAddButton(title: "레이아웃 추가", action: addLayout)
-                } header: {
-                    SidebarSectionHeader(title: "레이아웃", count: runtime.store.layouts.count)
-                }
-
-                Section {
-                    Label("설정", systemImage: "gearshape")
-                        .tag(SidebarSelection.settings)
-                }
-            }
-            .listStyle(.sidebar)
-            .navigationTitle("Wikey")
-            .navigationSplitViewColumnWidth(min: 220, ideal: 248, max: 290)
+            WikeySidebar(
+                workflows: runtime.store.workflows,
+                selection: selection ?? .overview,
+                select: { selection = $0 },
+                addWorkflow: addWorkflow,
+                showTemplates: showTemplates,
+                showLayouts: showLayouts,
+                deleteWorkflow: deleteWorkflow
+            )
+            .ignoresSafeArea(.container, edges: .top)
+            .navigationSplitViewColumnWidth(min: 238, ideal: 260, max: 300)
         } detail: {
             detail
+                .ignoresSafeArea(.container, edges: .top)
         }
-        .toolbar {
-            ToolbarItem {
-                Menu {
-                    Button("워크플로") { addWorkflow() }
-                    Button("템플릿") { addTemplate() }
-                    Button("레이아웃") { addLayout() }
-                } label: {
-                    Label("새로 만들기", systemImage: "plus")
-                }
-                .help("새 항목 만들기")
-            }
-        }
+        .toolbar(removing: .sidebarToggle)
+        .background(WindowToolbarConfigurator())
         .onAppear {
             if !didCompleteOnboarding { showOnboarding = true }
         }
@@ -103,18 +57,40 @@ struct ContentView: View {
                 openWorkflow: { selection = .workflow($0) },
                 openSettings: { selection = .settings }
             )
+        case .workflowCollection:
+            OverviewView(
+                createWorkflow: addWorkflow,
+                openWorkflow: { selection = .workflow($0) },
+                openSettings: { selection = .settings }
+            )
         case .workflow(let id):
             if let binding = workflowBinding(id) {
-                WorkflowEditorView(workflow: binding)
+                WorkflowEditorView(
+                    workflow: binding,
+                    onBack: { selection = .workflowCollection },
+                    onDelete: { deleteWorkflow(id) }
+                )
             } else {
                 ContentUnavailableView("워크플로를 찾을 수 없습니다", systemImage: "bolt.slash")
             }
+        case .templateCollection:
+            TemplateLibraryView(
+                templates: runtime.store.templates,
+                open: { selection = .template($0) },
+                add: addTemplate
+            )
         case .template(let id):
             if let binding = templateBinding(id) {
                 TemplateEditorView(template: binding)
             } else {
                 ContentUnavailableView("템플릿을 찾을 수 없습니다", systemImage: "doc.badge.ellipsis")
             }
+        case .layoutCollection:
+            LayoutLibraryView(
+                layouts: runtime.store.layouts,
+                open: { selection = .layout($0) },
+                add: addLayout
+            )
         case .layout(let id):
             if let binding = layoutBinding(id) {
                 LayoutEditorView(layout: binding)
@@ -123,13 +99,19 @@ struct ContentView: View {
             }
         case .settings:
             WikeySettingsView()
+        case .trash:
+            ContentUnavailableView(
+                "휴지통이 비어 있습니다",
+                systemImage: "trash",
+                description: Text("삭제한 항목을 보관하는 기능은 다음 업데이트에서 지원할 예정입니다.")
+            )
         }
     }
 
     private func workflowBinding(_ id: UUID) -> Binding<Workflow>? {
-        guard runtime.store.workflows.contains(where: { $0.id == id }) else { return nil }
+        guard let fallback = runtime.store.workflows.first(where: { $0.id == id }) else { return nil }
         return Binding(
-            get: { runtime.store.workflows.first(where: { $0.id == id })! },
+            get: { runtime.store.workflows.first(where: { $0.id == id }) ?? fallback },
             set: { updated in
                 guard let index = runtime.store.workflows.firstIndex(where: { $0.id == id }) else { return }
                 runtime.store.workflows[index] = updated
@@ -139,9 +121,9 @@ struct ContentView: View {
     }
 
     private func templateBinding(_ id: UUID) -> Binding<RichTemplate>? {
-        guard runtime.store.templates.contains(where: { $0.id == id }) else { return nil }
+        guard let fallback = runtime.store.templates.first(where: { $0.id == id }) else { return nil }
         return Binding(
-            get: { runtime.store.templates.first(where: { $0.id == id })! },
+            get: { runtime.store.templates.first(where: { $0.id == id }) ?? fallback },
             set: { updated in
                 guard let index = runtime.store.templates.firstIndex(where: { $0.id == id }) else { return }
                 runtime.store.templates[index] = updated
@@ -151,9 +133,9 @@ struct ContentView: View {
     }
 
     private func layoutBinding(_ id: UUID) -> Binding<WindowLayout>? {
-        guard runtime.store.layouts.contains(where: { $0.id == id }) else { return nil }
+        guard let fallback = runtime.store.layouts.first(where: { $0.id == id }) else { return nil }
         return Binding(
-            get: { runtime.store.layouts.first(where: { $0.id == id })! },
+            get: { runtime.store.layouts.first(where: { $0.id == id }) ?? fallback },
             set: { updated in
                 guard let index = runtime.store.layouts.firstIndex(where: { $0.id == id }) else { return }
                 runtime.store.layouts[index] = updated
@@ -174,10 +156,18 @@ struct ContentView: View {
         selection = .layout(runtime.store.addLayout())
     }
 
+    private func showTemplates() {
+        selection = .templateCollection
+    }
+
+    private func showLayouts() {
+        selection = .layoutCollection
+    }
+
     private func deleteWorkflow(_ id: UUID) {
         runtime.store.deleteWorkflow(id: id)
         runtime.reloadHotkeys()
-        selection = .overview
+        selection = .workflowCollection
     }
 
     private func deleteTemplate(_ id: UUID) {
@@ -188,6 +178,44 @@ struct ContentView: View {
     private func deleteLayout(_ id: UUID) {
         runtime.store.deleteLayout(id: id)
         selection = .overview
+    }
+}
+
+private struct WindowToolbarConfigurator: NSViewRepresentable {
+    func makeNSView(context: Context) -> NSView {
+        let view = NSView()
+        scheduleConfiguration(for: view)
+        return view
+    }
+
+    func updateNSView(_ nsView: NSView, context: Context) {
+        scheduleConfiguration(for: nsView)
+    }
+
+    private func scheduleConfiguration(for view: NSView) {
+        for delay in [0.0, 0.15, 0.6] {
+            DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+                configure(view.window)
+            }
+        }
+    }
+
+    private func configure(_ window: NSWindow?) {
+        guard let window, let toolbar = window.toolbar else { return }
+        window.titleVisibility = .hidden
+        window.titlebarAppearsTransparent = true
+        window.styleMask.insert(.fullSizeContentView)
+        toolbar.isVisible = false
+        for index in toolbar.items.indices.reversed() {
+            let item = toolbar.items[index]
+            let identifier = item.itemIdentifier
+            let looksLikeSidebarControl = identifier.rawValue.localizedCaseInsensitiveContains("sidebar")
+                || item.label.localizedCaseInsensitiveContains("sidebar")
+                || item.paletteLabel.localizedCaseInsensitiveContains("sidebar")
+            if identifier == .toggleSidebar || identifier == .sidebarTrackingSeparator || looksLikeSidebarControl {
+                toolbar.removeItem(at: index)
+            }
+        }
     }
 }
 
@@ -393,53 +421,309 @@ private struct RunSummaryView: View {
     }
 }
 
-private struct WorkflowSidebarRow: View {
-    var workflow: Workflow
+private struct TemplateLibraryView: View {
+    var templates: [RichTemplate]
+    var open: (UUID) -> Void
+    var add: () -> Void
 
     var body: some View {
-        HStack(spacing: 8) {
-            Image(systemName: workflow.isEnabled ? "bolt.fill" : "bolt.slash")
-                .foregroundStyle(workflow.isEnabled ? Color.accentColor : Color.secondary)
-                .frame(width: 16)
-            Text(workflow.name)
-                .lineLimit(1)
-            Spacer(minLength: 6)
-            if !workflow.shortcut.steps.isEmpty {
-                Text(workflow.shortcut.displayName)
-                    .font(.system(size: 10, weight: .medium, design: .monospaced))
-                    .foregroundStyle(.tertiary)
-                    .lineLimit(1)
+        LibraryLandingView(
+            title: "템플릿",
+            subtitle: "자주 쓰는 문장을 저장하고 워크플로에서 바로 사용합니다.",
+            addTitle: "템플릿 추가",
+            add: add
+        ) {
+            ForEach(templates) { template in
+                LibraryItemButton(
+                    title: template.name,
+                    subtitle: template.plainText.isEmpty ? "내용 없음" : template.plainText,
+                    systemImage: "doc.on.clipboard",
+                    action: { open(template.id) }
+                )
             }
         }
     }
 }
 
-private struct SidebarSectionHeader: View {
-    var title: String
-    var count: Int
+private struct LayoutLibraryView: View {
+    var layouts: [WindowLayout]
+    var open: (UUID) -> Void
+    var add: () -> Void
 
     var body: some View {
-        HStack(spacing: 6) {
-            Text(title)
-            Text("\(count)")
-                .font(.system(size: 9, weight: .semibold, design: .rounded))
-                .monospacedDigit()
-                .foregroundStyle(.secondary)
-                .frame(width: 17, height: 17)
-                .background(.quaternary, in: Circle())
+        LibraryLandingView(
+            title: "레이아웃",
+            subtitle: "앱 창의 위치와 크기를 한 번에 배치합니다.",
+            addTitle: "레이아웃 추가",
+            add: add
+        ) {
+            ForEach(layouts) { layout in
+                LibraryItemButton(
+                    title: layout.name,
+                    subtitle: "\(layout.placements.count)개 앱 배치",
+                    systemImage: "rectangle.3.group",
+                    action: { open(layout.id) }
+                )
+            }
         }
     }
 }
 
-private struct SidebarAddButton: View {
+private struct LibraryLandingView<Content: View>: View {
     var title: String
+    var subtitle: String
+    var addTitle: String
+    var add: () -> Void
+    @ViewBuilder var content: Content
+
+    var body: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 28) {
+                HStack(alignment: .center) {
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text(title)
+                            .font(.system(size: 32, weight: .bold))
+                        Text(subtitle)
+                            .foregroundStyle(.secondary)
+                    }
+                    Spacer()
+                    Button(addTitle, systemImage: "plus", action: add)
+                        .buttonStyle(.borderedProminent)
+                        .controlSize(.large)
+                }
+                LazyVStack(spacing: 12) {
+                    content
+                }
+            }
+            .padding(38)
+            .frame(maxWidth: 900, alignment: .leading)
+            .frame(maxWidth: .infinity, alignment: .topLeading)
+        }
+    }
+}
+
+private struct LibraryItemButton: View {
+    var title: String
+    var subtitle: String
+    var systemImage: String
     var action: () -> Void
 
     var body: some View {
         Button(action: action) {
-            Label(title, systemImage: "plus")
-                .foregroundStyle(.secondary)
+            HStack(spacing: 16) {
+                Image(systemName: systemImage)
+                    .font(.title2)
+                    .foregroundStyle(Color.wikeyAccent)
+                    .frame(width: 44, height: 44)
+                    .background(Color.wikeyAccent.opacity(0.08), in: RoundedRectangle(cornerRadius: 11, style: .continuous))
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(title)
+                        .font(.headline)
+                    Text(subtitle)
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(1)
+                }
+                Spacer()
+                Image(systemName: "chevron.right")
+                    .foregroundStyle(.tertiary)
+            }
+            .padding(18)
+            .background(Color(nsColor: .controlBackgroundColor), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+            .overlay {
+                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                    .stroke(Color(nsColor: .separatorColor).opacity(0.3), lineWidth: 1)
+            }
         }
         .buttonStyle(.plain)
+    }
+}
+
+private struct WikeySidebar: View {
+    var workflows: [Workflow]
+    var selection: SidebarSelection
+    var select: (SidebarSelection) -> Void
+    var addWorkflow: () -> Void
+    var showTemplates: () -> Void
+    var showLayouts: () -> Void
+    var deleteWorkflow: (UUID) -> Void
+
+    private var isWorkflowSection: Bool {
+        if case .workflow = selection { return true }
+        return selection == .workflowCollection
+    }
+
+    private var isTemplateSection: Bool {
+        if case .template = selection { return true }
+        return selection == .templateCollection
+    }
+
+    private var isLayoutSection: Bool {
+        if case .layout = selection { return true }
+        return selection == .layoutCollection
+    }
+
+    var body: some View {
+        VStack(spacing: 0) {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 0) {
+                    Text("Wikey")
+                        .font(.system(size: 22, weight: .bold))
+                        .padding(.horizontal, 24)
+                        .padding(.top, 58)
+                        .padding(.bottom, 12)
+
+                    VStack(spacing: 3) {
+                        SidebarNavigationRow(
+                            title: "홈",
+                            systemImage: "house",
+                            isActive: selection == .overview,
+                            action: { select(.overview) }
+                        )
+                        SidebarNavigationRow(
+                            title: "워크플로",
+                            systemImage: "point.3.connected.trianglepath.dotted",
+                            isActive: isWorkflowSection,
+                            action: { select(.workflowCollection) }
+                        )
+                        SidebarNavigationRow(
+                            title: "템플릿",
+                            systemImage: "square.grid.2x2",
+                            isActive: isTemplateSection,
+                            action: showTemplates
+                        )
+                        SidebarNavigationRow(
+                            title: "레이아웃",
+                            systemImage: "keyboard",
+                            isActive: isLayoutSection,
+                            action: showLayouts
+                        )
+                        SidebarNavigationRow(
+                            title: "설정",
+                            systemImage: "gearshape",
+                            isActive: selection == .settings,
+                            action: { select(.settings) }
+                        )
+                    }
+                    .padding(.horizontal, 14)
+
+                    HStack {
+                        Text("내 워크플로")
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                        Spacer()
+                        Button(action: addWorkflow) {
+                            Image(systemName: "plus")
+                                .font(.system(size: 13, weight: .semibold))
+                                .frame(width: 28, height: 28)
+                        }
+                        .buttonStyle(.plain)
+                        .background(.white.opacity(0.5), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+                        .overlay {
+                            RoundedRectangle(cornerRadius: 8, style: .continuous)
+                                .stroke(Color(nsColor: .separatorColor).opacity(0.35), lineWidth: 1)
+                        }
+                        .help("워크플로 추가")
+                    }
+                    .padding(.horizontal, 22)
+                    .padding(.top, 32)
+                    .padding(.bottom, 6)
+
+                    VStack(spacing: 5) {
+                        ForEach(workflows) { workflow in
+                            SidebarWorkflowButton(
+                                workflow: workflow,
+                                isActive: selection == .workflow(workflow.id),
+                                action: { select(.workflow(workflow.id)) }
+                            )
+                            .contextMenu {
+                                Button("삭제", role: .destructive) { deleteWorkflow(workflow.id) }
+                            }
+                        }
+                    }
+                    .padding(.horizontal, 14)
+                }
+                .padding(.bottom, 18)
+            }
+
+            SidebarNavigationRow(
+                title: "휴지통 보기",
+                systemImage: "trash",
+                isActive: selection == .trash,
+                action: { select(.trash) }
+            )
+            .frame(height: 42)
+            .background(Color(nsColor: .controlBackgroundColor).opacity(0.72), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+            .overlay {
+                RoundedRectangle(cornerRadius: 10, style: .continuous)
+                    .stroke(Color(nsColor: .separatorColor).opacity(0.3), lineWidth: 1)
+            }
+            .padding(.horizontal, 14)
+            .padding(.bottom, 14)
+        }
+        .background(.thinMaterial)
+    }
+}
+
+private struct SidebarNavigationRow: View {
+    var title: String
+    var systemImage: String
+    var isActive: Bool
+    var action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            HStack(spacing: 13) {
+                Image(systemName: systemImage)
+                    .font(.system(size: 16, weight: .medium))
+                    .frame(width: 22)
+                Text(title)
+                    .font(.system(size: 15, weight: isActive ? .semibold : .medium))
+                Spacer()
+            }
+            .foregroundStyle(isActive ? Color.wikeyAccent : Color.primary.opacity(0.78))
+            .padding(.horizontal, 14)
+            .frame(height: 36)
+            .background(
+                isActive ? Color.wikeyAccent.opacity(0.11) : Color.clear,
+                in: RoundedRectangle(cornerRadius: 9, style: .continuous)
+            )
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .frame(maxWidth: .infinity)
+    }
+}
+
+private struct SidebarWorkflowButton: View {
+    var workflow: Workflow
+    var isActive: Bool
+    var action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            HStack(spacing: 10) {
+                Circle()
+                    .fill(workflow.isEnabled ? Color.wikeyAccent.opacity(0.7) : Color.secondary.opacity(0.35))
+                    .frame(width: 6, height: 6)
+                Text(workflow.name)
+                    .font(.system(size: 14, weight: isActive ? .semibold : .regular))
+                    .lineLimit(1)
+                Spacer(minLength: 8)
+                if !workflow.shortcut.steps.isEmpty {
+                    ShortcutBadge(text: workflow.shortcut.displayName, isMuted: !isActive)
+                }
+            }
+            .foregroundStyle(isActive ? Color.wikeyAccent : Color.primary.opacity(0.7))
+            .padding(.horizontal, 12)
+            .frame(height: 38)
+            .background(
+                isActive ? Color.wikeyAccent.opacity(0.11) : Color.clear,
+                in: RoundedRectangle(cornerRadius: 9, style: .continuous)
+            )
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .frame(maxWidth: .infinity)
     }
 }

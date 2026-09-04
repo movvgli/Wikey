@@ -11,7 +11,7 @@ struct WikeyEditorHeader<Actions: View>: View {
             VStack(alignment: .leading, spacing: 5) {
                 TextField("이름", text: $title)
                     .textFieldStyle(.plain)
-                    .font(.system(size: 26, weight: .semibold))
+                    .font(.system(size: 30, weight: .semibold))
                     .accessibilityLabel("이름")
                 Text(subtitle)
                     .font(.subheadline)
@@ -21,8 +21,9 @@ struct WikeyEditorHeader<Actions: View>: View {
             Spacer(minLength: 16)
             actions
         }
-        .padding(.horizontal, 28)
-        .padding(.vertical, 20)
+        .padding(.horizontal, 34)
+        .padding(.vertical, 24)
+        .background(.bar)
     }
 }
 
@@ -56,10 +57,13 @@ struct ShortcutBadge: View {
     var body: some View {
         Text(text)
             .font(.system(size: 11, weight: .medium, design: .monospaced))
-            .foregroundStyle(isMuted ? .tertiary : .secondary)
-            .padding(.horizontal, 7)
-            .padding(.vertical, 3)
-            .background(.quaternary, in: RoundedRectangle(cornerRadius: 5, style: .continuous))
+            .foregroundStyle(isMuted ? Color.secondary : Color.accentColor)
+            .padding(.horizontal, 8)
+            .padding(.vertical, 4)
+            .background(
+                isMuted ? Color.secondary.opacity(0.08) : Color.accentColor.opacity(0.1),
+                in: RoundedRectangle(cornerRadius: 6, style: .continuous)
+            )
             .accessibilityLabel("단축키 \(text)")
     }
 }
@@ -102,12 +106,13 @@ struct PlainPanel<Content: View>: View {
 
     var body: some View {
         content
-            .padding(16)
+            .padding(18)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .background(Color(nsColor: .controlBackgroundColor), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+            .background(Color(nsColor: .controlBackgroundColor), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
             .overlay {
-                RoundedRectangle(cornerRadius: 10, style: .continuous)
-                    .stroke(Color(nsColor: .separatorColor).opacity(0.7), lineWidth: 1)
+                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                    .stroke(Color(nsColor: .separatorColor).opacity(0.3), lineWidth: 1)
             }
+            .shadow(color: .black.opacity(0.04), radius: 10, y: 3)
     }
 }

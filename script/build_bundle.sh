@@ -33,6 +33,8 @@ XCODEBUILD_ARGS=(
 
 if [[ "$SIGNING_IDENTITY" == "-" ]]; then
   XCODEBUILD_ARGS+=(ENABLE_HARDENED_RUNTIME=NO)
+else
+  XCODEBUILD_ARGS+=(CODE_SIGN_INJECT_BASE_ENTITLEMENTS=NO)
 fi
 
 xcodebuild "${XCODEBUILD_ARGS[@]}"
@@ -43,6 +45,59 @@ if [[ ! -d "$BUILT_APP" ]]; then
 fi
 
 ditto --rsrc --extattr "$BUILT_APP" "$APP_BUNDLE"
+
+if [[ "$SIGNING_IDENTITY" != "-" ]]; then
+  SPARKLE_FRAMEWORK="$APP_BUNDLE/Contents/Frameworks/Sparkle.framework"
+  SPARKLE_VERSION="$SPARKLE_FRAMEWORK/Versions/B"
+
+  # Xcode's Embed & Sign step does not re-sign Sparkle's nested helpers.
+  # Sign them from the inside out, preserving the Downloader entitlement.
+  codesign --force --sign "$SIGNING_IDENTITY" --options runtime --timestamp \
+    "$SPARKLE_VERSION/XPCServices/Installer.xpc"
+  codesign --force --sign "$SIGNING_IDENTITY" --options runtime --timestamp \
+    --preserve-metadata=entitlements \
+    "$SPARKLE_VERSION/XPCServices/Downloader.xpc"
+  codesign --force --sign "$SIGNING_IDENTITY" --options runtime --timestamp \
+    "$SPARKLE_VERSION/Autoupdate"
+  codesign --force --sign "$SIGNING_IDENTITY" --options runtime --timestamp \
+    "$SPARKLE_VERSION/Updater.app"
+  codesign --force --sign "$SIGNING_IDENTITY" --options runtime --timestamp \
+    "$SPARKLE_FRAMEWORK"
+  codesign --force --sign "$SIGNING_IDENTITY" --options runtime --timestamp \
+    "$APP_BUNDLE/Contents/Frameworks/WikeyCore.framework"
+  codesign --force --sign "$SIGNING_IDENTITY" --options runtime --timestamp \
+    "$APP_BUNDLE/Contents/Library/LoginItems/WikeyLoginHelper.app"
+  codesign --force --sign "$SIGNING_IDENTITY" --options runtime --timestamp \
+    --preserve-metadata=identifier,entitlements,requirements \
+    "$APP_BUNDLE"
+
+  APP_ENTITLEMENTS="$(codesign -d --entitlements :- "$APP_BUNDLE" 2>&1)"
+  if [[ "$APP_ENTITLEMENTS" == *"com.apple.security.get-task-allow"* ]]; then
+    echo "Developer ID build contains the forbidden get-task-allow entitlement." >&2
+    exit 1
+  fi
+
+  for SIGNED_ITEM in \
+    "$APP_BUNDLE" \
+    "$APP_BUNDLE/Contents/Library/LoginItems/WikeyLoginHelper.app" \
+    "$APP_BUNDLE/Contents/Frameworks/WikeyCore.framework" \
+    "$SPARKLE_FRAMEWORK" \
+    "$SPARKLE_VERSION/Autoupdate" \
+    "$SPARKLE_VERSION/Updater.app" \
+    "$SPARKLE_VERSION/XPCServices/Downloader.xpc" \
+    "$SPARKLE_VERSION/XPCServices/Installer.xpc"; do
+    SIGNING_DETAILS="$(codesign -dvvv "$SIGNED_ITEM" 2>&1)"
+    if [[ "$SIGNING_DETAILS" != *"flags=0x10000(runtime)"* ]]; then
+      echo "A valid Hardened Runtime signature is missing from $SIGNED_ITEM." >&2
+      exit 1
+    fi
+    if [[ "$SIGNING_DETAILS" != *"Timestamp="* ]]; then
+      echo "A secure timestamp is missing from $SIGNED_ITEM." >&2
+      exit 1
+    fi
+  done
+fi
+
 codesign --verify --deep --strict --verbose=2 "$APP_BUNDLE"
 
 ACTUAL_VERSION="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "$APP_BUNDLE/Contents/Info.plist")"

@@ -1,6 +1,5 @@
 import AppKit
 import SwiftUI
-import UniformTypeIdentifiers
 
 @MainActor
 final class RichTextEditorController {
@@ -67,9 +66,28 @@ final class RichTextEditorController {
         panel.title = "템플릿에 넣을 이미지 선택"
         panel.allowedContentTypes = [.image]
         panel.allowsMultipleSelection = false
-        guard panel.runModal() == .OK, let url = panel.url, let data = try? Data(contentsOf: url) else { return }
-        let type = UTType(filenameExtension: url.pathExtension)?.identifier
-        let attachment = NSTextAttachment(data: data, ofType: type)
+        guard panel.runModal() == .OK,
+              let url = panel.url,
+              let image = NSImage(contentsOf: url),
+              image.isValid else {
+            return
+        }
+
+        let attachment = NSTextAttachment()
+        attachment.image = image
+        attachment.allowsTextAttachmentView = false
+
+        let naturalSize = image.size
+        let containerWidth = textView.textContainer?.containerSize.width ?? naturalSize.width
+        let maximumWidth = max(containerWidth - 16, 1)
+        let scale = naturalSize.width > maximumWidth ? maximumWidth / naturalSize.width : 1
+        attachment.bounds = NSRect(
+            x: 0,
+            y: 0,
+            width: max(naturalSize.width * scale, 1),
+            height: max(naturalSize.height * scale, 1)
+        )
+
         let attributed = NSAttributedString(attachment: attachment)
         textView.textStorage?.replaceCharacters(in: textView.selectedRange(), with: attributed)
         emitChange()

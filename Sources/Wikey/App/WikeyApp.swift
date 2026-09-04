@@ -2,6 +2,10 @@ import AppKit
 import SwiftUI
 import WikeyCore
 
+extension Color {
+    static let wikeyAccent = Color(red: 0.31, green: 0.29, blue: 0.93)
+}
+
 @main
 struct WikeyApp: App {
     @NSApplicationDelegateAdaptor(WikeyAppDelegate.self) private var appDelegate
@@ -9,14 +13,16 @@ struct WikeyApp: App {
     @State private var updates = UpdateController()
 
     var body: some Scene {
-        WindowGroup("Wikey", id: "main") {
+        Window("Wikey", id: "main") {
             ContentView()
                 .environment(runtime)
                 .environment(updates)
+                .tint(.wikeyAccent)
                 .task { runtime.start() }
                 .frame(minWidth: 920, minHeight: 620)
         }
         .defaultSize(width: 1120, height: 760)
+        .windowToolbarStyle(.unified(showsTitle: false))
         .commands {
             CommandGroup(after: .appInfo) {
                 Button("업데이트 확인…") {
@@ -45,6 +51,7 @@ struct WikeyApp: App {
             WikeySettingsView()
                 .environment(runtime)
                 .environment(updates)
+                .tint(.wikeyAccent)
         }
     }
 
