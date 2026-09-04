@@ -3,6 +3,16 @@
     <channel>
         <title>Wikey</title>
         <item>
+            <title>1.2.4</title>
+            <pubDate>Fri, 04 Sep 2026 08:30:38 +0000</pubDate>
+            <link>https://github.com/movvgli/Wikey</link>
+            <sparkle:version>1002004</sparkle:version>
+            <sparkle:shortVersionString>1.2.4</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
+            <sparkle:releaseNotesLink>https://raw.githubusercontent.com/movvgli/Wikey/update-feed/Wikey-1.2.4.md</sparkle:releaseNotesLink>
+            <enclosure url="https://github.com/movvgli/Wikey/releases/download/v1.2.4/Wikey-1.2.4.dmg" length="5921030" type="application/octet-stream" sparkle:edSignature="42XQJndhRMMiAsh667Wnh4IVc6gw/gx+eyR5CI4WejsA3mz+zvxHiVhePU3ePxow3Z9ucuMwZCwnSEns0s+NAA=="/>
+        </item>
+        <item>
             <title>1.2.3</title>
             <pubDate>Fri, 04 Sep 2026 08:08:27 +0000</pubDate>
             <link>https://github.com/movvgli/Wikey</link>
@@ -21,16 +31,6 @@
             <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
             <sparkle:releaseNotesLink>https://raw.githubusercontent.com/movvgli/Wikey/update-feed/Wikey-1.2.2.md</sparkle:releaseNotesLink>
             <enclosure url="https://github.com/movvgli/Wikey/releases/download/v1.2.2/Wikey-1.2.2.dmg" length="5776902" type="application/octet-stream" sparkle:edSignature="AFKj1TiA5YNNPhCLLLKCap7RXL9qM0ukC6ylYKslIDuXEdy9KnJFJsd/7tqm9HXJNaRIuNAvdy8q7qPR5ZN4Cg=="/>
-        </item>
-        <item>
-            <title>1.2.1</title>
-            <pubDate>Fri, 04 Sep 2026 06:15:04 +0000</pubDate>
-            <link>https://github.com/movvgli/Wikey</link>
-            <sparkle:version>1002001</sparkle:version>
-            <sparkle:shortVersionString>1.2.1</sparkle:shortVersionString>
-            <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
-            <sparkle:releaseNotesLink>https://raw.githubusercontent.com/movvgli/Wikey/update-feed/Wikey-1.2.1.md</sparkle:releaseNotesLink>
-            <enclosure url="https://github.com/movvgli/Wikey/releases/download/v1.2.1/Wikey-1.2.1.dmg" length="5614363" type="application/octet-stream" sparkle:edSignature="1bNjPzB6CxPsT1TeGj8tENdf0/YHQeTkhH/vAY2njWalPM5XQVg5P0mk2wGgI1V5mgp61wMOu4OuIP8JpuSUCg=="/>
         </item>
     </channel>
 </rss>
