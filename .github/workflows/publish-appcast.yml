@@ -89,6 +89,8 @@ jobs:
             --clobber
 
       - name: Publish update feed branch
+        env:
+          VERSION: ${{ inputs.version }}
         run: |
           feed_parent="$(mktemp -d)"
           feed_worktree="$feed_parent/feed"
@@ -101,7 +103,8 @@ jobs:
             git -C "$feed_worktree" rm -rf --ignore-unmatch .
           fi
           cp feed/appcast.xml "$feed_worktree/appcast.xml"
-          git -C "$feed_worktree" add appcast.xml
+          cp "feed/Wikey-$VERSION.md" "$feed_worktree/Wikey-$VERSION.md"
+          git -C "$feed_worktree" add appcast.xml "Wikey-$VERSION.md"
           if git -C "$feed_worktree" diff --cached --quiet; then
             echo "Update feed is already current."
             exit 0
