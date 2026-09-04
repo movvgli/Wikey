@@ -4,6 +4,7 @@ import WikeyCore
 struct TemplateEditorView: View {
     @Environment(WikeyRuntime.self) private var runtime
     @Binding var template: RichTemplate
+    var onBack: () -> Void
     @State private var editor = RichTextEditorController()
     @State private var copyState: CopyState = .idle
 
@@ -17,7 +18,8 @@ struct TemplateEditorView: View {
         VStack(spacing: 0) {
             WikeyEditorHeader(
                 title: $template.name,
-                subtitle: "서식과 이미지를 그대로 보관합니다. 내용은 자동으로 저장됩니다."
+                subtitle: "서식과 이미지를 그대로 보관합니다. 내용은 자동으로 저장됩니다.",
+                onBack: onBack
             ) {
                 if copyState != .idle {
                     Label(

@@ -4,22 +4,43 @@ import SwiftUI
 struct WikeyEditorHeader<Actions: View>: View {
     @Binding var title: String
     var subtitle: String
+    var onBack: (() -> Void)? = nil
     @ViewBuilder var actions: Actions
 
     var body: some View {
-        HStack(alignment: .center, spacing: 20) {
-            VStack(alignment: .leading, spacing: 5) {
-                TextField("이름", text: $title)
-                    .textFieldStyle(.plain)
-                    .font(.system(size: 30, weight: .semibold))
-                    .accessibilityLabel("이름")
-                Text(subtitle)
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-                    .lineLimit(2)
+        VStack(alignment: .leading, spacing: 4) {
+            if let onBack {
+                HStack {
+                    Button(action: onBack) {
+                        Image(systemName: "chevron.left")
+                            .font(.system(size: 14, weight: .semibold))
+                            .frame(width: 38, height: 38)
+                            .contentShape(Circle())
+                    }
+                    .buttonStyle(.plain)
+                    .background(.white.opacity(0.72), in: Circle())
+                    .overlay {
+                        Circle().stroke(Color(nsColor: .separatorColor).opacity(0.4), lineWidth: 1)
+                    }
+                    .help("뒤로가기")
+                    Spacer()
+                }
             }
-            Spacer(minLength: 16)
-            actions
+
+            HStack(alignment: .center, spacing: 20) {
+                VStack(alignment: .leading, spacing: 5) {
+                    TextField("이름", text: $title)
+                        .textFieldStyle(.plain)
+                        .font(.system(size: 30, weight: .semibold))
+                        .accessibilityLabel("이름")
+                    Text(subtitle)
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(2)
+                }
+                Spacer(minLength: 16)
+                actions
+            }
         }
         .padding(.horizontal, 34)
         .padding(.vertical, 24)

@@ -11,6 +11,9 @@ struct WorkflowEditorView: View {
 
     @State private var showsShortcutEditor = false
     @State private var showsDeleteConfirmation = false
+    @State private var showsTemplateActionSetup = false
+    @State private var selectedTemplateID: UUID?
+    @State private var selectedTemplateMode: TemplateDeliveryMode = .copyOnly
 
     private var isRunning: Bool {
         runtime.runner.runningWorkflowID == workflow.id
@@ -111,6 +114,15 @@ struct WorkflowEditorView: View {
         ) {
             Button("삭제", role: .destructive, action: onDelete)
             Button("취소", role: .cancel) {}
+        }
+        .sheet(isPresented: $showsTemplateActionSetup) {
+            TemplateActionSetupView(
+                templates: runtime.store.templates,
+                selectedTemplateID: $selectedTemplateID,
+                selectedMode: $selectedTemplateMode,
+                onCancel: { showsTemplateActionSetup = false },
+                onAdd: addSelectedTemplateAction
+            )
         }
     }
 
@@ -226,11 +238,7 @@ struct WorkflowEditorView: View {
             Button("웹사이트 열기", systemImage: "globe") {
                 workflow.actions.append(.openURL("https://"))
             }
-            Button("템플릿 복사", systemImage: "doc.on.clipboard") {
-                if let template = runtime.store.templates.first {
-                    workflow.actions.append(.copyTemplate(templateID: template.id, mode: .copyOnly))
-                }
-            }
+            Button("템플릿 복사…", systemImage: "doc.on.clipboard", action: beginTemplateActionSetup)
             .disabled(runtime.store.templates.isEmpty)
             Button("창 레이아웃 적용", systemImage: "rectangle.3.group") {
                 if let layout = runtime.store.layouts.first {
@@ -266,6 +274,21 @@ struct WorkflowEditorView: View {
         workflow.actions.swapAt(index, destination)
     }
 
+    private func beginTemplateActionSetup() {
+        selectedTemplateID = nil
+        selectedTemplateMode = .copyOnly
+        showsTemplateActionSetup = true
+    }
+
+    private func addSelectedTemplateAction() {
+        guard let selectedTemplateID,
+              runtime.store.templates.contains(where: { $0.id == selectedTemplateID }) else { return }
+        workflow.actions.append(
+            .copyTemplate(templateID: selectedTemplateID, mode: selectedTemplateMode)
+        )
+        showsTemplateActionSetup = false
+    }
+
     private func chooseApplication() {
         let panel = NSOpenPanel()
         panel.title = "실행할 앱 선택"
@@ -278,6 +301,138 @@ struct WorkflowEditorView: View {
             ?? (bundle.object(forInfoDictionaryKey: "CFBundleName") as? String)
             ?? url.deletingPathExtension().lastPathComponent
         workflow.actions.append(.launchApplication(bundleIdentifier: identifier, displayName: name))
+    }
+}
+
+private struct TemplateActionSetupView: View {
+    var templates: [RichTemplate]
+    @Binding var selectedTemplateID: UUID?
+    @Binding var selectedMode: TemplateDeliveryMode
+    var onCancel: () -> Void
+    var onAdd: () -> Void
+
+    var body: some View {
+        VStack(spacing: 0) {
+            VStack(alignment: .leading, spacing: 6) {
+                Text("템플릿 복사 추가")
+                    .font(.title2.weight(.semibold))
+                Text("복사할 템플릿과 실행 방식을 선택하세요.")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal, 24)
+            .padding(.top, 24)
+            .padding(.bottom, 18)
+
+            Divider()
+
+            ScrollView {
+                VStack(alignment: .leading, spacing: 22) {
+                    VStack(alignment: .leading, spacing: 10) {
+                        Text("복사할 템플릿")
+                            .font(.headline)
+
+                        VStack(spacing: 8) {
+                            ForEach(templates) { template in
+                                templateButton(template)
+                            }
+                        }
+                    }
+
+                    VStack(alignment: .leading, spacing: 10) {
+                        Text("실행 방식")
+                            .font(.headline)
+                        Picker("실행 방식", selection: $selectedMode) {
+                            ForEach(TemplateDeliveryMode.allCases, id: \.self) { mode in
+                                Text(mode.title).tag(mode)
+                            }
+                        }
+                        .labelsHidden()
+                        .pickerStyle(.segmented)
+
+                        Text(modeDescription)
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                }
+                .padding(24)
+            }
+
+            Divider()
+
+            HStack(spacing: 10) {
+                Spacer()
+                Button("취소", action: onCancel)
+                    .keyboardShortcut(.cancelAction)
+                Button("동작 추가", action: onAdd)
+                    .buttonStyle(.borderedProminent)
+                    .keyboardShortcut(.defaultAction)
+                    .disabled(selectedTemplateID == nil)
+            }
+            .padding(.horizontal, 24)
+            .padding(.vertical, 16)
+            .background(.bar)
+        }
+        .frame(width: 520, height: 480)
+    }
+
+    private func templateButton(_ template: RichTemplate) -> some View {
+        let isSelected = selectedTemplateID == template.id
+
+        return Button {
+            selectedTemplateID = template.id
+        } label: {
+            HStack(spacing: 14) {
+                Image(systemName: "doc.on.clipboard")
+                    .font(.system(size: 18, weight: .semibold))
+                    .foregroundStyle(Color.wikeyAccent)
+                    .frame(width: 38, height: 38)
+                    .background(Color.wikeyAccent.opacity(0.1), in: RoundedRectangle(cornerRadius: 10))
+
+                VStack(alignment: .leading, spacing: 3) {
+                    Text(template.name)
+                        .font(.headline)
+                        .foregroundStyle(.primary)
+                    Text(template.plainText.isEmpty ? "내용 없음" : template.plainText)
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(1)
+                }
+
+                Spacer(minLength: 12)
+
+                Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
+                    .font(.system(size: 19))
+                    .foregroundStyle(isSelected ? Color.wikeyAccent : Color.secondary.opacity(0.5))
+            }
+            .padding(.horizontal, 14)
+            .padding(.vertical, 11)
+            .contentShape(Rectangle())
+            .background(
+                isSelected ? Color.wikeyAccent.opacity(0.08) : Color(nsColor: .controlBackgroundColor),
+                in: RoundedRectangle(cornerRadius: 12, style: .continuous)
+            )
+            .overlay {
+                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    .stroke(
+                        isSelected ? Color.wikeyAccent.opacity(0.7) : Color(nsColor: .separatorColor).opacity(0.35),
+                        lineWidth: isSelected ? 1.5 : 1
+                    )
+            }
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel("\(template.name) 템플릿")
+        .accessibilityValue(isSelected ? "선택됨" : "선택 안 됨")
+    }
+
+    private var modeDescription: String {
+        switch selectedMode {
+        case .copyOnly:
+            "내용을 클립보드에 복사하고 다음 동작으로 넘어갑니다."
+        case .copyAndPaste:
+            "내용을 복사한 뒤 현재 입력 위치에 자동으로 붙여넣습니다."
+        }
     }
 }
 

@@ -81,7 +81,10 @@ struct ContentView: View {
             )
         case .template(let id):
             if let binding = templateBinding(id) {
-                TemplateEditorView(template: binding)
+                TemplateEditorView(
+                    template: binding,
+                    onBack: { selection = .templateCollection }
+                )
             } else {
                 ContentUnavailableView("템플릿을 찾을 수 없습니다", systemImage: "doc.badge.ellipsis")
             }
