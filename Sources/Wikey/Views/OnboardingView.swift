@@ -176,7 +176,7 @@ struct OnboardingView: View {
                     .foregroundStyle(.secondary)
             }
 
-            Text("권한을 켜지 않아도 앱 실행, 웹사이트 열기와 템플릿 복사는 사용할 수 있습니다.")
+            Text("권한을 켜지 않아도 앱 실행, 웹사이트 열기와 템플릿 붙여넣기는 사용할 수 있습니다.")
                 .font(.caption)
                 .foregroundStyle(.secondary)
         }

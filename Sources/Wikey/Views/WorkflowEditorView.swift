@@ -268,7 +268,7 @@ struct WorkflowEditorView: View {
                 workflow.actions.append(.pressKey(.shiftEnter))
             }
             Divider()
-            Button("템플릿 복사…", systemImage: "doc.on.clipboard", action: beginTemplateActionSetup)
+            Button("템플릿 붙여넣기…", systemImage: "doc.on.clipboard", action: beginTemplateActionSetup)
             .disabled(runtime.store.templates.isEmpty)
             Button("이미지 붙여넣기…", systemImage: "photo.on.rectangle") {
                 if let paths = chooseFiles(title: "붙여넣을 이미지 선택", contentType: .image) {
@@ -378,9 +378,9 @@ private struct TemplateActionSetupView: View {
     var body: some View {
         VStack(spacing: 0) {
             VStack(alignment: .leading, spacing: 6) {
-                Text("템플릿 복사 추가")
+                Text("템플릿 붙여넣기 추가")
                     .font(.title2.weight(.semibold))
-                Text("복사할 템플릿과 실행 방식을 선택하세요.")
+                Text("붙여넣을 템플릿과 실행 방식을 선택하세요.")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
             }
@@ -394,7 +394,7 @@ private struct TemplateActionSetupView: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 22) {
                     VStack(alignment: .leading, spacing: 10) {
-                        Text("복사할 템플릿")
+                        Text("붙여넣을 템플릿")
                             .font(.headline)
 
                         VStack(spacing: 8) {
@@ -634,7 +634,7 @@ private struct FlowActionRow: View {
     private var actionTitle: String {
         switch action {
         case .launchApplication: "앱 열기"
-        case .copyTemplate: "템플릿 복사"
+        case .copyTemplate: "템플릿 붙여넣기"
         case .openURL: "웹사이트 열기"
         case .applyLayout: "창 배치"
         case .pressKey(let key): "\(key.title) 입력"

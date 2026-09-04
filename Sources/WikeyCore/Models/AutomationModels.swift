@@ -72,7 +72,7 @@ public enum WorkflowAction: Identifiable, Codable, Hashable, Sendable {
     public var title: String {
         switch self {
         case .launchApplication(_, let name): "앱 실행 · \(name)"
-        case .copyTemplate: "템플릿 복사"
+        case .copyTemplate: "템플릿 붙여넣기"
         case .openURL: "웹사이트 열기"
         case .applyLayout: "창 레이아웃 적용"
         case .pressKey(let key): "\(key.title) 입력"
