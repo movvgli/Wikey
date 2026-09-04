@@ -36,7 +36,9 @@ jobs:
         run: ./script/package_release.sh "$WIKEY_VERSION" "$WIKEY_BUILD_NUMBER"
 
       - name: Verify checksum
-        run: shasum -a 256 -c "dist/Wikey-$WIKEY_VERSION.dmg.sha256"
+        run: |
+          cd dist
+          shasum -a 256 -c "Wikey-$WIKEY_VERSION.dmg.sha256"
 
       - name: Generate signed update feed
         env:

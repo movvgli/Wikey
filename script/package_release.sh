@@ -52,6 +52,9 @@ else
   echo "Created an ad-hoc signed local DMG. Set WIKEY_CODESIGN_IDENTITY and WIKEY_NOTARY_PROFILE for public distribution."
 fi
 
-shasum -a 256 "$DMG_PATH" > "$CHECKSUM_PATH"
+(
+  cd "$DIST_DIR"
+  shasum -a 256 "$(basename "$DMG_PATH")"
+) > "$CHECKSUM_PATH"
 echo "$DMG_PATH"
 echo "$CHECKSUM_PATH"
