@@ -1,19 +1,30 @@
 import Carbon.HIToolbox
 import Foundation
 import Observation
+import OSLog
+
+private let shortcutLogger = Logger(subsystem: "com.wikey.app", category: "shortcuts")
 
 @Observable
 public final class HotkeyRegistrar {
     public private(set) var registrationErrors: [UUID: String] = [:]
     public private(set) var applicationRegistrationErrors: [UUID: String] = [:]
+    public private(set) var layoutRegistrationErrors: [UUID: String] = [:]
     public var onWorkflow: ((UUID) -> Void)?
     public var onApplication: ((UUID) -> Void)?
+    public var onLayout: ((UUID) -> Void)?
 
     private let sequenceMonitor: SequenceMonitor
     private var handlerRef: EventHandlerRef?
     private var hotKeyRefs: [EventHotKeyRef] = []
     private var routes: [UInt32: Route] = [:]
     private var nextID: UInt32 = 1
+    private var pressedIDs = Set<UInt32>()
+    private var recordingTokens = Set<UUID>()
+    private var configuredWorkflows: [Workflow] = []
+    private var configuredApplications: [ApplicationShortcut] = []
+    private var configuredLayouts: [WindowLayout] = []
+    private var installationStatus: OSStatus = noErr
 
     private enum Route {
         case single(Target)
@@ -23,6 +34,7 @@ public final class HotkeyRegistrar {
     private enum Target: Hashable {
         case workflow(UUID)
         case application(UUID)
+        case layout(UUID)
     }
 
     private struct Candidate {
@@ -33,12 +45,15 @@ public final class HotkeyRegistrar {
 
     public init(sequenceMonitor: SequenceMonitor = SequenceMonitor()) {
         self.sequenceMonitor = sequenceMonitor
-        var eventType = EventTypeSpec(eventClass: OSType(kEventClassKeyboard), eventKind: UInt32(kEventHotKeyPressed))
-        InstallEventHandler(
+        var eventTypes = [
+            EventTypeSpec(eventClass: OSType(kEventClassKeyboard), eventKind: UInt32(kEventHotKeyPressed)),
+            EventTypeSpec(eventClass: OSType(kEventClassKeyboard), eventKind: UInt32(kEventHotKeyReleased)),
+        ]
+        installationStatus = InstallEventHandler(
             GetApplicationEventTarget(),
             hotKeyHandler,
-            1,
-            &eventType,
+            2,
+            &eventTypes,
             Unmanaged.passUnretained(self).toOpaque(),
             &handlerRef
         )
@@ -51,15 +66,22 @@ public final class HotkeyRegistrar {
 
     public func configure(
         workflows: [Workflow],
-        applicationShortcuts: [ApplicationShortcut] = []
+        applicationShortcuts: [ApplicationShortcut] = [],
+        layouts: [WindowLayout] = []
     ) {
+        configuredWorkflows = workflows
+        configuredApplications = applicationShortcuts
+        configuredLayouts = layouts
         unregisterAll()
         let conflicts = ShortcutConflictDetector.conflicts(
             workflows: workflows,
-            applicationShortcuts: applicationShortcuts
+            applicationShortcuts: applicationShortcuts,
+            layouts: layouts
         )
         registrationErrors = conflicts.workflows
         applicationRegistrationErrors = conflicts.applications
+        layoutRegistrationErrors = conflicts.layouts
+        guard recordingTokens.isEmpty else { return }
 
         let workflowCandidates = workflows.compactMap { workflow -> Candidate? in
             guard workflow.isEnabled,
@@ -82,7 +104,13 @@ public final class HotkeyRegistrar {
             )
         }
 
-        let grouped = Dictionary(grouping: workflowCandidates + applicationCandidates) {
+        let layoutCandidates = layouts.compactMap { layout -> Candidate? in
+            guard layout.shortcut.validationMessage == nil,
+                  layoutRegistrationErrors[layout.id] == nil else { return nil }
+            return Candidate(target: .layout(layout.id), name: layout.name, shortcut: layout.shortcut)
+        }
+
+        let grouped = Dictionary(grouping: workflowCandidates + applicationCandidates + layoutCandidates) {
             $0.shortcut.steps[0]
         }
 
@@ -99,6 +127,18 @@ public final class HotkeyRegistrar {
             }
             register(firstChord, route: route, affected: group.map(\.target))
         }
+        shortcutLogger.info("Global shortcuts ready: \(self.routes.count, privacy: .public) registered prefixes")
+    }
+
+    /// Temporarily release global shortcuts so recording cannot launch another action.
+    public func beginRecording(token: UUID) {
+        recordingTokens.insert(token)
+        unregisterAll()
+    }
+
+    public func endRecording(token: UUID) {
+        guard recordingTokens.remove(token) != nil, recordingTokens.isEmpty else { return }
+        configure(workflows: configuredWorkflows, applicationShortcuts: configuredApplications, layouts: configuredLayouts)
     }
 
     fileprivate func receive(_ event: EventRef) -> OSStatus {
@@ -112,7 +152,17 @@ public final class HotkeyRegistrar {
             nil,
             &hotKeyID
         )
-        guard status == noErr, let route = routes[hotKeyID.id] else { return status }
+        guard status == noErr else { return status }
+        guard hotKeyID.signature == fourCharacterCode("WKEY"),
+              let route = routes[hotKeyID.id], recordingTokens.isEmpty else {
+            return OSStatus(eventNotHandledErr)
+        }
+        if GetEventKind(event) == UInt32(kEventHotKeyReleased) {
+            pressedIDs.remove(hotKeyID.id)
+            return noErr
+        }
+        guard pressedIDs.insert(hotKeyID.id).inserted else { return noErr }
+        shortcutLogger.info("Global shortcut received: \(hotKeyID.id, privacy: .public)")
 
         switch route {
         case .single(let target):
@@ -123,6 +173,7 @@ public final class HotkeyRegistrar {
                     guard let chord, let target = endings[chord] else { return }
                     self?.trigger(target)
                 }
+                for target in endings.values { setRegistrationError(nil, for: target) }
             } catch {
                 for target in endings.values {
                     setRegistrationError(error.localizedDescription, for: target)
@@ -134,21 +185,22 @@ public final class HotkeyRegistrar {
 
     private func register(_ chord: KeyChord, route: Route, affected targets: [Target]) {
         let id = nextID
-        nextID += 1
+        nextID &+= 1
         let hotKeyID = EventHotKeyID(signature: fourCharacterCode("WKEY"), id: id)
         var ref: EventHotKeyRef?
-        let status = RegisterEventHotKey(
+        let status = installationStatus == noErr ? RegisterEventHotKey(
             chord.keyCode,
             chord.modifiers.carbonValue,
             hotKeyID,
             GetApplicationEventTarget(),
             OptionBits(kEventHotKeyExclusive),
             &ref
-        )
+        ) : installationStatus
         if status == noErr, let ref {
             hotKeyRefs.append(ref)
             routes[id] = route
         } else {
+            shortcutLogger.error("Global shortcut registration failed: \(status, privacy: .public)")
             for target in targets {
                 setRegistrationError(
                     "다른 앱 또는 macOS가 이 단축키를 사용 중입니다. (\(status))",
@@ -162,21 +214,24 @@ public final class HotkeyRegistrar {
         switch target {
         case .workflow(let id): onWorkflow?(id)
         case .application(let id): onApplication?(id)
+        case .layout(let id): onLayout?(id)
         }
     }
 
-    private func setRegistrationError(_ message: String, for target: Target) {
+    private func setRegistrationError(_ message: String?, for target: Target) {
         switch target {
         case .workflow(let id): registrationErrors[id] = message
         case .application(let id): applicationRegistrationErrors[id] = message
+        case .layout(let id): layoutRegistrationErrors[id] = message
         }
     }
 
     private func unregisterAll() {
+        sequenceMonitor.cancel()
         for ref in hotKeyRefs { UnregisterEventHotKey(ref) }
         hotKeyRefs.removeAll()
         routes.removeAll()
-        nextID = 1
+        pressedIDs.removeAll()
     }
 }
 

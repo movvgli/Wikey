@@ -7,7 +7,8 @@ Before making substantial visual changes, use the Product Design plugin's `get-c
 ## Selected visual direction
 
 - The user selected the first generated landing-page direction on 2026-09-04.
-- Preserve its quiet editorial layout: generous white space, concise Korean copy, a narrow left-aligned story column, real Wikey product screenshots, and one blue-violet download action.
+- Preserve its quiet editorial layout: generous white space, concise Korean copy, a narrow left-aligned story column, and one blue-violet download action.
+- Privacy update (2026-09-06): never publish actual user screenshots, workflows, template content, app lists, names, or local paths. Use clearly labeled fictional examples rendered from static public data. Audit all public assets, not just visible references. Explain workflows and installation in plain Korean; the supported minimum is macOS 14 from version 1.2.6.
 - Use Sukurini only as structural inspiration. Do not copy its content or assets.
 
 When implementing from a selected generated mock, treat that image as the source of truth for layout, component anatomy, density, spacing, color, typography, visible content, and hierarchy.

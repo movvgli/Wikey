@@ -6,7 +6,11 @@ import WikeyCore
 struct LayoutEditorView: View {
     @Environment(WikeyRuntime.self) private var runtime
     @Binding var layout: WindowLayout
+    var onBack: () -> Void
+    var onDelete: () -> Void
     @State private var previewDisplayID: String?
+    @State private var showsDeleteConfirmation = false
+    @State private var applicationSelectionError: String?
 
     private var displays: [DisplayInfo] { runtime.layoutController.availableDisplays }
 
@@ -16,8 +20,12 @@ struct LayoutEditorView: View {
                 title: $layout.name,
                 subtitle: layout.placements.isEmpty
                     ? "앱을 추가하고 사용할 화면 영역을 정하세요."
-                    : "앱 \(layout.placements.count)개의 창을 한 번에 정리합니다."
+                    : "앱 \(layout.placements.count)개의 창을 한 번에 정리합니다.",
+                onBack: onBack
             ) {
+                WikeyDeleteButton(title: "레이아웃 삭제") {
+                    showsDeleteConfirmation = true
+                }
                 Button("앱 추가", systemImage: "plus", action: addApplication)
                     .buttonStyle(.borderedProminent)
                     .controlSize(.large)
@@ -34,23 +42,92 @@ struct LayoutEditorView: View {
                 )
             } else {
                 ScrollView {
-                    ViewThatFits(in: .horizontal) {
-                        HStack(alignment: .top, spacing: 28) {
-                            previewSection.frame(minWidth: 330)
-                            placementsSection.frame(minWidth: 370)
+                    VStack(alignment: .leading, spacing: 28) {
+                        WikeySection(title: "단축키", detail: "이 단축키로 레이아웃을 바로 적용합니다.") {
+                            PlainPanel {
+                                VStack(alignment: .leading, spacing: 12) {
+                                    ShortcutRecorderView(shortcut: $layout.shortcut)
+                                    if let error = runtime.hotkeys.layoutRegistrationErrors[layout.id] {
+                                        Label(error, systemImage: "exclamationmark.triangle.fill")
+                                            .font(.caption)
+                                            .foregroundStyle(.orange)
+                                    }
+                                }
+                            }
                         }
-                        VStack(alignment: .leading, spacing: 28) {
-                            previewSection
-                            placementsSection
+
+                        if !runtime.permissions.accessibilityGranted {
+                            PlainPanel {
+                                VStack(alignment: .leading, spacing: 10) {
+                                    Label("창 배치에는 손쉬운 사용 권한이 필요합니다", systemImage: "lock.open.display")
+                                        .font(.headline)
+                                    Text("권한을 허용한 뒤 레이아웃을 다시 적용해 주세요.")
+                                        .font(.subheadline)
+                                        .foregroundStyle(.secondary)
+                                    Button("권한 설정 열기", action: runtime.permissions.requestAccessibility)
+                                }
+                            }
+                        }
+
+                        ViewThatFits(in: .horizontal) {
+                            HStack(alignment: .top, spacing: 28) {
+                                previewSection.frame(minWidth: 280)
+                                placementsSection.frame(minWidth: 330)
+                            }
+                            VStack(alignment: .leading, spacing: 28) {
+                                previewSection
+                                placementsSection
+                            }
+                        }
+
+                        if let summary = runtime.lastRun, summary.workflowID == layout.id {
+                            PlainPanel { RunSummaryView(summary: summary) }
                         }
                     }
-                    .padding(28)
+                    .padding(WikeyPageMetrics.padding)
+                    .frame(maxWidth: WikeyPageMetrics.maximumWidth, alignment: .leading)
+                    .frame(maxWidth: .infinity, alignment: .topLeading)
                 }
             }
+
+            Divider()
+            HStack(spacing: 12) {
+                WikeySaveStatus()
+                Spacer()
+                Text("\(layout.placements.count)개 앱 배치")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                Button("레이아웃 적용", systemImage: "play.fill") {
+                    runtime.run(layoutID: layout.id)
+                }
+                .buttonStyle(.borderedProminent)
+                .controlSize(.large)
+                .disabled(layout.placements.isEmpty || displays.isEmpty
+                          || runtime.runner.runningWorkflowID == layout.id
+                          || runtime.runner.queuedWorkflowIDs.contains(layout.id))
+                .keyboardShortcut(.return, modifiers: [.command])
+            }
+            .padding(.horizontal, WikeyPageMetrics.padding)
+            .padding(.vertical, 13)
+            .background(.bar)
         }
         .navigationTitle(layout.name)
         .onAppear {
             previewDisplayID = previewDisplayID ?? displays.first?.id
+        }
+        .alert("레이아웃을 삭제할까요?", isPresented: $showsDeleteConfirmation) {
+            Button("취소", role: .cancel) {}
+            Button("삭제", role: .destructive, action: onDelete)
+        } message: {
+            Text("‘\(layout.name)’과 이 레이아웃을 사용하는 워크플로 동작이 함께 삭제됩니다. 이 작업은 되돌릴 수 없습니다.")
+        }
+        .alert("앱을 추가하지 못했습니다", isPresented: Binding(
+            get: { applicationSelectionError != nil },
+            set: { if !$0 { applicationSelectionError = nil } }
+        )) {
+            Button("확인", role: .cancel) { applicationSelectionError = nil }
+        } message: {
+            Text(applicationSelectionError ?? "")
         }
     }
 
@@ -96,16 +173,19 @@ struct LayoutEditorView: View {
                 }
             } else {
                 VStack(spacing: 0) {
-                    ForEach(layout.placements.indices, id: \.self) { index in
+                    ForEach(layout.placements) { placement in
                         PlacementRow(
                             placement: Binding(
-                                get: { layout.placements[index] },
-                                set: { layout.placements[index] = $0 }
+                                get: { layout.placements.first(where: { $0.id == placement.id }) ?? placement },
+                                set: { updated in
+                                    guard let index = layout.placements.firstIndex(where: { $0.id == placement.id }) else { return }
+                                    layout.placements[index] = updated
+                                }
                             ),
                             displays: displays.map(\.target),
-                            delete: { layout.placements.remove(at: index) }
+                            delete: { layout.placements.removeAll { $0.id == placement.id } }
                         )
-                        if index < layout.placements.count - 1 {
+                        if placement.id != layout.placements.last?.id {
                             Divider().padding(.leading, 46)
                         }
                     }
@@ -121,7 +201,7 @@ struct LayoutEditorView: View {
     }
 
     private func addApplication() {
-        guard let display = displays.first?.target else { return }
+        guard let display = displays.first(where: { $0.id == previewDisplayID })?.target ?? displays.first?.target else { return }
         let panel = NSOpenPanel()
         panel.title = "배치할 앱 선택"
         panel.allowedContentTypes = [.application]
@@ -132,6 +212,10 @@ struct LayoutEditorView: View {
         let name = (bundle.object(forInfoDictionaryKey: "CFBundleDisplayName") as? String)
             ?? (bundle.object(forInfoDictionaryKey: "CFBundleName") as? String)
             ?? url.deletingPathExtension().lastPathComponent
+        guard !layout.placements.contains(where: { $0.bundleIdentifier == identifier }) else {
+            applicationSelectionError = "‘\(name)’은 이미 추가되어 있습니다. 아래 앱 배치에서 기존 항목의 모니터와 영역을 변경하세요."
+            return
+        }
         layout.placements.append(AppWindowPlacement(
             bundleIdentifier: identifier,
             appName: name,
@@ -230,9 +314,19 @@ private struct PlacementRow: View {
                 Grid(alignment: .leading, horizontalSpacing: 12, verticalSpacing: 8) {
                     GridRow {
                         Text("모니터").foregroundStyle(.secondary)
-                        Picker("모니터", selection: $placement.display) {
+                        Picker("모니터", selection: Binding(
+                            get: { placement.display.uuid },
+                            set: { id in
+                                guard let display = displays.first(where: { $0.uuid == id }) else { return }
+                                placement.display = display
+                            }
+                        )) {
+                            if !displays.contains(where: { $0.uuid == placement.display.uuid }) {
+                                Text("\(placement.display.name) · 연결 안 됨").tag(placement.display.uuid)
+                            }
                             ForEach(displays, id: \.uuid) { display in
-                                Text(display.name).tag(display)
+                                // Names can change with system language; UUID is identity.
+                                Text(display.name).tag(display.uuid)
                             }
                         }
                         .labelsHidden()
@@ -248,6 +342,11 @@ private struct PlacementRow: View {
                     }
                 }
                 .font(.subheadline)
+                if !displays.contains(where: { $0.uuid == placement.display.uuid }) {
+                    Label("저장한 모니터가 연결되어 있지 않습니다. 사용할 모니터를 선택하세요.", systemImage: "exclamationmark.triangle")
+                        .font(.caption)
+                        .foregroundStyle(.orange)
+                }
             }
         }
         .padding(.vertical, 16)

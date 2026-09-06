@@ -9,6 +9,7 @@ struct TemplateEditorView: View {
     @State private var editor = RichTextEditorController()
     @State private var copyState: CopyState = .idle
     @State private var showsDeleteConfirmation = false
+    @State private var copyError: String?
 
     private enum CopyState {
         case idle
@@ -32,19 +33,9 @@ struct TemplateEditorView: View {
                     .foregroundStyle(copyState == .copied ? Color.green : Color.orange)
                     .transition(.opacity)
                 }
-                Button(role: .destructive) {
+                WikeyDeleteButton(title: "템플릿 삭제") {
                     showsDeleteConfirmation = true
-                } label: {
-                    Image(systemName: "trash")
-                        .font(.system(size: 14, weight: .medium))
-                        .frame(width: 30, height: 30)
-                        .contentShape(Rectangle())
                 }
-                .buttonStyle(.plain)
-                .foregroundStyle(.red)
-                .background(Color.red.opacity(0.07), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
-                .help("템플릿 삭제")
-                .accessibilityLabel("템플릿 삭제")
                 Button("클립보드에 복사", systemImage: "doc.on.doc", action: copyTemplate)
                     .buttonStyle(.borderedProminent)
                     .controlSize(.large)
@@ -72,15 +63,21 @@ struct TemplateEditorView: View {
                 }
                 .fixedSize()
                 Spacer()
-                Text("자동 저장")
-                    .font(.caption)
-                    .foregroundStyle(.tertiary)
+                WikeySaveStatus()
             }
             .padding(.horizontal, 20)
             .padding(.vertical, 10)
             .background(.bar)
 
             Divider()
+
+            if let copyError {
+                Label(copyError, systemImage: "exclamationmark.triangle.fill")
+                    .font(.subheadline)
+                    .foregroundStyle(.red)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(16)
+            }
 
             ZStack {
                 Color(nsColor: .windowBackgroundColor)
@@ -101,15 +98,17 @@ struct TemplateEditorView: View {
             Button("취소", role: .cancel) {}
             Button("삭제", role: .destructive, action: onDelete)
         } message: {
-            Text("‘\(template.name)’과 이 템플릿을 사용하는 워크플로 동작이 함께 삭제됩니다.")
+            Text("‘\(template.name)’과 이 템플릿을 사용하는 워크플로 동작이 함께 삭제됩니다. 이 작업은 되돌릴 수 없습니다.")
         }
     }
 
     private func copyTemplate() {
         do {
             try runtime.clipboard.copy(runtime.store.templateDocument(id: template.id))
+            copyError = nil
             showCopyState(.copied)
         } catch {
+            copyError = error.localizedDescription
             showCopyState(.failed)
         }
     }

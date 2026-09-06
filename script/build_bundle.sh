@@ -23,6 +23,8 @@ XCODEBUILD_ARGS=(
   -quiet
   -derivedDataPath "$DERIVED_DATA"
   -destination "generic/platform=macOS"
+  ONLY_ACTIVE_ARCH=NO
+  "ARCHS=arm64 x86_64"
   MARKETING_VERSION="$VERSION"
   CURRENT_PROJECT_VERSION="$BUILD_NUMBER"
   CODE_SIGN_STYLE=Manual
@@ -106,6 +108,34 @@ if [[ "$ACTUAL_VERSION" != "$VERSION" || "$ACTUAL_BUILD" != "$BUILD_NUMBER" ]]; 
   echo "Version mismatch: expected $VERSION ($BUILD_NUMBER), built $ACTUAL_VERSION ($ACTUAL_BUILD)" >&2
   exit 1
 fi
+
+# The installer and its embedded login helper must agree with the executable's
+# deployment target. Check both architectures so an Intel-only regression cannot
+# slip through a successful build on Apple Silicon.
+MINIMUM_MACOS="14.0"
+for INFO_PLIST in \
+  "$APP_BUNDLE/Contents/Info.plist" \
+  "$APP_BUNDLE/Contents/Library/LoginItems/WikeyLoginHelper.app/Contents/Info.plist"; do
+  ACTUAL_MINIMUM_MACOS="$(/usr/libexec/PlistBuddy -c 'Print :LSMinimumSystemVersion' "$INFO_PLIST")"
+  if [[ "$ACTUAL_MINIMUM_MACOS" != "$MINIMUM_MACOS" ]]; then
+    echo "Minimum macOS mismatch: expected $MINIMUM_MACOS, found $ACTUAL_MINIMUM_MACOS in $INFO_PLIST" >&2
+    exit 1
+  fi
+done
+
+for NATIVE_BINARY in \
+  "$APP_BUNDLE/Contents/MacOS/Wikey" \
+  "$APP_BUNDLE/Contents/Frameworks/WikeyCore.framework/WikeyCore" \
+  "$APP_BUNDLE/Contents/Library/LoginItems/WikeyLoginHelper.app/Contents/MacOS/WikeyLoginHelper"; do
+  for ARCHITECTURE in arm64 x86_64; do
+    xcrun lipo "$NATIVE_BINARY" -verify_arch "$ARCHITECTURE"
+    BINARY_MINIMUM_MACOS="$(xcrun vtool -arch "$ARCHITECTURE" -show-build "$NATIVE_BINARY" | awk '$1 == "minos" {print $2}')"
+    if [[ "$BINARY_MINIMUM_MACOS" != "$MINIMUM_MACOS" ]]; then
+      echo "Unsupported $ARCHITECTURE minimum macOS: $BINARY_MINIMUM_MACOS in $NATIVE_BINARY" >&2
+      exit 1
+    fi
+  done
+done
 
 if [[ ! -d "$APP_BUNDLE/Contents/Frameworks/Sparkle.framework" ]]; then
   echo "Sparkle.framework is missing from the app bundle." >&2

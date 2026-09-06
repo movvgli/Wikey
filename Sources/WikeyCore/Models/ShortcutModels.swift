@@ -93,6 +93,7 @@ public struct ShortcutGesture: Codable, Hashable, Sendable {
 private enum ShortcutConflictTarget {
     case workflow(UUID)
     case application(UUID)
+    case layout(UUID)
 }
 
 public enum ShortcutConflictDetector {
@@ -103,16 +104,19 @@ public enum ShortcutConflictDetector {
     public struct Result: Sendable {
         public var workflows: [UUID: String]
         public var applications: [UUID: String]
+        public var layouts: [UUID: String]
 
-        public init(workflows: [UUID: String] = [:], applications: [UUID: String] = [:]) {
+        public init(workflows: [UUID: String] = [:], applications: [UUID: String] = [:], layouts: [UUID: String] = [:]) {
             self.workflows = workflows
             self.applications = applications
+            self.layouts = layouts
         }
     }
 
     public static func conflicts(
         workflows: [Workflow],
-        applicationShortcuts: [ApplicationShortcut]
+        applicationShortcuts: [ApplicationShortcut],
+        layouts: [WindowLayout] = []
     ) -> Result {
         struct Candidate {
             var target: ShortcutConflictTarget
@@ -130,6 +134,9 @@ public enum ShortcutConflictDetector {
                 name: application.displayName,
                 shortcut: application.shortcut
             )
+        } + layouts.compactMap { layout -> Candidate? in
+            guard layout.shortcut.validationMessage == nil else { return nil }
+            return Candidate(target: .layout(layout.id), name: layout.name, shortcut: layout.shortcut)
         }
 
         var result = Result()
@@ -167,6 +174,7 @@ public enum ShortcutConflictDetector {
         switch target {
         case .workflow(let id): result.workflows[id] = message
         case .application(let id): result.applications[id] = message
+        case .layout(let id): result.layouts[id] = message
         }
     }
 }

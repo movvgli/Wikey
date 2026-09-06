@@ -2,6 +2,8 @@
 
 ## GitHub Releases에서 설치
 
+Wikey 1.2.6부터 macOS 14 이상을 대상으로 Apple Silicon과 Intel용으로 빌드합니다. 실제 macOS 14·Intel 기기의 실행 검증은 아직 남아 있습니다.
+
 1. 최신 릴리스의 `Wikey-버전.dmg`를 내려받습니다.
 2. DMG를 열고 Wikey를 Applications 폴더로 드래그합니다.
 3. 응용 프로그램 폴더의 Wikey를 엽니다.

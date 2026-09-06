@@ -89,30 +89,10 @@ jobs:
               --notes-file "$notes" \
               --generate-notes \
               --prerelease \
+              --latest=false \
               --verify-tag
           fi
 
-      - name: Publish update feed
-        run: |
-          git fetch origin update-feed:refs/remotes/origin/update-feed || true
-          feed_parent="$(mktemp -d)"
-          feed_worktree="$feed_parent/feed"
-          if git show-ref --verify --quiet refs/remotes/origin/update-feed; then
-            git worktree add --detach "$feed_worktree" origin/update-feed
-            git -C "$feed_worktree" switch -C update-feed
-          else
-            git worktree add --detach "$feed_worktree"
-            git -C "$feed_worktree" switch --orphan update-feed
-            git -C "$feed_worktree" rm -rf --ignore-unmatch .
-          fi
-          cp dist/appcast.xml "$feed_worktree/appcast.xml"
-          git -C "$feed_worktree" add appcast.xml
-          if git -C "$feed_worktree" diff --cached --quiet; then
-            echo "Update feed is already current."
-            exit 0
-          fi
-          git -C "$feed_worktree" \
-            -c user.name='github-actions[bot]' \
-            -c user.email='41898282+github-actions[bot]@users.noreply.github.com' \
-            commit -m "Update appcast for $GITHUB_REF_NAME"
-          git -C "$feed_worktree" push origin update-feed
+      # Preview appcasts remain attached to their prerelease only. Never publish
+      # an unnotarized preview to the update-feed branch used by installed apps.
+      # Production feed publication is owned by publish-appcast.yml.

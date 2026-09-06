@@ -74,6 +74,7 @@ public enum WorkflowAction: Identifiable, Codable, Hashable, Sendable {
     case runWorkflow(workflowID: UUID)
     case pasteImages(filePaths: [String])
     case pasteFiles(filePaths: [String])
+    case wait(seconds: Double)
 
     public var id: String {
         switch self {
@@ -85,6 +86,7 @@ public enum WorkflowAction: Identifiable, Codable, Hashable, Sendable {
         case .runWorkflow(let id): "workflow:\(id)"
         case .pasteImages(let paths): "images:\(paths.joined(separator: "|"))"
         case .pasteFiles(let paths): "files:\(paths.joined(separator: "|"))"
+        case .wait(let seconds): "wait:\(seconds)"
         }
     }
 
@@ -98,6 +100,7 @@ public enum WorkflowAction: Identifiable, Codable, Hashable, Sendable {
         case .runWorkflow: "다른 워크플로 실행"
         case .pasteImages: "이미지 붙여넣기"
         case .pasteFiles: "파일 붙여넣기"
+        case .wait: "잠시 기다리기"
         }
     }
 }
@@ -236,11 +239,25 @@ public struct WindowLayout: Identifiable, Codable, Hashable, Sendable {
     public var id: UUID
     public var name: String
     public var placements: [AppWindowPlacement]
+    public var shortcut: ShortcutGesture
 
-    public init(id: UUID = UUID(), name: String = "새 레이아웃", placements: [AppWindowPlacement] = []) {
+    public init(id: UUID = UUID(), name: String = "새 레이아웃", placements: [AppWindowPlacement] = [], shortcut: ShortcutGesture = .init()) {
         self.id = id
         self.name = name
         self.placements = placements
+        self.shortcut = shortcut
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case id, name, placements, shortcut
+    }
+
+    public init(from decoder: Decoder) throws {
+        let values = try decoder.container(keyedBy: CodingKeys.self)
+        id = try values.decode(UUID.self, forKey: .id)
+        name = try values.decode(String.self, forKey: .name)
+        placements = try values.decode([AppWindowPlacement].self, forKey: .placements)
+        shortcut = try values.decodeIfPresent(ShortcutGesture.self, forKey: .shortcut) ?? .init()
     }
 }
 
@@ -293,6 +310,7 @@ public struct ActionFailure: Identifiable, Hashable, Sendable {
 }
 
 public struct RunSummary: Hashable, Sendable {
+    public var workflowID: UUID? = nil
     public var workflowName: String
     public var startedAt: Date
     public var finishedAt: Date

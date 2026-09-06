@@ -12,7 +12,6 @@ enum SidebarSelection: Hashable {
     case layoutCollection
     case layout(UUID)
     case settings
-    case trash
 }
 
 struct ContentView: View {
@@ -20,6 +19,7 @@ struct ContentView: View {
     @AppStorage("didCompleteOnboarding") private var didCompleteOnboarding = false
     @State private var selection: SidebarSelection? = .overview
     @State private var showOnboarding = false
+    @State private var workflowToDelete: UUID?
 
     var body: some View {
         NavigationSplitView {
@@ -30,12 +30,44 @@ struct ContentView: View {
                 addWorkflow: addWorkflow,
                 showTemplates: showTemplates,
                 showLayouts: showLayouts,
-                deleteWorkflow: deleteWorkflow
+                deleteWorkflow: { workflowToDelete = $0 }
             )
             .ignoresSafeArea(.container, edges: .top)
             .navigationSplitViewColumnWidth(min: 238, ideal: 260, max: 300)
         } detail: {
-            detail
+            VStack(spacing: 0) {
+                if let error = runtime.store.lastPersistenceError {
+                    HStack(spacing: 12) {
+                        Label(error, systemImage: "exclamationmark.triangle.fill")
+                            .font(.subheadline)
+                            .foregroundStyle(.red)
+                        Spacer()
+                        Button("다시 저장") { runtime.saveAndReloadHotkeys() }
+                    }
+                    .padding(16)
+                    .background(Color.red.opacity(0.08))
+                }
+                detail
+                if runtime.runner.runningWorkflowID != nil {
+                    Divider()
+                    HStack(spacing: 10) {
+                        ProgressView().controlSize(.small)
+                        Text(runtime.runner.currentActionTitle ?? "실행 준비 중")
+                            .font(.subheadline)
+                            .lineLimit(1)
+                        if !runtime.runner.queuedWorkflowIDs.isEmpty {
+                            Text("대기 \(runtime.runner.queuedWorkflowIDs.count)개")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+                        Spacer()
+                        Button("실행 중지", systemImage: "stop.fill") { runtime.runner.cancel() }
+                    }
+                    .padding(.horizontal, WikeyPageMetrics.padding)
+                    .padding(.vertical, 12)
+                    .background(.bar)
+                }
+            }
                 .ignoresSafeArea(.container, edges: .top)
         }
         .toolbar(removing: .sidebarToggle)
@@ -47,6 +79,18 @@ struct ContentView: View {
             OnboardingView(isPresented: $showOnboarding)
                 .environment(runtime)
         }
+        .alert("워크플로를 삭제할까요?", isPresented: Binding(
+            get: { workflowToDelete != nil },
+            set: { if !$0 { workflowToDelete = nil } }
+        )) {
+            Button("취소", role: .cancel) { workflowToDelete = nil }
+            Button("삭제", role: .destructive) {
+                if let id = workflowToDelete { deleteWorkflow(id) }
+                workflowToDelete = nil
+            }
+        } message: {
+            Text("다른 워크플로에서 이 워크플로를 실행하는 동작도 함께 삭제됩니다. 이 작업은 되돌릴 수 없습니다.")
+        }
     }
 
     @ViewBuilder
@@ -54,12 +98,14 @@ struct ContentView: View {
         switch selection ?? .overview {
         case .overview:
             OverviewView(
+                isHome: true,
                 createWorkflow: addWorkflow,
                 openWorkflow: { selection = .workflow($0) },
                 openSettings: { selection = .settings }
             )
         case .workflowCollection:
             OverviewView(
+                isHome: false,
                 createWorkflow: addWorkflow,
                 openWorkflow: { selection = .workflow($0) },
                 openSettings: { selection = .settings }
@@ -71,6 +117,7 @@ struct ContentView: View {
                     onBack: { selection = .workflowCollection },
                     onDelete: { deleteWorkflow(id) }
                 )
+                .id(id)
             } else {
                 ContentUnavailableView("워크플로를 찾을 수 없습니다", systemImage: "bolt.slash")
             }
@@ -89,6 +136,7 @@ struct ContentView: View {
                     onBack: { selection = .templateCollection },
                     onDelete: { deleteTemplate(id) }
                 )
+                .id(id)
             } else {
                 ContentUnavailableView("템플릿을 찾을 수 없습니다", systemImage: "doc.badge.ellipsis")
             }
@@ -100,18 +148,17 @@ struct ContentView: View {
             )
         case .layout(let id):
             if let binding = layoutBinding(id) {
-                LayoutEditorView(layout: binding)
+                LayoutEditorView(
+                    layout: binding,
+                    onBack: { selection = .layoutCollection },
+                    onDelete: { deleteLayout(id) }
+                )
+                .id(id)
             } else {
                 ContentUnavailableView("레이아웃을 찾을 수 없습니다", systemImage: "rectangle.3.group")
             }
         case .settings:
             WikeySettingsView()
-        case .trash:
-            ContentUnavailableView(
-                "휴지통이 비어 있습니다",
-                systemImage: "trash",
-                description: Text("삭제한 항목을 보관하는 기능은 다음 업데이트에서 지원할 예정입니다.")
-            )
         }
     }
 
@@ -146,7 +193,7 @@ struct ContentView: View {
             set: { updated in
                 guard let index = runtime.store.layouts.firstIndex(where: { $0.id == id }) else { return }
                 runtime.store.layouts[index] = updated
-                runtime.store.save()
+                runtime.saveAndReloadHotkeys()
             }
         )
     }
@@ -185,7 +232,8 @@ struct ContentView: View {
 
     private func deleteLayout(_ id: UUID) {
         runtime.store.deleteLayout(id: id)
-        selection = .overview
+        runtime.reloadHotkeys()
+        selection = .layoutCollection
     }
 }
 
@@ -229,12 +277,20 @@ private struct WindowToolbarConfigurator: NSViewRepresentable {
 
 private struct OverviewView: View {
     @Environment(WikeyRuntime.self) private var runtime
+    var isHome: Bool
     var createWorkflow: () -> Void
     var openWorkflow: (UUID) -> Void
     var openSettings: () -> Void
+    @State private var searchText = ""
 
     private var activeWorkflows: [Workflow] {
         runtime.store.workflows.filter(\.isEnabled)
+    }
+
+    private var visibleWorkflows: [Workflow] {
+        let workflows = isHome ? activeWorkflows : runtime.store.workflows
+        guard !searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return workflows }
+        return workflows.filter { $0.name.localizedCaseInsensitiveContains(searchText) }
     }
 
     private var needsSetup: Bool {
@@ -244,16 +300,12 @@ private struct OverviewView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 30) {
-                HStack(alignment: .center, spacing: 20) {
-                    VStack(alignment: .leading, spacing: 6) {
-                        Text("워크플로")
-                            .font(.system(size: 30, weight: .semibold))
-                        Text(activeWorkflows.isEmpty
-                             ? "자주 하는 일을 단축키 하나로 묶어보세요."
-                             : "활성화된 워크플로 \(activeWorkflows.count)개를 어디서든 실행할 수 있습니다.")
-                            .foregroundStyle(.secondary)
-                    }
-                    Spacer()
+                WikeyPageHeader(
+                    title: isHome ? "홈" : "워크플로",
+                    subtitle: isHome
+                        ? "자주 하는 일을 실행하고 최근 결과를 확인하세요."
+                        : "모든 워크플로 \(runtime.store.workflows.count)개 · 활성화 \(activeWorkflows.count)개"
+                ) {
                     Button("새 워크플로", systemImage: "plus", action: createWorkflow)
                         .buttonStyle(.borderedProminent)
                         .controlSize(.large)
@@ -263,11 +315,17 @@ private struct OverviewView: View {
                     SetupNotice(openSettings: openSettings)
                 }
 
+                if !isHome {
+                    WikeySearchField(prompt: "워크플로 검색", text: $searchText)
+                }
+
                 WikeySection(
-                    title: activeWorkflows.isEmpty ? "첫 워크플로 만들기" : "빠른 실행",
-                    detail: activeWorkflows.isEmpty ? "이름과 단축키를 정한 뒤 실행할 동작을 순서대로 추가합니다." : nil
+                    title: isHome ? "빠른 실행" : "내 워크플로",
+                    detail: runtime.store.workflows.isEmpty ? "이름과 단축키를 정한 뒤 실행할 동작을 순서대로 추가합니다." : nil
                 ) {
-                    if activeWorkflows.isEmpty {
+                    if visibleWorkflows.isEmpty && !searchText.isEmpty {
+                        ContentUnavailableView.search(text: searchText)
+                    } else if visibleWorkflows.isEmpty {
                         PlainPanel {
                             HStack(spacing: 14) {
                                 Image(systemName: "bolt")
@@ -275,9 +333,11 @@ private struct OverviewView: View {
                                     .foregroundStyle(.tint)
                                     .frame(width: 30)
                                 VStack(alignment: .leading, spacing: 3) {
-                                    Text("앱 열기부터 시작해 보세요")
+                                    Text(runtime.store.workflows.isEmpty ? "앱 열기부터 시작해 보세요" : "활성화된 워크플로가 없습니다")
                                         .font(.headline)
-                                    Text("웹사이트, 템플릿, 창 배치도 같은 단축키에 이어 붙일 수 있습니다.")
+                                    Text(runtime.store.workflows.isEmpty
+                                         ? "웹사이트, 템플릿, 창 배치도 같은 단축키에 이어 붙일 수 있습니다."
+                                         : "워크플로 탭에서 기존 워크플로를 켜거나 새로 만들 수 있습니다.")
                                         .font(.subheadline)
                                         .foregroundStyle(.secondary)
                                 }
@@ -287,10 +347,11 @@ private struct OverviewView: View {
                         }
                     } else {
                         LazyVStack(spacing: 12) {
-                            ForEach(activeWorkflows) { workflow in
+                            ForEach(visibleWorkflows) { workflow in
                                 WorkflowQuickRunCard(
                                     workflow: workflow,
-                                    isRunning: runtime.runner.runningWorkflowID == workflow.id,
+                                    isRunning: runtime.runner.runningWorkflowID == workflow.id
+                                        || runtime.runner.queuedWorkflowIDs.contains(workflow.id),
                                     hasConflict: runtime.hotkeys.registrationErrors[workflow.id] != nil,
                                     open: { openWorkflow(workflow.id) },
                                     run: { runtime.run(workflowID: workflow.id) }
@@ -300,7 +361,7 @@ private struct OverviewView: View {
                     }
                 }
 
-                if let lastRun = runtime.lastRun {
+                if isHome, let lastRun = runtime.lastRun {
                     WikeySection(title: "최근 실행") {
                         PlainPanel {
                             RunSummaryView(summary: lastRun)
@@ -308,11 +369,11 @@ private struct OverviewView: View {
                     }
                 }
             }
-            .padding(32)
-            .frame(maxWidth: 820, alignment: .leading)
+            .padding(WikeyPageMetrics.padding)
+            .frame(maxWidth: WikeyPageMetrics.maximumWidth, alignment: .leading)
             .frame(maxWidth: .infinity, alignment: .topLeading)
         }
-        .navigationTitle("홈")
+        .navigationTitle(isHome ? "홈" : "워크플로")
     }
 }
 
@@ -346,8 +407,8 @@ private struct SetupNotice: View {
 
     private var missingPermissionText: String {
         switch (runtime.permissions.accessibilityGranted, runtime.permissions.inputMonitoringGranted) {
-        case (false, false): "창 배치·자동 붙여넣기와 두 단계 단축키가 아직 꺼져 있습니다."
-        case (false, true): "창 배치와 자동 붙여넣기가 아직 꺼져 있습니다."
+        case (false, false): "창 배치·자동 붙여넣기에는 손쉬운 사용, 두 단계 단축키에는 두 권한이 필요합니다."
+        case (false, true): "창 배치·자동 붙여넣기와 두 단계 단축키에 손쉬운 사용 권한이 필요합니다."
         case (true, false): "두 단계 단축키가 아직 꺼져 있습니다."
         case (true, true): ""
         }
@@ -379,7 +440,7 @@ private struct WorkflowQuickRunCard: View {
                             .font(.headline)
                             .foregroundStyle(.primary)
                             .lineLimit(1)
-                        Text("동작 \(workflow.actions.count)개")
+                        Text("동작 \(workflow.actions.count)개" + (workflow.isEnabled ? "" : " · 비활성화됨"))
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
                     }
@@ -413,9 +474,10 @@ private struct WorkflowQuickRunCard: View {
                 }
             }
             .buttonStyle(.plain)
-            .foregroundStyle(hasConflict ? Color.secondary : Color.wikeyAccent)
-            .help(hasConflict ? "단축키 충돌을 해결한 뒤 실행할 수 있습니다" : "워크플로 실행")
-            .disabled(hasConflict || isRunning || workflow.actions.isEmpty)
+            .foregroundStyle(Color.wikeyAccent)
+            .help("워크플로 실행")
+            .accessibilityLabel("\(workflow.name) 실행")
+            .disabled(isRunning || workflow.actions.isEmpty)
             .padding(.trailing, 18)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -440,14 +502,14 @@ private struct WorkflowQuickRunCard: View {
     }
 }
 
-private struct RunSummaryView: View {
+struct RunSummaryView: View {
     var summary: RunSummary
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack {
                 Label(
-                    summary.failures.isEmpty ? "완료" : "일부 동작을 실행하지 못했습니다",
+                    summary.failures.isEmpty ? "완료" : "실행을 완료하지 못했습니다",
                     systemImage: summary.failures.isEmpty ? "checkmark.circle.fill" : "exclamationmark.triangle.fill"
                 )
                 .foregroundStyle(summary.failures.isEmpty ? Color.green : Color.orange)
@@ -471,15 +533,29 @@ private struct TemplateLibraryView: View {
     var templates: [RichTemplate]
     var open: (UUID) -> Void
     var add: () -> Void
+    @State private var searchText = ""
+
+    private var filteredTemplates: [RichTemplate] {
+        guard !searchText.isEmpty else { return templates }
+        return templates.filter {
+            $0.name.localizedCaseInsensitiveContains(searchText)
+                || $0.plainText.localizedCaseInsensitiveContains(searchText)
+        }
+    }
 
     var body: some View {
         LibraryLandingView(
             title: "템플릿",
             subtitle: "자주 쓰는 문장을 저장하고 워크플로에서 바로 사용합니다.",
             addTitle: "템플릿 추가",
+            searchText: $searchText,
+            isEmpty: templates.isEmpty,
+            hasSearchResults: !filteredTemplates.isEmpty,
+            emptySymbol: "doc.on.clipboard",
+            emptyDescription: "자주 쓰는 문장과 이미지를 담은 첫 템플릿을 만들어 보세요.",
             add: add
         ) {
-            ForEach(templates) { template in
+            ForEach(filteredTemplates) { template in
                 LibraryItemButton(
                     title: template.name,
                     subtitle: template.plainText.isEmpty ? "내용 없음" : template.plainText,
@@ -492,22 +568,36 @@ private struct TemplateLibraryView: View {
 }
 
 private struct LayoutLibraryView: View {
+    @Environment(WikeyRuntime.self) private var runtime
     var layouts: [WindowLayout]
     var open: (UUID) -> Void
     var add: () -> Void
+    @State private var searchText = ""
+
+    private var filteredLayouts: [WindowLayout] {
+        guard !searchText.isEmpty else { return layouts }
+        return layouts.filter { $0.name.localizedCaseInsensitiveContains(searchText) }
+    }
 
     var body: some View {
         LibraryLandingView(
             title: "레이아웃",
             subtitle: "앱 창의 위치와 크기를 한 번에 배치합니다.",
             addTitle: "레이아웃 추가",
+            searchText: $searchText,
+            isEmpty: layouts.isEmpty,
+            hasSearchResults: !filteredLayouts.isEmpty,
+            emptySymbol: "rectangle.3.group",
+            emptyDescription: "함께 사용하는 앱을 추가하고 창을 배치할 위치를 정하세요.",
             add: add
         ) {
-            ForEach(layouts) { layout in
+            ForEach(filteredLayouts) { layout in
                 LibraryItemButton(
                     title: layout.name,
-                    subtitle: "\(layout.placements.count)개 앱 배치",
+                    subtitle: "\(layout.placements.count)개 앱 배치 · "
+                        + (layout.shortcut.steps.isEmpty ? "단축키 미지정" : layout.shortcut.displayName),
                     systemImage: "rectangle.3.group",
+                    warning: runtime.hotkeys.layoutRegistrationErrors[layout.id],
                     action: { open(layout.id) }
                 )
             }
@@ -519,32 +609,47 @@ private struct LibraryLandingView<Content: View>: View {
     var title: String
     var subtitle: String
     var addTitle: String
+    @Binding var searchText: String
+    var isEmpty: Bool
+    var hasSearchResults: Bool
+    var emptySymbol: String
+    var emptyDescription: String
     var add: () -> Void
     @ViewBuilder var content: Content
 
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 28) {
-                HStack(alignment: .center) {
-                    VStack(alignment: .leading, spacing: 6) {
-                        Text(title)
-                            .font(.system(size: 32, weight: .bold))
-                        Text(subtitle)
-                            .foregroundStyle(.secondary)
-                    }
-                    Spacer()
+                WikeyPageHeader(title: title, subtitle: subtitle) {
                     Button(addTitle, systemImage: "plus", action: add)
                         .buttonStyle(.borderedProminent)
                         .controlSize(.large)
                 }
-                LazyVStack(spacing: 12) {
-                    content
+                WikeySearchField(prompt: "\(title) 검색", text: $searchText)
+                if isEmpty {
+                    ContentUnavailableView {
+                        Label("아직 \(title)이 없습니다", systemImage: emptySymbol)
+                    } description: {
+                        Text(emptyDescription)
+                    } actions: {
+                        Button(addTitle, action: add)
+                            .buttonStyle(.borderedProminent)
+                    }
+                    .frame(maxWidth: .infinity, minHeight: 240)
+                } else if !hasSearchResults {
+                    ContentUnavailableView.search(text: searchText)
+                        .frame(maxWidth: .infinity, minHeight: 240)
+                } else {
+                    LazyVStack(spacing: 12) {
+                        content
+                    }
                 }
             }
-            .padding(38)
-            .frame(maxWidth: 900, alignment: .leading)
+            .padding(WikeyPageMetrics.padding)
+            .frame(maxWidth: WikeyPageMetrics.maximumWidth, alignment: .leading)
             .frame(maxWidth: .infinity, alignment: .topLeading)
         }
+        .navigationTitle(title)
     }
 }
 
@@ -552,6 +657,7 @@ private struct LibraryItemButton: View {
     var title: String
     var subtitle: String
     var systemImage: String
+    var warning: String? = nil
     var action: () -> Void
 
     var body: some View {
@@ -569,12 +675,20 @@ private struct LibraryItemButton: View {
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                         .lineLimit(1)
+                    if let warning {
+                        Label(warning, systemImage: "exclamationmark.triangle.fill")
+                            .font(.caption)
+                            .foregroundStyle(.orange)
+                            .lineLimit(2)
+                    }
                 }
                 Spacer()
                 Image(systemName: "chevron.right")
                     .foregroundStyle(.tertiary)
             }
             .padding(18)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .contentShape(Rectangle())
             .background(Color(nsColor: .controlBackgroundColor), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
             .overlay {
                 RoundedRectangle(cornerRadius: 14, style: .continuous)
@@ -650,7 +764,7 @@ private struct WikeySidebar: View {
                         )
                         SidebarNavigationRow(
                             title: "레이아웃",
-                            systemImage: "keyboard",
+                            systemImage: "rectangle.3.group",
                             isActive: isLayoutSection,
                             action: showLayouts
                         )
@@ -674,7 +788,7 @@ private struct WikeySidebar: View {
                                 .frame(width: 28, height: 28)
                         }
                         .buttonStyle(.plain)
-                        .background(.white.opacity(0.5), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+                        .background(Color(nsColor: .controlBackgroundColor), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
                         .overlay {
                             RoundedRectangle(cornerRadius: 8, style: .continuous)
                                 .stroke(Color(nsColor: .separatorColor).opacity(0.35), lineWidth: 1)
@@ -702,20 +816,6 @@ private struct WikeySidebar: View {
                 .padding(.bottom, 18)
             }
 
-            SidebarNavigationRow(
-                title: "휴지통 보기",
-                systemImage: "trash",
-                isActive: selection == .trash,
-                action: { select(.trash) }
-            )
-            .frame(height: 42)
-            .background(Color(nsColor: .controlBackgroundColor).opacity(0.72), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
-            .overlay {
-                RoundedRectangle(cornerRadius: 10, style: .continuous)
-                    .stroke(Color(nsColor: .separatorColor).opacity(0.3), lineWidth: 1)
-            }
-            .padding(.horizontal, 14)
-            .padding(.bottom, 14)
         }
         .background(.thinMaterial)
     }

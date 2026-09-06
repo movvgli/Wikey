@@ -12,6 +12,18 @@ struct WikeyApp: App {
     @State private var runtime = WikeyRuntime()
     @State private var updates = UpdateController()
 
+    init() {
+        // A separate store lets local regression checks exercise the signed app
+        // without changing the user's workflows, templates, or app shortcuts.
+        let arguments = ProcessInfo.processInfo.arguments
+        if let index = arguments.firstIndex(of: "--test-store"),
+           arguments.indices.contains(index + 1), arguments[index + 1].hasPrefix("/") {
+            _runtime = State(initialValue: WikeyRuntime(
+                storeRootURL: URL(fileURLWithPath: arguments[index + 1], isDirectory: true)
+            ))
+        }
+    }
+
     var body: some Scene {
         Window("Wikey", id: "main") {
             ContentView()

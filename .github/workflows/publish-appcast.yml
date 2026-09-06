@@ -74,6 +74,7 @@ jobs:
           printf '%s' "$SPARKLE_ED_PRIVATE_KEY" | "$appcast_tool" \
             --ed-key-file - \
             --download-url-prefix "https://github.com/$GITHUB_REPOSITORY/releases/download/v$VERSION/" \
+            --release-notes-url-prefix "https://raw.githubusercontent.com/$GITHUB_REPOSITORY/update-feed/" \
             --link "https://github.com/$GITHUB_REPOSITORY" \
             --maximum-versions 3 \
             feed

@@ -1,3 +1,4 @@
+import ApplicationServices
 import CoreGraphics
 import Foundation
 
@@ -7,10 +8,14 @@ public final class SequenceMonitor {
     private var eventTap: CFMachPort?
     private var runLoopSource: CFRunLoopSource?
     private var timeoutWorkItem: DispatchWorkItem?
-    private var acceptable: Set<KeyChord> = []
+    private var keyState = SequenceKeyState(acceptable: [])
     private var completion: Completion?
 
     public init() {}
+
+    public func cancel() {
+        stop(result: nil)
+    }
 
     deinit {
         stop(result: nil)
@@ -21,14 +26,17 @@ public final class SequenceMonitor {
         guard CGPreflightListenEventAccess() else {
             throw AutomationError.permissionRequired("입력 모니터링")
         }
+        guard AXIsProcessTrusted() else {
+            throw AutomationError.permissionRequired("손쉬운 사용 · 연속 단축키가 다른 앱에 입력되지 않도록 필요")
+        }
 
-        self.acceptable = acceptable
+        keyState = SequenceKeyState(acceptable: acceptable)
         self.completion = completion
-        let mask = CGEventMask(1 << CGEventType.keyDown.rawValue)
+        let mask = CGEventMask((1 << CGEventType.keyDown.rawValue) | (1 << CGEventType.keyUp.rawValue))
         guard let tap = CGEvent.tapCreate(
             tap: .cgSessionEventTap,
             place: .headInsertEventTap,
-            options: .listenOnly,
+            options: .defaultTap,
             eventsOfInterest: mask,
             callback: sequenceEventCallback,
             userInfo: Unmanaged.passUnretained(self).toOpaque()
@@ -49,24 +57,32 @@ public final class SequenceMonitor {
     }
 
     fileprivate func receive(eventType: CGEventType, event: CGEvent) -> Unmanaged<CGEvent>? {
+        if event.getIntegerValueField(.eventSourceUserData) == KeyboardService.syntheticEventUserData {
+            return Unmanaged.passUnretained(event)
+        }
         if eventType == .tapDisabledByTimeout || eventType == .tapDisabledByUserInput {
             if let eventTap { CGEvent.tapEnable(tap: eventTap, enable: true) }
             return Unmanaged.passUnretained(event)
         }
-        guard eventType == .keyDown else { return Unmanaged.passUnretained(event) }
-
+        guard eventType == .keyDown || eventType == .keyUp else { return Unmanaged.passUnretained(event) }
         let keyCode = UInt32(event.getIntegerValueField(.keyboardEventKeycode))
-        if keyCode == 53 {
-            stop(result: nil)
-            return nil
-        }
         let chord = KeyChord(keyCode: keyCode, modifiers: ShortcutModifiers(cgFlags: event.flags))
-        if acceptable.contains(chord) {
-            stop(result: chord)
+        switch keyState.receive(chord: chord, isKeyDown: eventType == .keyDown,
+                                isRepeat: event.getIntegerValueField(.keyboardEventAutorepeat) != 0) {
+        case .passThrough:
+            return Unmanaged.passUnretained(event)
+        case .consume:
             return nil
+        case .matched:
+            timeoutWorkItem?.cancel()
+            let item = DispatchWorkItem { [weak self] in self?.stop(result: nil) }
+            timeoutWorkItem = item
+            DispatchQueue.main.asyncAfter(deadline: .now() + 3, execute: item)
+            return nil
+        case .finish(let result, let consume):
+            stop(result: result)
+            return consume ? nil : Unmanaged.passUnretained(event)
         }
-        stop(result: nil)
-        return Unmanaged.passUnretained(event)
     }
 
     private func stop(result: KeyChord?) {
@@ -76,11 +92,38 @@ public final class SequenceMonitor {
             CFRunLoopRemoveSource(CFRunLoopGetMain(), source, .commonModes)
         }
         runLoopSource = nil
+        if let eventTap { CFMachPortInvalidate(eventTap) }
         eventTap = nil
-        acceptable = []
+        keyState = SequenceKeyState(acceptable: [])
         let callback = completion
         completion = nil
         if let callback { callback(result) }
+    }
+}
+
+/// Consume the second key through release, including repeat events. Otherwise a
+/// held second key starts typing into the destination as soon as the tap closes.
+struct SequenceKeyState {
+    enum Decision: Equatable {
+        case passThrough, consume, matched
+        case finish(KeyChord?, consume: Bool)
+    }
+
+    var acceptable: Set<KeyChord>
+    private var matchedChord: KeyChord?
+
+    init(acceptable: Set<KeyChord>) { self.acceptable = acceptable }
+
+    mutating func receive(chord: KeyChord, isKeyDown: Bool, isRepeat: Bool) -> Decision {
+        if let matchedChord, chord.keyCode == matchedChord.keyCode {
+            return isKeyDown ? .consume : .finish(matchedChord, consume: true)
+        }
+        guard isKeyDown else { return .passThrough }
+        if chord.keyCode == 53 { return .finish(nil, consume: true) }
+        if isRepeat { return .consume }
+        guard matchedChord == nil, acceptable.contains(chord) else { return .finish(nil, consume: false) }
+        matchedChord = chord
+        return .matched
     }
 }
 

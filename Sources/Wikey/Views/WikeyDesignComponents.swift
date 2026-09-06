@@ -1,5 +1,98 @@
 import AppKit
 import SwiftUI
+import WikeyCore
+
+enum WikeyPageMetrics {
+    static let padding: CGFloat = 32
+    static let maximumWidth: CGFloat = 1000
+}
+
+struct WikeyPageHeader<Actions: View>: View {
+    var title: String
+    var subtitle: String
+    @ViewBuilder var actions: Actions
+
+    var body: some View {
+        HStack(alignment: .center, spacing: 20) {
+            VStack(alignment: .leading, spacing: 6) {
+                Text(title)
+                    .font(.system(size: 30, weight: .semibold))
+                Text(subtitle)
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            actions
+        }
+    }
+}
+
+struct WikeySearchField: View {
+    var prompt: String
+    @Binding var text: String
+
+    var body: some View {
+        HStack(spacing: 10) {
+            Image(systemName: "magnifyingglass")
+                .foregroundStyle(.secondary)
+            TextField(prompt, text: $text)
+                .textFieldStyle(.plain)
+                .accessibilityLabel(prompt)
+            if !text.isEmpty {
+                Button { text = "" } label: {
+                    Image(systemName: "xmark.circle.fill")
+                        .foregroundStyle(.secondary)
+                        .frame(width: 24, height: 24)
+                        .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .help("검색 지우기")
+                .accessibilityLabel("검색 지우기")
+            }
+        }
+        .padding(.horizontal, 13)
+        .frame(height: 40)
+        .background(Color(nsColor: .controlBackgroundColor), in: RoundedRectangle(cornerRadius: 10))
+        .overlay {
+            RoundedRectangle(cornerRadius: 10)
+                .stroke(Color(nsColor: .separatorColor).opacity(0.35), lineWidth: 1)
+        }
+    }
+}
+
+struct WikeySaveStatus: View {
+    @Environment(WikeyRuntime.self) private var runtime
+
+    var body: some View {
+        Label(
+            runtime.store.lastPersistenceError == nil ? "자동 저장됨" : "저장 실패",
+            systemImage: runtime.store.lastPersistenceError == nil ? "checkmark.circle" : "exclamationmark.triangle"
+        )
+        .font(.caption)
+        .foregroundStyle(runtime.store.lastPersistenceError == nil ? Color.secondary : Color.red)
+        .help(runtime.store.lastPersistenceError ?? "변경 사항을 자동으로 저장합니다.")
+    }
+}
+
+struct WikeyDeleteButton: View {
+    var title: String
+    var action: () -> Void
+
+    var body: some View {
+        Button(role: .destructive, action: action) {
+            Image(systemName: "trash")
+                .font(.system(size: 14, weight: .medium))
+                .frame(width: 30, height: 30)
+                .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .foregroundStyle(.red)
+        .background(Color.red.opacity(0.07), in: RoundedRectangle(cornerRadius: 8))
+        .help(title)
+        .accessibilityLabel(title)
+    }
+}
 
 struct WikeyEditorHeader<Actions: View>: View {
     @Binding var title: String
@@ -18,11 +111,13 @@ struct WikeyEditorHeader<Actions: View>: View {
                             .contentShape(Circle())
                     }
                     .buttonStyle(.plain)
-                    .background(.white.opacity(0.72), in: Circle())
+                    .background(Color(nsColor: .controlBackgroundColor), in: Circle())
                     .overlay {
                         Circle().stroke(Color(nsColor: .separatorColor).opacity(0.4), lineWidth: 1)
                     }
                     .help("뒤로가기")
+                    .accessibilityLabel("목록으로 돌아가기")
+                    .keyboardShortcut("[", modifiers: [.command])
                     Spacer()
                 }
             }
@@ -42,7 +137,7 @@ struct WikeyEditorHeader<Actions: View>: View {
                 actions
             }
         }
-        .padding(.horizontal, 34)
+        .padding(.horizontal, WikeyPageMetrics.padding)
         .padding(.vertical, 24)
         .background(.bar)
     }

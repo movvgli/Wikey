@@ -8,12 +8,7 @@ struct WikeySettingsView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 30) {
-                VStack(alignment: .leading, spacing: 6) {
-                    Text("설정")
-                        .font(.system(size: 30, weight: .semibold))
-                    Text("필요한 기능만 권한을 켜고, Wikey의 실행 방식을 정할 수 있습니다.")
-                        .foregroundStyle(.secondary)
-                }
+                WikeyPageHeader(title: "설정", subtitle: "필요한 권한과 Wikey의 실행 방식을 관리합니다.") { EmptyView() }
 
                 WikeySection(
                     title: "권한",
@@ -43,7 +38,7 @@ struct WikeySettingsView: View {
                         VStack(spacing: 0) {
                             PermissionSettingRow(
                                 title: "손쉬운 사용",
-                                detail: "창 배치와 자동 붙여넣기에 사용",
+                                detail: "창 배치·자동 붙여넣기·두 단계 단축키에 사용",
                                 granted: runtime.permissions.accessibilityGranted,
                                 request: runtime.permissions.requestAccessibility,
                                 open: runtime.permissions.openAccessibilitySettings
@@ -51,7 +46,7 @@ struct WikeySettingsView: View {
                             Divider().padding(.leading, 42)
                             PermissionSettingRow(
                                 title: "입력 모니터링",
-                                detail: "두 단계로 이어 누르는 단축키에 사용",
+                                detail: "두 단계 단축키에 사용 · 손쉬운 사용도 필요",
                                 granted: runtime.permissions.inputMonitoringGranted,
                                 request: runtime.permissions.requestInputMonitoring,
                                 open: runtime.permissions.openInputMonitoringSettings
@@ -181,7 +176,7 @@ struct WikeySettingsView: View {
                     }
                 }
 
-                if !runtime.hotkeys.registrationErrors.isEmpty || runtime.store.lastPersistenceError != nil {
+                if hasErrors {
                     Divider()
                     WikeySection(title: "확인 필요") {
                         PlainPanel {
@@ -194,6 +189,30 @@ struct WikeySettingsView: View {
                                     )
                                     .foregroundStyle(.orange)
                                 }
+                                ForEach(Array(runtime.hotkeys.layoutRegistrationErrors.keys), id: \.self) { id in
+                                    let name = runtime.store.layouts.first(where: { $0.id == id })?.name ?? "레이아웃"
+                                    Label(
+                                        "\(name): \(runtime.hotkeys.layoutRegistrationErrors[id] ?? "단축키 오류")",
+                                        systemImage: "exclamationmark.triangle.fill"
+                                    )
+                                    .foregroundStyle(.orange)
+                                }
+                                ForEach(Array(runtime.hotkeys.applicationRegistrationErrors.keys), id: \.self) { id in
+                                    let name = runtime.store.applicationShortcuts.first(where: { $0.id == id })?.displayName ?? "앱"
+                                    Label(
+                                        "\(name): \(runtime.hotkeys.applicationRegistrationErrors[id] ?? "단축키 오류")",
+                                        systemImage: "exclamationmark.triangle.fill"
+                                    )
+                                    .foregroundStyle(.orange)
+                                }
+                                ForEach(Array(runtime.applicationLaunchErrors.keys), id: \.self) { id in
+                                    let name = runtime.applicationName(runID: id) ?? "앱"
+                                    Label(
+                                        "\(name): \(runtime.applicationLaunchErrors[id] ?? "실행 오류")",
+                                        systemImage: "exclamationmark.triangle.fill"
+                                    )
+                                    .foregroundStyle(.red)
+                                }
                                 if let error = runtime.store.lastPersistenceError {
                                     Label(error, systemImage: "externaldrive.badge.exclamationmark")
                                         .foregroundStyle(.red)
@@ -204,13 +223,21 @@ struct WikeySettingsView: View {
                     }
                 }
             }
-            .padding(32)
-            .frame(maxWidth: 760, alignment: .leading)
+            .padding(WikeyPageMetrics.padding)
+            .frame(maxWidth: WikeyPageMetrics.maximumWidth, alignment: .leading)
             .frame(maxWidth: .infinity, alignment: .topLeading)
         }
         .frame(minWidth: 560, minHeight: 460)
         .navigationTitle("설정")
         .task { updates.refresh() }
+    }
+
+    private var hasErrors: Bool {
+        !runtime.hotkeys.registrationErrors.isEmpty
+            || !runtime.hotkeys.layoutRegistrationErrors.isEmpty
+            || !runtime.hotkeys.applicationRegistrationErrors.isEmpty
+            || !runtime.applicationLaunchErrors.isEmpty
+            || runtime.store.lastPersistenceError != nil
     }
 
     private var isRunningFromApplications: Bool {

@@ -1,16 +1,17 @@
 name: Wikey
 options:
   bundleIdPrefix: com.wikey
+  developmentLanguage: ko
   deploymentTarget:
-    macOS: "15.0"
+    macOS: "14.0"
   xcodeVersion: "16.0"
 
 settings:
   base:
     SWIFT_VERSION: "5.0"
-    MACOSX_DEPLOYMENT_TARGET: "15.0"
-    MARKETING_VERSION: "1.2.5"
-    CURRENT_PROJECT_VERSION: "1002005"
+    MACOSX_DEPLOYMENT_TARGET: "14.0"
+    MARKETING_VERSION: "1.2.6"
+    CURRENT_PROJECT_VERSION: "1002006"
     CODE_SIGN_STYLE: Automatic
     DEVELOPMENT_TEAM: ""
 
@@ -40,7 +41,7 @@ targets:
       properties:
         CFBundleShortVersionString: $(MARKETING_VERSION)
         CFBundleVersion: $(CURRENT_PROJECT_VERSION)
-        LSMinimumSystemVersion: "15.0"
+        LSMinimumSystemVersion: "14.0"
         LSUIElement: true
     settings:
       base:
@@ -57,10 +58,13 @@ targets:
     info:
       path: Resources/Wikey-Info.plist
       properties:
+        CFBundleDevelopmentRegion: ko
+        CFBundleLocalizations:
+          - ko
         CFBundleShortVersionString: $(MARKETING_VERSION)
         CFBundleVersion: $(CURRENT_PROJECT_VERSION)
         LSApplicationCategoryType: public.app-category.productivity
-        LSMinimumSystemVersion: "15.0"
+        LSMinimumSystemVersion: "14.0"
         SUEnableAutomaticChecks: true
         SUAutomaticallyUpdate: false
         SUFeedURL: https://raw.githubusercontent.com/movvgli/Wikey/update-feed/appcast.xml

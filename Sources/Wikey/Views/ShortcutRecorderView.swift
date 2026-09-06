@@ -47,7 +47,7 @@ struct ShortcutRecorderView: View {
             return "입력란을 클릭한 뒤 원하는 키를 누르세요. 첫 입력에는 ⌘, ⌥, ⌃, ⇧ 중 하나가 필요합니다."
         }
         return stepCount == 2
-            ? "첫 입력 뒤 1.2초 안에 두 번째 키를 누르면 실행됩니다."
+            ? "첫 입력 뒤 1.2초 안에 두 번째 키를 누르세요. 손쉬운 사용과 입력 모니터링 권한이 필요합니다."
             : "이 단축키는 다른 앱을 사용 중일 때도 동작합니다."
     }
 
@@ -89,6 +89,7 @@ struct CompactShortcutRecorderView: View {
 }
 
 private struct KeyRecorderRepresentable: NSViewRepresentable {
+    @Environment(WikeyRuntime.self) private var runtime
     @Binding var shortcut: ShortcutGesture
     var stepCount: Int
     var recordingRequest: Int = 0
@@ -100,13 +101,22 @@ private struct KeyRecorderRepresentable: NSViewRepresentable {
         control.maximumSteps = stepCount
         control.shortcut = shortcut
         control.onChange = { context.coordinator.shortcut.wrappedValue = $0 }
+        let hotkeys = runtime.hotkeys
+        let token = context.coordinator.recordingToken
+        control.onRecordingChange = { recording in
+            if recording { hotkeys.beginRecording(token: token) }
+            else { hotkeys.endRecording(token: token) }
+        }
         return control
     }
 
     func updateNSView(_ control: KeyRecorderControl, context: Context) {
         context.coordinator.shortcut = $shortcut
         control.maximumSteps = stepCount
-        if !control.isRecording, control.shortcut != shortcut {
+        if control.shortcut != shortcut {
+            // SwiftUI clear buttons need not resign this AppKit first responder.
+            // An external value change must end recording and restore hotkeys too.
+            control.endRecording()
             control.shortcut = shortcut
         }
         if context.coordinator.lastRecordingRequest != recordingRequest {
@@ -117,8 +127,15 @@ private struct KeyRecorderRepresentable: NSViewRepresentable {
 
     final class Coordinator {
         var shortcut: Binding<ShortcutGesture>
+        let recordingToken = UUID()
         var lastRecordingRequest = 0
         init(shortcut: Binding<ShortcutGesture>) { self.shortcut = shortcut }
+    }
+
+    static func dismantleNSView(_ control: KeyRecorderControl, coordinator: Coordinator) {
+        control.endRecording()
+        control.onChange = nil
+        control.onRecordingChange = nil
     }
 }
 
@@ -129,15 +146,29 @@ private final class KeyRecorderControl: NSControl {
             setAccessibilityValue(shortcut.displayName)
         }
     }
-    var maximumSteps = 1
+    var maximumSteps = 1 {
+        didSet { if oldValue != maximumSteps { endRecording() } }
+    }
     var onChange: ((ShortcutGesture) -> Void)?
+    var onRecordingChange: ((Bool) -> Void)?
     private(set) var isRecording = false
     private var captured: [KeyChord] = []
+    private var windowObserver: NSObjectProtocol?
 
     override var acceptsFirstResponder: Bool { true }
 
     override func viewDidMoveToWindow() {
         super.viewDidMoveToWindow()
+        if let windowObserver { NotificationCenter.default.removeObserver(windowObserver) }
+        windowObserver = nil
+        if window == nil { endRecording() }
+        if let window {
+            windowObserver = NotificationCenter.default.addObserver(
+                forName: NSWindow.didResignKeyNotification, object: window, queue: .main
+            ) { [weak self] _ in
+                MainActor.assumeIsolated { self?.endRecording() }
+            }
+        }
         setAccessibilityElement(true)
         setAccessibilityRole(.button)
         setAccessibilityLabel("단축키 입력")
@@ -145,30 +176,58 @@ private final class KeyRecorderControl: NSControl {
         setAccessibilityValue(shortcut.displayName)
     }
 
+    deinit {
+        if let windowObserver { NotificationCenter.default.removeObserver(windowObserver) }
+    }
+
     override func mouseDown(with event: NSEvent) {
         beginRecording()
     }
 
     func beginRecording() {
-        window?.makeFirstResponder(self)
+        guard window?.makeFirstResponder(self) == true else { return }
         captured = []
+        if !isRecording { onRecordingChange?(true) }
         isRecording = true
         needsDisplay = true
         setAccessibilityValue("지금 단축키를 누르세요")
     }
 
+    func endRecording() {
+        let wasRecording = isRecording
+        isRecording = false
+        captured = []
+        needsDisplay = true
+        setAccessibilityValue(shortcut.displayName)
+        if wasRecording { onRecordingChange?(false) }
+    }
+
+    override func accessibilityPerformPress() -> Bool {
+        beginRecording()
+        return isRecording
+    }
+
+    override func performKeyEquivalent(with event: NSEvent) -> Bool {
+        guard isRecording, window?.firstResponder === self else { return super.performKeyEquivalent(with: event) }
+        keyDown(with: event)
+        return true
+    }
+
     override func keyDown(with event: NSEvent) {
-        if event.keyCode == 53 {
-            isRecording = false
-            captured = []
-            needsDisplay = true
+        guard isRecording else {
+            if event.keyCode == 36 || event.keyCode == 49 { beginRecording() }
+            else { super.keyDown(with: event) }
             return
         }
-        if event.keyCode == 51 || event.keyCode == 117 {
+        guard !event.isARepeat else { return }
+        if event.keyCode == 53 {
+            endRecording()
+            return
+        }
+        if (event.keyCode == 51 || event.keyCode == 117), ShortcutModifiers(eventFlags: event.modifierFlags).isEmpty {
             shortcut = ShortcutGesture()
-            isRecording = false
-            captured = []
             onChange?(shortcut)
+            endRecording()
             return
         }
 
@@ -184,16 +243,13 @@ private final class KeyRecorderControl: NSControl {
         if captured.count >= maximumSteps {
             shortcut = ShortcutGesture(steps: captured)
             onChange?(shortcut)
-            captured = []
-            isRecording = false
+            endRecording()
         }
         needsDisplay = true
     }
 
     override func resignFirstResponder() -> Bool {
-        isRecording = false
-        captured = []
-        needsDisplay = true
+        endRecording()
         return super.resignFirstResponder()
     }
 

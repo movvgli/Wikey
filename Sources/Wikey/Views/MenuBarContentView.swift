@@ -21,17 +21,29 @@ struct MenuBarContentView: View {
                     Text(workflow.shortcut.steps.isEmpty ? "미지정" : workflow.shortcut.displayName)
                 }
                 .disabled(
-                    runtime.hotkeys.registrationErrors[workflow.id] != nil ||
                     runtime.runner.runningWorkflowID == workflow.id ||
+                    runtime.runner.queuedWorkflowIDs.contains(workflow.id) ||
                     workflow.actions.isEmpty
                 )
             }
             Divider()
         }
 
-        if let runningID = runtime.runner.runningWorkflowID,
-           let workflow = runtime.store.workflows.first(where: { $0.id == runningID }) {
-            Text("실행 중 · \(shortMenuTitle(workflow.name))")
+        if !runtime.store.layouts.isEmpty {
+            Menu("레이아웃 적용") {
+                ForEach(runtime.store.layouts) { layout in
+                    Button(shortMenuTitle(layout.name)) { runtime.run(layoutID: layout.id) }
+                        .disabled(layout.placements.isEmpty
+                                  || runtime.runner.runningWorkflowID == layout.id
+                                  || runtime.runner.queuedWorkflowIDs.contains(layout.id))
+                }
+            }
+            Divider()
+        }
+
+        if runtime.runner.runningWorkflowID != nil {
+            Text(shortMenuTitle("실행 중 · \(runtime.runner.currentActionTitle ?? "준비 중")"))
+            Button("실행 중지") { runtime.runner.cancel() }
             Divider()
         }
 

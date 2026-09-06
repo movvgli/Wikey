@@ -30,12 +30,15 @@
 		8C4980DCEAB4DBFB4490CF2A /* TemplateEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5D474D7A2FE6E9C6853A5B0 /* TemplateEditorView.swift */; };
 		927F0D80C51F1791461D8FEA /* WikeyRuntime.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F8F86E61039D8E0A96453B2 /* WikeyRuntime.swift */; };
 		9321B69E644F99C715153975 /* InstalledApplicationCatalog.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9A9022F68765B1273395BCD /* InstalledApplicationCatalog.swift */; };
+		9326BA0B076DD5284458D227 /* WikeyRuntimeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51FDEC8A0E2FCB4DFE3AF16D /* WikeyRuntimeTests.swift */; };
 		A29D31B4C0383875CBDE463E /* ApplicationsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C8650191882F2C13EE06D44 /* ApplicationsView.swift */; };
+		A4C4AC1BFE45F2466945A51A /* WindowLayoutControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC2B14662FB8FC6B02D3FA9F /* WindowLayoutControllerTests.swift */; };
 		A82F0ABC9CA30EED0A8635F2 /* ShortcutRecorderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 928C51A8110C6A07CC483231 /* ShortcutRecorderView.swift */; };
 		AC96BF2982CDB8BFD3C83617 /* ShortcutModelsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 663A3FFA0154A8359CDC55F4 /* ShortcutModelsTests.swift */; };
 		B2DAC1456C2D128715B1C578 /* AutomationModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7EDE41677010F0CFC513F4F7 /* AutomationModels.swift */; };
 		B5799D8F35C35736980A3568 /* ClipboardService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 744108B9609996B38F488896 /* ClipboardService.swift */; };
 		BC6A1834D3C90304AFE9B0A3 /* SequenceMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8A71BEF5729FB22DA320117 /* SequenceMonitor.swift */; };
+		C4498FA942718AE545DBA12B /* KeyboardServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F907DE950E781134887866B /* KeyboardServiceTests.swift */; };
 		C550C2993B9C28E16D2DD1B2 /* WikeyStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A29E038D71C3173FDA10BF35 /* WikeyStoreTests.swift */; };
 		C6AD3D7ACA38FD462B1A8B80 /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = B66D693FB7A487E2063ACB81 /* Sparkle */; };
 		C8F8C8ACF5F699D21CB5F3D0 /* ClipboardServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A09383B53E374BC48B26ACE /* ClipboardServiceTests.swift */; };
@@ -44,6 +47,7 @@
 		DD5B1C0F78ADC5846938C905 /* UpdateController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CFCF42AC1BEA3A2CEFF6D14 /* UpdateController.swift */; };
 		E24573A2C1C0FF57A601F03A /* ShortcutModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A806BBE6571A9A314CA4626 /* ShortcutModels.swift */; };
 		E77D93BDE77F2DACE4F10BFC /* ApplicationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D115422AEFE98EEB2398A213 /* ApplicationController.swift */; };
+		E7F35481616C68CBD6E628B0 /* WorkflowRunnerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 374E241E259897380A8DAA90 /* WorkflowRunnerTests.swift */; };
 		F8C4225DF9C0D8447F187BCD /* KeyboardService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BBFD811CFF41BB6E50326A3 /* KeyboardService.swift */; };
 		FAB9A8082885070D03068832 /* WikeyCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 40179216A1772150F1719EAC /* WikeyCore.framework */; };
 		FCA8C63E9E1624F4EB94572B /* WikeyStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A24D53D060BE24564F62CF55 /* WikeyStore.swift */; };
@@ -105,12 +109,15 @@
 		29F348C057BC64F22F800363 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		2A09383B53E374BC48B26ACE /* ClipboardServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipboardServiceTests.swift; sourceTree = "<group>"; };
 		2AAC3E4BFBB08DCCCA85D5BC /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		374E241E259897380A8DAA90 /* WorkflowRunnerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkflowRunnerTests.swift; sourceTree = "<group>"; };
 		3AA2E33F5834328B1676075C /* WorkflowEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkflowEditorView.swift; sourceTree = "<group>"; };
 		40179216A1772150F1719EAC /* WikeyCore.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = WikeyCore.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		4E4044A7589BCC13D42395C5 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
+		51FDEC8A0E2FCB4DFE3AF16D /* WikeyRuntimeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WikeyRuntimeTests.swift; sourceTree = "<group>"; };
 		663A3FFA0154A8359CDC55F4 /* ShortcutModelsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShortcutModelsTests.swift; sourceTree = "<group>"; };
 		6A34AA7CAB109B5FC6B0402E /* Wikey.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Wikey.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6A806BBE6571A9A314CA4626 /* ShortcutModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShortcutModels.swift; sourceTree = "<group>"; };
+		6F907DE950E781134887866B /* KeyboardServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardServiceTests.swift; sourceTree = "<group>"; };
 		744108B9609996B38F488896 /* ClipboardService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipboardService.swift; sourceTree = "<group>"; };
 		785E1FA6D60362D2E231CFB0 /* MenuBarContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarContentView.swift; sourceTree = "<group>"; };
 		78E342F0F6965420E4F40F7C /* WikeyDesignComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WikeyDesignComponents.swift; sourceTree = "<group>"; };
@@ -138,6 +145,7 @@
 		E7A58779AA8B13CB411D03F8 /* WorkflowDependencyGraphTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkflowDependencyGraphTests.swift; sourceTree = "<group>"; };
 		EB5E59681CF2AF25BFC5FF4B /* WorkflowRunner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkflowRunner.swift; sourceTree = "<group>"; };
 		F423893B1BA45A8F9760DDEC /* WorkflowReferenceSetupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkflowReferenceSetupView.swift; sourceTree = "<group>"; };
+		FC2B14662FB8FC6B02D3FA9F /* WindowLayoutControllerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindowLayoutControllerTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -176,10 +184,14 @@
 			isa = PBXGroup;
 			children = (
 				2A09383B53E374BC48B26ACE /* ClipboardServiceTests.swift */,
+				6F907DE950E781134887866B /* KeyboardServiceTests.swift */,
 				DED5C2DC0216363FC43B3BF0 /* LayoutZoneTests.swift */,
 				663A3FFA0154A8359CDC55F4 /* ShortcutModelsTests.swift */,
+				51FDEC8A0E2FCB4DFE3AF16D /* WikeyRuntimeTests.swift */,
 				A29E038D71C3173FDA10BF35 /* WikeyStoreTests.swift */,
+				FC2B14662FB8FC6B02D3FA9F /* WindowLayoutControllerTests.swift */,
 				E7A58779AA8B13CB411D03F8 /* WorkflowDependencyGraphTests.swift */,
+				374E241E259897380A8DAA90 /* WorkflowRunnerTests.swift */,
 			);
 			name = WikeyCoreTests;
 			path = Tests/WikeyCoreTests;
@@ -415,11 +427,11 @@
 				};
 			};
 			buildConfigurationList = 39E32D1E66E14ED4244D0AE9 /* Build configuration list for PBXProject "Wikey" */;
-			developmentRegion = en;
+			developmentRegion = ko;
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				Base,
-				en,
+				ko,
 			);
 			mainGroup = F89E5A444538CC56D59EEA3D;
 			minimizedProjectReferenceProxies = 1;
@@ -528,10 +540,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				C8F8C8ACF5F699D21CB5F3D0 /* ClipboardServiceTests.swift in Sources */,
+				C4498FA942718AE545DBA12B /* KeyboardServiceTests.swift in Sources */,
 				445E014CC3B3C6F67694C884 /* LayoutZoneTests.swift in Sources */,
 				AC96BF2982CDB8BFD3C83617 /* ShortcutModelsTests.swift in Sources */,
+				9326BA0B076DD5284458D227 /* WikeyRuntimeTests.swift in Sources */,
 				C550C2993B9C28E16D2DD1B2 /* WikeyStoreTests.swift in Sources */,
+				A4C4AC1BFE45F2466945A51A /* WindowLayoutControllerTests.swift in Sources */,
 				386E00ABEB48AEA32143901F /* WorkflowDependencyGraphTests.swift in Sources */,
+				E7F35481616C68CBD6E628B0 /* WorkflowRunnerTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -627,7 +643,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 1002005;
+				CURRENT_PROJECT_VERSION = 1002006;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -646,8 +662,8 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 15.0;
-				MARKETING_VERSION = 1.2.5;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = 1.2.6;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -694,7 +710,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 1002005;
+				CURRENT_PROJECT_VERSION = 1002006;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = "";
 				ENABLE_NS_ASSERTIONS = NO;
@@ -707,8 +723,8 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 15.0;
-				MARKETING_VERSION = 1.2.5;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = 1.2.6;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";

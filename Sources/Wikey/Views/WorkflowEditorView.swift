@@ -13,7 +13,7 @@ struct WorkflowEditorView: View {
     @State private var showsDeleteConfirmation = false
     @State private var showsTemplateActionSetup = false
     @State private var selectedTemplateID: UUID?
-    @State private var selectedTemplateMode: TemplateDeliveryMode = .copyOnly
+    @State private var selectedTemplateMode: TemplateDeliveryMode = .copyAndPaste
     @State private var showsWorkflowActionSetup = false
     @State private var selectedWorkflowID: UUID?
 
@@ -33,12 +33,18 @@ struct WorkflowEditorView: View {
 
     var body: some View {
         VStack(spacing: 0) {
+            editorHeader
+            Divider()
             ScrollView {
                 VStack(alignment: .leading, spacing: 0) {
-                    editorHeader
-
                     shortcutSummary
-                        .padding(.top, 24)
+
+                    if !workflow.isEnabled {
+                        Label("이 워크플로는 꺼져 있습니다. 단축키로 실행하려면 다시 켜 주세요.", systemImage: "pause.circle")
+                            .font(.subheadline)
+                            .foregroundStyle(.orange)
+                            .padding(.top, 16)
+                    }
 
                     VStack(alignment: .leading, spacing: 0) {
                         TriggerSummaryRow(continues: !workflow.actions.isEmpty)
@@ -84,11 +90,14 @@ struct WorkflowEditorView: View {
                             .padding(.top, 10)
                     }
                     .padding(.top, 20)
+
+                    if let summary = runtime.lastRun, summary.workflowID == workflow.id {
+                        PlainPanel { RunSummaryView(summary: summary) }
+                            .padding(.top, 24)
+                    }
                 }
-                .padding(.horizontal, 30)
-                .padding(.top, 20)
-                .padding(.bottom, 34)
-                .frame(maxWidth: 1120, alignment: .leading)
+                .padding(WikeyPageMetrics.padding)
+                .frame(maxWidth: WikeyPageMetrics.maximumWidth, alignment: .leading)
                 .frame(maxWidth: .infinity, alignment: .topLeading)
             }
             .background(Color(nsColor: .windowBackgroundColor))
@@ -96,6 +105,7 @@ struct WorkflowEditorView: View {
             Divider()
 
             HStack(spacing: 12) {
+                WikeySaveStatus()
                 Spacer()
                 Text("\(workflow.actions.count)개 동작")
                     .font(.subheadline)
@@ -103,10 +113,10 @@ struct WorkflowEditorView: View {
                 Button {
                     runtime.run(workflowID: workflow.id)
                 } label: {
-                    if isRunning {
+                    if isRunning || runtime.runner.queuedWorkflowIDs.contains(workflow.id) {
                         HStack(spacing: 7) {
                             ProgressView().controlSize(.small)
-                            Text("실행 중")
+                            Text(isRunning ? "실행 중" : "대기 중")
                         }
                     } else {
                         Label("테스트 실행", systemImage: "play.fill")
@@ -114,10 +124,10 @@ struct WorkflowEditorView: View {
                 }
                 .buttonStyle(.borderedProminent)
                 .controlSize(.large)
-                .disabled(workflow.actions.isEmpty || isRunning)
+                .disabled(workflow.actions.isEmpty || isRunning || runtime.runner.queuedWorkflowIDs.contains(workflow.id))
                 .keyboardShortcut(.return, modifiers: [.command])
             }
-            .padding(.horizontal, 34)
+            .padding(.horizontal, WikeyPageMetrics.padding)
             .padding(.vertical, 13)
             .background(.bar)
         }
@@ -128,6 +138,8 @@ struct WorkflowEditorView: View {
         ) {
             Button("삭제", role: .destructive, action: onDelete)
             Button("취소", role: .cancel) {}
+        } message: {
+            Text("다른 워크플로에서 이 워크플로를 실행하는 동작도 함께 삭제됩니다. 이 작업은 되돌릴 수 없습니다.")
         }
         .sheet(isPresented: $showsTemplateActionSetup) {
             TemplateActionSetupView(
@@ -149,72 +161,18 @@ struct WorkflowEditorView: View {
     }
 
     private var editorHeader: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            HStack {
-                Button(action: onBack) {
-                    Image(systemName: "chevron.left")
-                        .font(.system(size: 14, weight: .semibold))
-                        .frame(width: 38, height: 38)
-                        .contentShape(Circle())
-                }
-                .buttonStyle(.plain)
-                .background(.white.opacity(0.72), in: Circle())
-                .overlay { Circle().stroke(Color(nsColor: .separatorColor).opacity(0.4), lineWidth: 1) }
-                Spacer()
-            }
-
-            HStack(alignment: .center, spacing: 20) {
-                VStack(alignment: .leading, spacing: 4) {
-                    TextField("워크플로 이름", text: $workflow.name)
-                        .textFieldStyle(.plain)
-                        .font(.system(size: 32, weight: .bold))
-                        .fixedSize()
-                    Text("업무에 집중할 수 있도록 필요한 앱과 작업을 순서대로 실행합니다.")
-                        .font(.system(size: 15))
-                        .foregroundStyle(.secondary)
-                }
-
-                Spacer(minLength: 20)
-
-                HStack(spacing: 16) {
-                    Label("자동 저장됨", systemImage: "checkmark.circle.fill")
-                    TimelineView(.periodic(from: .now, by: 60)) { context in
-                        Text(context.date, format: .dateTime.hour().minute())
-                    }
-                    workflowMenu
-                }
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
+        WikeyEditorHeader(
+            title: $workflow.name,
+            subtitle: "필요한 앱과 작업을 위에서부터 순서대로 실행합니다.",
+            onBack: onBack
+        ) {
+            Toggle("활성화", isOn: $workflow.isEnabled)
+                .toggleStyle(.switch)
+                .help("끄면 이 워크플로의 단축키를 해제합니다.")
+            WikeyDeleteButton(title: "워크플로 삭제") {
+                showsDeleteConfirmation = true
             }
         }
-    }
-
-    private var workflowMenu: some View {
-        ZStack {
-            Circle()
-                .fill(.white.opacity(0.72))
-            Circle()
-                .stroke(Color(nsColor: .separatorColor).opacity(0.4), lineWidth: 1)
-            Menu {
-                Button(workflow.isEnabled ? "워크플로 끄기" : "워크플로 켜기") {
-                    workflow.isEnabled.toggle()
-                }
-                Divider()
-                Button("워크플로 삭제", role: .destructive) {
-                    showsDeleteConfirmation = true
-                }
-            } label: {
-                Image(systemName: "ellipsis")
-                    .font(.system(size: 16, weight: .semibold))
-                    .frame(width: 38, height: 38)
-                    .contentShape(Circle())
-            }
-            .menuStyle(.borderlessButton)
-            .menuIndicator(.hidden)
-            .fixedSize()
-        }
-        .frame(width: 38, height: 38)
-        .help("워크플로 메뉴")
     }
 
     private var shortcutSummary: some View {
@@ -266,6 +224,9 @@ struct WorkflowEditorView: View {
             }
             Button("Shift + Enter 입력", systemImage: "arrow.turn.down.left") {
                 workflow.actions.append(.pressKey(.shiftEnter))
+            }
+            Button("잠시 기다리기…", systemImage: "clock") {
+                workflow.actions.append(.wait(seconds: 1))
             }
             Divider()
             Button("템플릿 붙여넣기…", systemImage: "doc.on.clipboard", action: beginTemplateActionSetup)
@@ -321,7 +282,7 @@ struct WorkflowEditorView: View {
 
     private func beginTemplateActionSetup() {
         selectedTemplateID = nil
-        selectedTemplateMode = .copyOnly
+        selectedTemplateMode = .copyAndPaste
         showsTemplateActionSetup = true
     }
 
@@ -573,19 +534,28 @@ private struct FlowActionRow: View {
             FlowMarker(number: number, continues: true, endsFlow: isLast)
 
             HStack(spacing: 16) {
-                ActionIcon(action: action)
-                VStack(alignment: .leading, spacing: 5) {
-                    Text(actionTitle)
-                        .font(.headline)
-                    Text(actionSubtitle)
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
-                        .lineLimit(1)
+                Button { showsEditor = true } label: {
+                    HStack(spacing: 16) {
+                        ActionIcon(action: action)
+                        VStack(alignment: .leading, spacing: 5) {
+                            Text(actionTitle)
+                                .font(.headline)
+                                .foregroundStyle(.primary)
+                            Text(actionSubtitle)
+                                .font(.subheadline)
+                                .foregroundStyle(.secondary)
+                                .lineLimit(1)
+                        }
+                        Spacer(minLength: 16)
+                        Image(systemName: "slider.horizontal.3")
+                            .foregroundStyle(.secondary)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .frame(minHeight: 42)
+                    .contentShape(Rectangle())
                 }
-                Spacer(minLength: 16)
-                Image(systemName: "circle.grid.2x3.fill")
-                    .font(.system(size: 14))
-                    .foregroundStyle(.tertiary)
+                .buttonStyle(.plain)
+                .help("동작 세부 설정")
                 Menu {
                     Button("세부 설정…", systemImage: "slider.horizontal.3") {
                         showsEditor = true
@@ -611,12 +581,21 @@ private struct FlowActionRow: View {
                         actionEditor
                         Divider()
                         HStack {
-                            Button("위로 이동", systemImage: "arrow.up", action: moveUp)
+                            Button("위로 이동", systemImage: "arrow.up") {
+                                showsEditor = false
+                                moveUp()
+                            }
                                 .disabled(!canMoveUp)
-                            Button("아래로 이동", systemImage: "arrow.down", action: moveDown)
+                            Button("아래로 이동", systemImage: "arrow.down") {
+                                showsEditor = false
+                                moveDown()
+                            }
                                 .disabled(!canMoveDown)
                             Spacer()
-                            Button("삭제", systemImage: "trash", role: .destructive, action: delete)
+                            Button("삭제", systemImage: "trash", role: .destructive) {
+                                showsEditor = false
+                                delete()
+                            }
                         }
                     }
                     .padding(20)
@@ -638,6 +617,7 @@ private struct FlowActionRow: View {
         case .openURL: "웹사이트 열기"
         case .applyLayout: "창 배치"
         case .pressKey(let key): "\(key.title) 입력"
+        case .wait: "잠시 기다리기"
         case .runWorkflow: "워크플로 실행"
         case .pasteImages: "이미지 붙여넣기"
         case .pasteFiles: "파일 붙여넣기"
@@ -657,6 +637,8 @@ private struct FlowActionRow: View {
             return layouts.first(where: { $0.id == layoutID })?.name ?? "레이아웃 선택"
         case .pressKey(let key):
             return key == .enter ? "현재 앱에 Enter 키를 입력합니다." : "현재 앱에 Shift + Enter 키를 입력합니다."
+        case .wait(let seconds):
+            return "\(seconds.formatted(.number.precision(.fractionLength(0...1))))초 후 다음 동작을 실행합니다."
         case .runWorkflow(let workflowID):
             return workflows.first(where: { $0.id == workflowID })?.name ?? "워크플로 선택"
         case .pasteImages(let filePaths):
@@ -675,17 +657,37 @@ private struct FlowActionRow: View {
                 Text(bundleID)
                     .font(.caption)
                     .foregroundStyle(.secondary)
+                Button("앱 변경…") {
+                    let panel = NSOpenPanel()
+                    panel.title = "실행할 앱 선택"
+                    panel.allowedContentTypes = [.application]
+                    panel.allowsMultipleSelection = false
+                    panel.directoryURL = URL(fileURLWithPath: "/Applications", isDirectory: true)
+                    guard panel.runModal() == .OK, let url = panel.url,
+                          let bundle = Bundle(url: url), let identifier = bundle.bundleIdentifier else { return }
+                    let displayName = (bundle.object(forInfoDictionaryKey: "CFBundleDisplayName") as? String)
+                        ?? (bundle.object(forInfoDictionaryKey: "CFBundleName") as? String)
+                        ?? url.deletingPathExtension().lastPathComponent
+                    action = .launchApplication(bundleIdentifier: identifier, displayName: displayName)
+                }
             }
 
         case .openURL(let url):
-            TextField(
-                "https://example.com",
-                text: Binding(
-                    get: { url },
-                    set: { action = .openURL($0) }
+            VStack(alignment: .leading, spacing: 8) {
+                TextField(
+                    "https://example.com",
+                    text: Binding(
+                        get: { url },
+                        set: { action = .openURL($0) }
+                    )
                 )
-            )
-            .textFieldStyle(.roundedBorder)
+                .textFieldStyle(.roundedBorder)
+                if URL(string: url)?.host?.isEmpty != false {
+                    Label("전체 웹사이트 주소를 입력하세요. 예: https://example.com", systemImage: "info.circle")
+                        .font(.caption)
+                        .foregroundStyle(.orange)
+                }
+            }
 
         case .copyTemplate(let templateID, let mode):
             VStack(alignment: .leading, spacing: 14) {
@@ -731,6 +733,19 @@ private struct FlowActionRow: View {
                 ForEach(WorkflowKeyPress.allCases, id: \.self) { key in
                     Text(key.title).tag(key)
                 }
+            }
+
+        case .wait(let seconds):
+            VStack(alignment: .leading, spacing: 10) {
+                Stepper(value: Binding(
+                    get: { seconds },
+                    set: { action = .wait(seconds: $0) }
+                ), in: 0.1...30, step: 0.1) {
+                    Text("대기 시간: \(seconds.formatted(.number.precision(.fractionLength(1))))초")
+                }
+                Text("파일 첨부나 화면 전환이 끝날 시간을 확보합니다. 0.1초부터 30초까지 설정할 수 있습니다.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
             }
 
         case .runWorkflow(let workflowID):
@@ -920,6 +935,7 @@ private struct ActionIcon: View {
         case .openURL: "globe"
         case .applyLayout: "rectangle.3.group"
         case .pressKey: "return"
+        case .wait: "clock"
         case .runWorkflow: "arrow.triangle.branch"
         case .pasteImages: "photo.on.rectangle"
         case .pasteFiles: "paperclip"

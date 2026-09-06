@@ -3,7 +3,7 @@ import PackageDescription
 
 let package = Package(
     name: "Wikey",
-    platforms: [.macOS(.v15)],
+    platforms: [.macOS(.v14)],
     products: [
         .executable(name: "Wikey", targets: ["Wikey"]),
         .executable(name: "WikeyLoginHelper", targets: ["WikeyLoginHelper"]),
