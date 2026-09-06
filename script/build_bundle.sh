@@ -52,6 +52,19 @@ if [[ "$SIGNING_IDENTITY" != "-" ]]; then
   SPARKLE_FRAMEWORK="$APP_BUNDLE/Contents/Frameworks/Sparkle.framework"
   SPARKLE_VERSION="$SPARKLE_FRAMEWORK/Versions/B"
 
+  # Remove only debug symbols containing local build paths from public builds.
+  # Keep executable code and exported symbols intact; re-sign these binaries below.
+  for NATIVE_BINARY in \
+    "$APP_BUNDLE/Contents/MacOS/Wikey" \
+    "$APP_BUNDLE/Contents/Frameworks/WikeyCore.framework/WikeyCore" \
+    "$APP_BUNDLE/Contents/Library/LoginItems/WikeyLoginHelper.app/Contents/MacOS/WikeyLoginHelper"; do
+    xcrun strip -S "$NATIVE_BINARY"
+    if LC_ALL=C /usr/bin/grep -aFq "$ROOT_DIR/" "$NATIVE_BINARY"; then
+      echo "Local build paths remain in ${NATIVE_BINARY##*/}; refusing public distribution." >&2
+      exit 1
+    fi
+  done
+
   # Xcode's Embed & Sign step does not re-sign Sparkle's nested helpers.
   # Sign them from the inside out, preserving the Downloader entitlement.
   codesign --force --sign "$SIGNING_IDENTITY" --options runtime --timestamp \
