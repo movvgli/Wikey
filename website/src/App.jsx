@@ -47,7 +47,7 @@ export function App() {
       </header>
       <main id="main">
         <section className="hero" aria-labelledby="hero-title">
-          <div className="hero-copy"><p className="eyebrow">Mac을 쓰는 나만의 순서</p><h1 id="hero-title">매번 하던 일,<br />한 번에 시작.</h1><p className="hero-description">앱을 열고, 자주 쓰는 문구를 붙이고,<br className="desktop-break" /> 창을 정리하는 일.<br />Wikey에 순서를 저장하고 단축키로 실행하세요.</p><a className="button button--primary" href={RELEASE_URL}>Mac용 Wikey 다운로드 <ArrowDown size={18} weight="bold" /></a><p className="metadata">최신 버전 1.2.7 · macOS 14 이상<br />Apple Silicon 및 Intel · Apple 공증 완료<br />무료 · Wikey 가입 없이 사용</p></div>
+          <div className="hero-copy"><p className="eyebrow">Mac을 쓰는 나만의 순서</p><h1 id="hero-title">매번 하던 일,<br />한 번에 시작.</h1><p className="hero-description">앱을 열고, 자주 쓰는 문구를 붙이고,<br className="desktop-break" /> 창을 정리하는 일.<br />Wikey에 순서를 저장하고 단축키로 실행하세요.</p><a className="button button--primary" href={RELEASE_URL}>Mac용 Wikey 다운로드 <ArrowDown size={18} weight="bold" /></a><p className="metadata">최신 버전 1.2.8 · macOS 14 이상<br />Apple Silicon 및 Intel · Apple 공증 완료<br />무료 · Wikey 가입 없이 사용</p></div>
           <Demo />
         </section>
         <section className="feature-section" id="features" aria-labelledby="features-title">

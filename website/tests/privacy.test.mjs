@@ -36,7 +36,7 @@ test("site renders installation, privacy and download information without storag
     for (const text of ["macOS 14 이상", "가상 예시", "손쉬운 사용", "입력 모니터링", "releases/latest"]) assert.ok(html.includes(text));
     assert.ok(!html.includes("<form"));
     assert.ok(html.includes('src="./assets/wikey-icon.png"'));
-    assert.ok(html.includes("최신 버전 1.2.7"));
+    assert.ok(html.includes("최신 버전 1.2.8"));
     const privacy = html.match(/<section class="privacy-section"[\s\S]*?<\/section>/)?.[0];
     assert.ok(privacy);
     for (const removed of ["사이트에는 가상 예시만", "실제 두 Mac 간 전송은 아직 미검증", "iCloud 사용에는 Apple 계정이 필요합니다", "화면 속 내용은 모두 설명용 예시예요"]) {
