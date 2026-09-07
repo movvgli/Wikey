@@ -10,6 +10,7 @@
 
 <p align="center">
   <a href="https://github.com/movvgli/Wikey/releases/latest"><strong>최신 버전 다운로드</strong></a>
+  · <a href="https://movvgli.github.io/Wikey/">공식 사이트</a>
   · <a href="README.en.md">English</a>
   · <a href="docs/INSTALL.md">설치 안내</a>
   · <a href="docs/PRIVACY.md">개인정보 보호</a>

@@ -6,6 +6,8 @@ Before making substantial visual changes, use the Product Design plugin's `get-c
 
 ## Selected visual direction
 
+- Hosting update (2026-09-07): the user requested GitHub Pages instead of Sites. The primary URL is https://movvgli.github.io/Wikey/. Publish only `dist/client` through `.github/workflows/pages.yml`; retain existing Sites metadata as a recovery option, not the primary publishing destination. Keep asset paths relative so the `/Wikey/` prefix works. Do not restore personal screenshots.
+
 - The user selected the first generated landing-page direction on 2026-09-04.
 - Preserve its quiet editorial layout: generous white space, concise Korean copy, a narrow left-aligned story column, and one blue-violet download action.
 - Privacy update (2026-09-06): never publish actual user screenshots, workflows, template content, app lists, names, or local paths. Use clearly labeled fictional examples rendered from static public data. Audit all public assets, not just visible references. Explain workflows and installation in plain Korean; the supported minimum is macOS 14 from version 1.2.6.

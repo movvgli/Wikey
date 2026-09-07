@@ -42,7 +42,7 @@ export function App() {
     <div className="site-shell" id="top">
       <a className="skip-link" href="#main">본문으로 바로가기</a>
       <header className="site-header">
-        <a className="brand" href="#top" aria-label="Wikey 홈"><img src="/assets/wikey-icon.png" alt="" width="34" height="34" /><span>Wikey</span></a>
+        <a className="brand" href="#top" aria-label="Wikey 홈"><img src="./assets/wikey-icon.png" alt="" width="34" height="34" /><span>Wikey</span></a>
         <nav aria-label="주요 메뉴"><a href="#features">사용 방법</a><a href="#privacy">개인정보</a><a href="#install">설치</a><button className="theme-toggle" type="button" onClick={() => setTheme(theme === "light" ? "dark" : "light")} aria-label={`${theme === "light" ? "어두운" : "밝은"} 화면으로 전환`}>{theme === "light" ? <Moon size={19} /> : <Sun size={19} />}</button></nav>
       </header>
       <main id="main">

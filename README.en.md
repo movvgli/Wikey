@@ -10,6 +10,7 @@
 
 <p align="center">
   <a href="https://github.com/movvgli/Wikey/releases/latest"><strong>Download the latest release</strong></a>
+  · <a href="https://movvgli.github.io/Wikey/">Website</a>
   · <a href="README.md">한국어</a>
   · <a href="docs/INSTALL.md">Installation</a>
   · <a href="docs/PRIVACY.md">Privacy</a>
