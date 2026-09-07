@@ -37,7 +37,12 @@ test("site renders installation, privacy and download information without storag
     assert.ok(!html.includes("<form"));
     assert.ok(html.includes('src="./assets/wikey-icon.png"'));
     assert.ok(html.includes("최신 버전 1.2.7"));
-    assert.ok(html.includes("실제 두 Mac 간 전송은 아직 미검증"));
+    const privacy = html.match(/<section class="privacy-section"[\s\S]*?<\/section>/)?.[0];
+    assert.ok(privacy);
+    for (const removed of ["사이트에는 가상 예시만", "실제 두 Mac 간 전송은 아직 미검증", "iCloud 사용에는 Apple 계정이 필요합니다", "화면 속 내용은 모두 설명용 예시예요"]) {
+      assert.ok(!privacy.includes(removed));
+    }
+    assert.ok(privacy.includes("개인 iCloud Drive 폴더"));
     assert.ok(html.includes("기본값은 꺼짐"));
     assert.ok(!html.includes("클라우드에 업로드하지 않습니다"));
     assert.ok(!html.includes("공개 준비 중"));

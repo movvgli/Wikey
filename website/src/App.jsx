@@ -60,8 +60,8 @@ export function App() {
           <p className="feature-note">자주 쓰는 문구는 <b>템플릿</b>에 저장해 재사용하세요. 이미지·파일 붙여넣기도 동작으로 추가할 수 있습니다.</p>
         </section>
         <section className="privacy-section" id="privacy" aria-labelledby="privacy-title">
-          <div><p className="eyebrow">개인 작업은 공개하지 않아요</p><h2 id="privacy-title">설정은 내 Mac에.<br />사이트에는 가상 예시만.</h2></div>
-          <div className="privacy-copy"><p>워크플로, 템플릿, 앱별 단축키와 레이아웃은 기본적으로 Mac에만 저장됩니다. iCloud 동기화를 직접 켜면 설정과 첨부 파일 사본을 선택한 개인 iCloud Drive 폴더에 저장합니다.</p><p>iCloud 동기화는 시험 기능이며 기본값은 꺼짐입니다. 실제 두 Mac 간 전송은 아직 미검증이므로 사용 전에 로컬 백업을 만들어 주세요. iCloud 사용에는 Apple 계정이 필요합니다.</p><p>이 사이트는 사용자의 실제 앱 목록이나 개인 워크플로를 읽지 않습니다. 화면 속 내용은 모두 설명용 예시예요.</p><p className="small-copy">자동 업데이트를 확인할 때는 GitHub에 연결합니다. 직접 연 웹사이트나 붙여넣은 외부 앱에서의 데이터 처리는 해당 서비스의 정책을 따릅니다.</p><a className="text-link" href={`${GITHUB_URL}/blob/main/docs/PRIVACY.md`}>개인정보 안내 읽기 <ArrowRight size={16} /></a></div>
+          <div><p className="eyebrow">개인 작업은 공개하지 않아요</p><h2 id="privacy-title">설정은 내 Mac에.</h2></div>
+          <div className="privacy-copy"><p>워크플로, 템플릿, 단축키와 레이아웃은 기본적으로 내 Mac에 저장됩니다.</p><p>원하면 iCloud 동기화를 켜서 설정과 첨부 파일 사본을 개인 iCloud Drive 폴더에 저장할 수 있습니다. 동기화는 시험 기능이며 기본값은 꺼짐입니다.</p><p className="small-copy">자동 업데이트를 확인할 때는 GitHub에 연결합니다. 직접 연 웹사이트나 붙여넣은 외부 앱에서의 데이터 처리는 해당 서비스의 정책을 따릅니다.</p><a className="text-link" href={`${GITHUB_URL}/blob/main/docs/PRIVACY.md`}>개인정보 안내 읽기 <ArrowRight size={16} /></a></div>
         </section>
         <section className="install-section" id="install" aria-labelledby="install-title">
           <div className="install-heading"><div><p className="eyebrow">처음 쓰는 분을 위해</p><h2 id="install-title">설치하고, 작은 동작부터.</h2></div><a className="button button--primary" href={RELEASE_URL}>Wikey 다운로드 <ArrowDown size={18} /></a></div>
