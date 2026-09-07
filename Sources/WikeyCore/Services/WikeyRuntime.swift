@@ -13,6 +13,7 @@ public final class WikeyRuntime {
     public let layoutController: WindowLayoutController
     public let hotkeys: HotkeyRegistrar
     public let runner: WorkflowRunner
+    public let iCloudSync: ICloudSyncService
 
     public private(set) var lastRun: RunSummary?
     public private(set) var applicationLaunchErrors: [UUID: String] = [:]
@@ -29,6 +30,7 @@ public final class WikeyRuntime {
         let hotkeys = HotkeyRegistrar()
 
         self.store = store
+        self.iCloudSync = ICloudSyncService(store: store)
         self.permissions = PermissionCenter()
         self.loginItem = LoginItemService()
         self.applications = applications
@@ -63,15 +65,22 @@ public final class WikeyRuntime {
                 self.applicationLaunchErrors[id] = summary.failures.first?.message
             }
         }
+        iCloudSync.canApply = { [weak self] in
+            guard let self else { return false }
+            return self.runner.runningWorkflowID == nil && self.runner.queuedWorkflowIDs.isEmpty
+        }
+        iCloudSync.onApply = { [weak self] in self?.reloadHotkeys() }
     }
 
     public func start() {
         guard !hasStarted else { return }
         store.load()
+        layoutController.loadDisplayMappings(from: store.storageURL)
         reloadHotkeys()
         permissions.refresh()
         loginItem.refresh()
         hasStarted = true
+        iCloudSync.start()
     }
 
     public func saveAndReloadHotkeys() {

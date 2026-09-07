@@ -18,7 +18,7 @@
 
 Wikey connects app launches, websites, text, image and file pasting, and window layouts into ordered macOS workflows. Assign shortcuts to a workflow, an individual app, or a saved layout.
 
-All workflows and templates stay on your Mac and are not sent to an external server.
+Workflows and templates stay on your Mac by default. Version 1.2.7 includes experimental, opt-in iCloud sync that copies settings and referenced attachments to a user-selected iCloud Drive folder. Actual transfers between two Macs have not yet been verified. Back up your settings before enabling sync; see the [release notes](docs/RELEASE-1.2.7.md).
 
 ## Quick start
 

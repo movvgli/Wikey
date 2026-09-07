@@ -84,6 +84,10 @@ struct WikeySettingsView: View {
 
                 Divider()
 
+                ICloudSyncSettingsSection()
+
+                Divider()
+
                 WikeySection(title: "일반") {
                     PlainPanel {
                         VStack(alignment: .leading, spacing: 12) {

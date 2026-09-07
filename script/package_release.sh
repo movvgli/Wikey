@@ -48,8 +48,10 @@ if [[ -n "$NOTARY_PROFILE" ]]; then
   xcrun stapler staple "$DMG_PATH"
   xcrun stapler validate "$DMG_PATH"
   spctl --assess --type open --context context:primary-signature --verbose=2 "$DMG_PATH"
-else
+elif [[ "$SIGNING_IDENTITY" == "-" ]]; then
   echo "Created an ad-hoc signed local DMG. Set WIKEY_CODESIGN_IDENTITY and WIKEY_NOTARY_PROFILE for public distribution."
+else
+  echo "Created a Developer ID signed DMG. Notarization has not been submitted; WIKEY_NOTARY_PROFILE is unset."
 fi
 
 (

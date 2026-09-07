@@ -3,6 +3,7 @@ import AppKit
 import CoreGraphics
 import Foundation
 import OSLog
+import Observation
 
 private let layoutLogger = Logger(subsystem: "com.wikey.app", category: "layout")
 
@@ -18,8 +19,30 @@ public struct DisplayInfo: Identifiable, Hashable {
 }
 
 @MainActor
+@Observable
 public final class WindowLayoutController {
     private let applications: ApplicationController
+    public private(set) var displayMappings: [String: String] = [:]
+    public private(set) var mappingError: String?
+    private var mappingsURL: URL?
+
+    public func loadDisplayMappings(from root: URL) {
+        let url = root.appendingPathComponent("display-mappings-local.json")
+        mappingsURL = url
+        guard FileManager.default.fileExists(atPath: url.path) else { return }
+        do { displayMappings = try JSONDecoder().decode([String: String].self, from: Data(contentsOf: url)) }
+        catch { mappingError = "이 Mac의 모니터 연결을 다시 설정해 주세요." }
+    }
+
+    public func setDisplayMapping(source: String, target: String) {
+        guard let mappingsURL else { return }
+        do {
+            var next = displayMappings
+            next[source] = target.isEmpty ? nil : target
+            try JSONEncoder().encode(next).write(to: mappingsURL, options: .atomic)
+            displayMappings = next; mappingError = nil
+        } catch { mappingError = "모니터 연결을 저장하지 못했습니다: \(error.localizedDescription)" }
+    }
 
     public init(applications: ApplicationController) {
         self.applications = applications
@@ -62,14 +85,15 @@ public final class WindowLayoutController {
         guard AXIsProcessTrusted() else {
             throw AutomationError.permissionRequired("손쉬운 사용")
         }
-        guard let display = availableDisplays.first(where: { $0.target.uuid == placement.display.uuid }) else {
+        let displayID = displayMappings[placement.display.uuid] ?? placement.display.uuid
+        guard let display = availableDisplays.first(where: { $0.target.uuid == displayID }) else {
             throw AutomationError.displayNotFound(placement.display.name)
         }
 
         let app = try await applications.launch(bundleIdentifier: placement.bundleIdentifier, activates: true)
         let window = try await waitForWindow(pid: app.processIdentifier, appName: placement.appName)
         AXUIElementSetMessagingTimeout(window, 1)
-        let currentDisplayFrame = availableDisplays.first(where: { $0.target.uuid == placement.display.uuid })?.visibleFrame
+        let currentDisplayFrame = availableDisplays.first(where: { $0.target.uuid == displayID })?.visibleFrame
         layoutLogger.info("Placement target bundle=\(placement.bundleIdentifier, privacy: .public) zone=\(placement.zone.rawValue, privacy: .public) visibleBeforeActivation=\(NSStringFromRect(display.visibleFrame), privacy: .public) visibleAfterActivation=\(currentDisplayFrame.map(NSStringFromRect) ?? "missing", privacy: .public)")
         let cocoaFrame = placement.zone.frame(in: display.visibleFrame)
         // AX coordinates are relative to the primary display, not the display

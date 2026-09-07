@@ -20,6 +20,7 @@ struct ContentView: View {
     @State private var selection: SidebarSelection? = .overview
     @State private var showOnboarding = false
     @State private var workflowToDelete: UUID?
+    @State private var editingSession = UUID()
 
     var body: some View {
         NavigationSplitView {
@@ -75,6 +76,13 @@ struct ContentView: View {
         .onAppear {
             if !didCompleteOnboarding { showOnboarding = true }
         }
+        .onChange(of: selection, initial: true) { _, current in
+            switch current {
+            case .workflow, .template, .layout: runtime.iCloudSync.setEditing(true, session: editingSession)
+            default: runtime.iCloudSync.setEditing(false, session: editingSession)
+            }
+        }
+        .onDisappear { runtime.iCloudSync.setEditing(false, session: editingSession) }
         .sheet(isPresented: $showOnboarding) {
             OnboardingView(isPresented: $showOnboarding)
                 .environment(runtime)

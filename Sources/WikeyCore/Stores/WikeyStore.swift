@@ -7,6 +7,8 @@ import Observation
 public final class WikeyStore {
     public private(set) var state = PersistedState()
     public private(set) var lastPersistenceError: String?
+    @ObservationIgnored public var onSave: (() -> Void)?
+    public var storageURL: URL { rootURL }
 
     public var workflows: [Workflow] {
         get { state.workflows }
@@ -81,6 +83,7 @@ public final class WikeyStore {
             let data = try encoder.encode(state)
             try data.write(to: stateURL, options: .atomic)
             lastPersistenceError = nil
+            onSave?()
             return true
         } catch {
             lastPersistenceError = "설정을 저장하지 못했습니다: \(error.localizedDescription)"
@@ -213,6 +216,61 @@ public final class WikeyStore {
         let suffix = formatter.string(from: Date()).replacingOccurrences(of: ":", with: "-")
         let backupURL = rootURL.appendingPathComponent("config-corrupt-\(suffix).json")
         try? FileManager.default.copyItem(at: stateURL, to: backupURL)
+    }
+
+    /// Install a fully validated portable backup. The configuration is committed last;
+    /// isolated asset names keep the previous configuration usable if any write fails.
+    public func installBackup(_ payload: SyncPayload) throws {
+        try commitImportedState(Self.prepareBackup(payload, rootURL: rootURL))
+    }
+
+    /// Preparation touches only new transaction-scoped assets. The sync service calls this
+    /// off the UI actor and rechecks edits before committing the small configuration.
+    nonisolated static func prepareBackup(_ payload: SyncPayload, rootURL: URL) throws -> PersistedState {
+        try payload.validate()
+        var imported = payload.state
+        let templatesURL = rootURL.appendingPathComponent("Templates", isDirectory: true)
+        let transaction = UUID().uuidString
+        let assetsURL = rootURL.appendingPathComponent("SyncedAttachments", isDirectory: true)
+            .appendingPathComponent(transaction, isDirectory: true)
+        try FileManager.default.createDirectory(at: assetsURL, withIntermediateDirectories: true)
+        try FileManager.default.createDirectory(at: templatesURL, withIntermediateDirectories: true)
+        var paths: [String: String] = [:]
+        for (key, asset) in payload.assets {
+            let directory = assetsURL.appendingPathComponent(key, isDirectory: true)
+            try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+            let url = directory.appendingPathComponent(asset.name)
+            try asset.data.write(to: url, options: .atomic)
+            paths[key] = url.path
+        }
+        for index in imported.templates.indices {
+            let id = imported.templates[index].id.uuidString
+            guard let data = payload.templateDocuments[id] else { throw SyncError.invalidArchive }
+            let name = "\(id)-\(transaction).rtfd"
+            try data.write(to: templatesURL.appendingPathComponent(name), options: .atomic)
+            imported.templates[index].fileName = name
+        }
+        for index in imported.workflows.indices {
+            imported.workflows[index].actions = try imported.workflows[index].actions.map { action in
+                switch action {
+                case .pasteFiles(let keys): return .pasteFiles(filePaths: try keys.map { try Self.assetPath($0, in: paths) })
+                case .pasteImages(let keys): return .pasteImages(filePaths: try keys.map { try Self.assetPath($0, in: paths) })
+                default: return action
+                }
+            }
+        }
+        return imported
+    }
+
+    func commitImportedState(_ imported: PersistedState) throws {
+        try encoder.encode(imported).write(to: stateURL, options: .atomic)
+        state = imported
+        lastPersistenceError = nil
+    }
+
+    nonisolated private static func assetPath(_ key: String, in paths: [String: String]) throws -> String {
+        guard let path = paths[key] else { throw SyncError.invalidArchive }
+        return path
     }
 }
 

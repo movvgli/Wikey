@@ -94,8 +94,8 @@ struct OnboardingView: View {
                 )
                 OnboardingFeatureCard(
                     systemImage: "lock.shield.fill",
-                    title: "내 Mac에만 안전하게 저장",
-                    detail: "워크플로와 템플릿은 외부 서버로 보내지 않고 이 Mac에 저장합니다."
+                    title: "기본은 내 Mac에 저장",
+                    detail: "설정은 이 Mac에 보관합니다. 원하면 설정에서 iCloud 동기화를 직접 켤 수 있습니다."
                 )
             }
 
