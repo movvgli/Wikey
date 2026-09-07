@@ -36,7 +36,10 @@ test("site renders installation, privacy and download information without storag
     for (const text of ["macOS 14 이상", "가상 예시", "손쉬운 사용", "입력 모니터링", "releases/latest"]) assert.ok(html.includes(text));
     assert.ok(!html.includes("<form"));
     assert.ok(html.includes('src="./assets/wikey-icon.png"'));
-    assert.ok(html.includes("최신 버전 1.2.6"));
+    assert.ok(html.includes("최신 버전 1.2.7"));
+    assert.ok(html.includes("실제 두 Mac 간 전송은 아직 미검증"));
+    assert.ok(html.includes("기본값은 꺼짐"));
+    assert.ok(!html.includes("클라우드에 업로드하지 않습니다"));
     assert.ok(!html.includes("공개 준비 중"));
     assert.ok(!html.includes("현재 공개: 1.2.4"));
   } finally {
