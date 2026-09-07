@@ -83,7 +83,7 @@ struct ICloudSyncSettingsSection: View {
             Button("개인 폴더 선택…") { showFolderPicker = true }
             Button("취소", role: .cancel) {}
         } message: {
-            Text("단축키, 워크플로, 템플릿 내용, 레이아웃과 연결된 이미지·파일의 사본이 선택한 폴더로 전송됩니다. Wikey 서버나 GitHub에는 올리지 않습니다. 같은 Apple 계정의 Mac에서만 사용할 개인 폴더를 선택하세요.")
+            Text("단축키, 워크플로, 템플릿 내용, 레이아웃과 연결된 이미지·파일의 사본이 선택한 폴더로 전송됩니다.")
         }
         .fileImporter(isPresented: $showFolderPicker, allowedContentTypes: [.folder]) { result in
             switch result {
