@@ -90,6 +90,11 @@ public final class WikeyRuntime {
         reloadHotkeys()
     }
 
+    public func setDockIconVisible(_ visible: Bool) {
+        dockIcon.setVisible(visible)
+        reloadHotkeys()
+    }
+
     public func reloadHotkeys() {
         hotkeys.configure(
             workflows: store.workflows,

@@ -45,6 +45,18 @@ public final class HotkeyRegistrar {
 
     public init(sequenceMonitor: SequenceMonitor = SequenceMonitor()) {
         self.sequenceMonitor = sequenceMonitor
+    }
+
+    deinit {
+        unregisterAll()
+        if let handlerRef { RemoveEventHandler(handlerRef) }
+    }
+
+    private func reinstallEventHandler() {
+        if let handlerRef {
+            RemoveEventHandler(handlerRef)
+            self.handlerRef = nil
+        }
         var eventTypes = [
             EventTypeSpec(eventClass: OSType(kEventClassKeyboard), eventKind: UInt32(kEventHotKeyPressed)),
             EventTypeSpec(eventClass: OSType(kEventClassKeyboard), eventKind: UInt32(kEventHotKeyReleased)),
@@ -57,11 +69,9 @@ public final class HotkeyRegistrar {
             Unmanaged.passUnretained(self).toOpaque(),
             &handlerRef
         )
-    }
-
-    deinit {
-        unregisterAll()
-        if let handlerRef { RemoveEventHandler(handlerRef) }
+        if installationStatus != noErr {
+            shortcutLogger.error("Global shortcut handler installation failed: \(self.installationStatus, privacy: .public)")
+        }
     }
 
     public func configure(
@@ -73,6 +83,11 @@ public final class HotkeyRegistrar {
         configuredApplications = applicationShortcuts
         configuredLayouts = layouts
         unregisterAll()
+        // Changing NSApplication's activation policy (for example, hiding the
+        // Dock icon) can replace the Carbon application event target. Install
+        // the handler only after that policy is final, and refresh it whenever
+        // shortcuts are reloaded.
+        reinstallEventHandler()
         let conflicts = ShortcutConflictDetector.conflicts(
             workflows: workflows,
             applicationShortcuts: applicationShortcuts,

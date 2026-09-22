@@ -108,7 +108,7 @@ struct WikeySettingsView: View {
                                     "Dock에 Wikey 표시",
                                     isOn: Binding(
                                         get: { runtime.dockIcon.isVisible },
-                                        set: { runtime.dockIcon.setVisible($0) }
+                                        set: { runtime.setDockIconVisible($0) }
                                     )
                                 )
                                 .labelsHidden()
