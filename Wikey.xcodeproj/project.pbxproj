@@ -36,6 +36,7 @@
 		9321B69E644F99C715153975 /* InstalledApplicationCatalog.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9A9022F68765B1273395BCD /* InstalledApplicationCatalog.swift */; };
 		9326BA0B076DD5284458D227 /* WikeyRuntimeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51FDEC8A0E2FCB4DFE3AF16D /* WikeyRuntimeTests.swift */; };
 		A29D31B4C0383875CBDE463E /* ApplicationsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C8650191882F2C13EE06D44 /* ApplicationsView.swift */; };
+		A2A5F289B4A7E910E11B6BA3 /* DockIconService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8311B814F3B168ADCFCB038 /* DockIconService.swift */; };
 		A4C4AC1BFE45F2466945A51A /* WindowLayoutControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC2B14662FB8FC6B02D3FA9F /* WindowLayoutControllerTests.swift */; };
 		A5CDA3E6904085F9FAEA757B /* ICloudSyncSettingsSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 89F81B7F60FA22BFA250E4A5 /* ICloudSyncSettingsSection.swift */; };
 		A82F0ABC9CA30EED0A8635F2 /* ShortcutRecorderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 928C51A8110C6A07CC483231 /* ShortcutRecorderView.swift */; };
@@ -48,6 +49,7 @@
 		C6AD3D7ACA38FD462B1A8B80 /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = B66D693FB7A487E2063ACB81 /* Sparkle */; };
 		C8F8C8ACF5F699D21CB5F3D0 /* ClipboardServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A09383B53E374BC48B26ACE /* ClipboardServiceTests.swift */; };
 		CF2B941163616EA8EBA6622D /* WindowLayoutController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5C17D07296F5224CC879898 /* WindowLayoutController.swift */; };
+		D1366FE939AEAC7723F2DF18 /* DockIconServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AD25086AB769827C29D0C69 /* DockIconServiceTests.swift */; };
 		DB1F394805DE2D7195B28F28 /* WikeyCore.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 40179216A1772150F1719EAC /* WikeyCore.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		DD5B1C0F78ADC5846938C905 /* UpdateController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CFCF42AC1BEA3A2CEFF6D14 /* UpdateController.swift */; };
 		E24573A2C1C0FF57A601F03A /* ShortcutModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A806BBE6571A9A314CA4626 /* ShortcutModels.swift */; };
@@ -134,6 +136,7 @@
 		8A79D5DA40723B9FDE481569 /* SyncBackup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncBackup.swift; sourceTree = "<group>"; };
 		8CFCF42AC1BEA3A2CEFF6D14 /* UpdateController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateController.swift; sourceTree = "<group>"; };
 		928C51A8110C6A07CC483231 /* ShortcutRecorderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShortcutRecorderView.swift; sourceTree = "<group>"; };
+		9AD25086AB769827C29D0C69 /* DockIconServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DockIconServiceTests.swift; sourceTree = "<group>"; };
 		9BBFD811CFF41BB6E50326A3 /* KeyboardService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardService.swift; sourceTree = "<group>"; };
 		9CD5FD16E604EF4F1646268C /* RichTextEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RichTextEditor.swift; sourceTree = "<group>"; };
 		A24D53D060BE24564F62CF55 /* WikeyStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WikeyStore.swift; sourceTree = "<group>"; };
@@ -155,6 +158,7 @@
 		E7A58779AA8B13CB411D03F8 /* WorkflowDependencyGraphTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkflowDependencyGraphTests.swift; sourceTree = "<group>"; };
 		EB5E59681CF2AF25BFC5FF4B /* WorkflowRunner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkflowRunner.swift; sourceTree = "<group>"; };
 		F423893B1BA45A8F9760DDEC /* WorkflowReferenceSetupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkflowReferenceSetupView.swift; sourceTree = "<group>"; };
+		F8311B814F3B168ADCFCB038 /* DockIconService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DockIconService.swift; sourceTree = "<group>"; };
 		FC2B14662FB8FC6B02D3FA9F /* WindowLayoutControllerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindowLayoutControllerTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -194,6 +198,7 @@
 			isa = PBXGroup;
 			children = (
 				2A09383B53E374BC48B26ACE /* ClipboardServiceTests.swift */,
+				9AD25086AB769827C29D0C69 /* DockIconServiceTests.swift */,
 				A470959FA842CDFBBE30E373 /* ICloudSyncTests.swift */,
 				6F907DE950E781134887866B /* KeyboardServiceTests.swift */,
 				DED5C2DC0216363FC43B3BF0 /* LayoutZoneTests.swift */,
@@ -241,6 +246,7 @@
 			children = (
 				D115422AEFE98EEB2398A213 /* ApplicationController.swift */,
 				744108B9609996B38F488896 /* ClipboardService.swift */,
+				F8311B814F3B168ADCFCB038 /* DockIconService.swift */,
 				B7262FE82D70589434BC129D /* HotkeyRegistrar.swift */,
 				36B40AE6CCD06A372F012DB3 /* ICloudSyncService.swift */,
 				9BBFD811CFF41BB6E50326A3 /* KeyboardService.swift */,
@@ -507,6 +513,7 @@
 				E77D93BDE77F2DACE4F10BFC /* ApplicationController.swift in Sources */,
 				B2DAC1456C2D128715B1C578 /* AutomationModels.swift in Sources */,
 				B5799D8F35C35736980A3568 /* ClipboardService.swift in Sources */,
+				A2A5F289B4A7E910E11B6BA3 /* DockIconService.swift in Sources */,
 				20CF0164562147E06DC478F2 /* HotkeyRegistrar.swift in Sources */,
 				36F3268859F502F1E228C600 /* ICloudSyncService.swift in Sources */,
 				F8C4225DF9C0D8447F187BCD /* KeyboardService.swift in Sources */,
@@ -559,6 +566,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				C8F8C8ACF5F699D21CB5F3D0 /* ClipboardServiceTests.swift in Sources */,
+				D1366FE939AEAC7723F2DF18 /* DockIconServiceTests.swift in Sources */,
 				212EB4359479D9620C2B2781 /* ICloudSyncTests.swift in Sources */,
 				C4498FA942718AE545DBA12B /* KeyboardServiceTests.swift in Sources */,
 				445E014CC3B3C6F67694C884 /* LayoutZoneTests.swift in Sources */,

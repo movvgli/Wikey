@@ -52,7 +52,7 @@ struct WikeyApp: App {
             }
         }
 
-        MenuBarExtra("Wikey", systemImage: menuBarSymbol) {
+        MenuBarExtra("Wikey", systemImage: menuBarSymbol, isInserted: .constant(true)) {
             MenuBarContentView()
                 .environment(runtime)
                 .environment(updates)
@@ -76,7 +76,11 @@ struct WikeyApp: App {
 
 final class WikeyAppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
-        NSApp.setActivationPolicy(.regular)
+        ProcessInfo.processInfo.disableAutomaticTermination("Wikey menu bar runtime")
+        let activationPolicy = DockIconService.activationPolicy(for: DockIconService.savedVisibility())
+        if NSApp.activationPolicy() != activationPolicy {
+            NSApp.setActivationPolicy(activationPolicy)
+        }
         if ProcessInfo.processInfo.arguments.contains("--background") {
             DispatchQueue.main.async { NSApp.hide(nil) }
         } else {

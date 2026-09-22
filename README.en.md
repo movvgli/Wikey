@@ -43,7 +43,7 @@ Starting with 1.2.6, Wikey targets macOS 14 or later. Apple Silicon and Intel bu
 | Key input and waits | Add Enter, Shift + Enter, and waits of 0.1–30 seconds between actions. |
 | Window layouts | Arrange windows on connected displays in full, half, third, two-thirds, and quadrant zones. Assign a shortcut directly to a layout. |
 | Execution controls | See the current action and queued runs, or stop execution and clear the queue. |
-| Quick access | Run workflows from the menu bar and prepare Wikey at login. |
+| Quick access | Run workflows from the menu bar and prepare Wikey at login. You can optionally show its Dock icon in Settings. |
 | Updates | Check, download, and install new versions inside the app. |
 
 If an action fails, Wikey stops the remaining actions in that workflow and identifies the failing step. For example, a failed app launch will not be followed by a paste or Enter action. Actions that have already completed are not undone.

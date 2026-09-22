@@ -7,6 +7,7 @@ public final class WikeyRuntime {
     public let store: WikeyStore
     public let permissions: PermissionCenter
     public let loginItem: LoginItemService
+    public let dockIcon: DockIconService
     public let applications: ApplicationController
     public let clipboard: ClipboardService
     public let keyboard: KeyboardService
@@ -33,6 +34,7 @@ public final class WikeyRuntime {
         self.iCloudSync = ICloudSyncService(store: store)
         self.permissions = PermissionCenter()
         self.loginItem = LoginItemService()
+        self.dockIcon = DockIconService()
         self.applications = applications
         self.clipboard = clipboard
         self.keyboard = keyboard

@@ -65,6 +65,7 @@ targets:
         CFBundleVersion: $(CURRENT_PROJECT_VERSION)
         LSApplicationCategoryType: public.app-category.productivity
         LSMinimumSystemVersion: "14.0"
+        LSUIElement: true
         SUEnableAutomaticChecks: true
         SUAutomaticallyUpdate: false
         SUFeedURL: https://raw.githubusercontent.com/movvgli/Wikey/update-feed/appcast.xml

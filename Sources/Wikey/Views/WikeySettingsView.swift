@@ -90,38 +90,68 @@ struct WikeySettingsView: View {
 
                 WikeySection(title: "일반") {
                     PlainPanel {
-                        VStack(alignment: .leading, spacing: 12) {
-                            HStack {
+                        VStack(alignment: .leading, spacing: 0) {
+                            HStack(spacing: 12) {
+                                Image(systemName: "dock.rectangle")
+                                    .foregroundStyle(.secondary)
+                                    .font(.title3)
+                                    .frame(width: 30)
                                 VStack(alignment: .leading, spacing: 3) {
-                                    Text("로그인 시 Wikey 실행")
+                                    Text("Dock에 Wikey 표시")
                                         .font(.headline)
-                                    Text("메인 창은 열지 않고 메뉴 막대와 단축키만 준비합니다.")
+                                    Text("끄면 메뉴 막대에만 아이콘을 표시합니다.")
                                         .font(.subheadline)
                                         .foregroundStyle(.secondary)
                                 }
                                 Spacer()
                                 Toggle(
-                                    "로그인 시 실행",
+                                    "Dock에 Wikey 표시",
                                     isOn: Binding(
-                                        get: { runtime.loginItem.isEnabled },
-                                        set: { runtime.loginItem.setEnabled($0) }
+                                        get: { runtime.dockIcon.isVisible },
+                                        set: { runtime.dockIcon.setVisible($0) }
                                     )
                                 )
                                 .labelsHidden()
                                 .toggleStyle(.switch)
                             }
+                            .padding(.vertical, 12)
 
-                            if runtime.loginItem.status == .requiresApproval {
-                                Label("macOS 설정에서 로그인 항목을 허용해 주세요.", systemImage: "info.circle")
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
-                                Button("로그인 항목 설정 열기") { runtime.loginItem.openSystemSettings() }
+                            Divider().padding(.leading, 42)
+
+                            VStack(alignment: .leading, spacing: 12) {
+                                HStack {
+                                    VStack(alignment: .leading, spacing: 3) {
+                                        Text("로그인 시 Wikey 실행")
+                                            .font(.headline)
+                                        Text("메인 창은 열지 않고 메뉴 막대와 단축키만 준비합니다.")
+                                            .font(.subheadline)
+                                            .foregroundStyle(.secondary)
+                                    }
+                                    Spacer()
+                                    Toggle(
+                                        "로그인 시 실행",
+                                        isOn: Binding(
+                                            get: { runtime.loginItem.isEnabled },
+                                            set: { runtime.loginItem.setEnabled($0) }
+                                        )
+                                    )
+                                    .labelsHidden()
+                                    .toggleStyle(.switch)
+                                }
+
+                                if runtime.loginItem.status == .requiresApproval {
+                                    Label("macOS 설정에서 로그인 항목을 허용해 주세요.", systemImage: "info.circle")
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
+                                    Button("로그인 항목 설정 열기") { runtime.loginItem.openSystemSettings() }
+                                }
+                                if let error = runtime.loginItem.lastError {
+                                    Label(error, systemImage: "exclamationmark.triangle")
+                                        .font(.caption)
+                                        .foregroundStyle(.red)
+                                }
                             }
-                            if let error = runtime.loginItem.lastError {
-                                Label(error, systemImage: "exclamationmark.triangle")
-                                    .font(.caption)
-                                    .foregroundStyle(.red)
-                            }
+                            .padding(.vertical, 12)
                         }
                     }
                 }
