@@ -95,6 +95,10 @@ final class WikeyAppDelegate: NSObject, NSApplicationDelegate {
         sender.activate(ignoringOtherApps: true)
         return true
     }
+
+    func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
+        false
+    }
 }
 
 func shortMenuTitle(_ title: String) -> String {
